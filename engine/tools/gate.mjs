@@ -24,6 +24,7 @@ const TMP = resolve(".tmp/gate"); mkdirSync(TMP, { recursive: true });
 
 let fails = 0, checks = 0;
 const say = (ok, label, detail = "") => { checks++; if (!ok) fails++; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${detail ? "   " + detail : ""}`); };
+const note = (label, detail = "") => console.log(`  ----  ${label}${detail ? "   " + detail : ""}`); // not applicable: printed, never counted
 const head = (n, t) => console.log(`\n${n}. ${t}\n${"-".repeat(58)}`);
 
 // ---------------------------------------------------------------- 2. the contract, statically
@@ -133,11 +134,15 @@ const run = async () => {
         : `        DIAGNOSIS: frame ${bad} is stable within a session; the difference is between sessions.`);
     }
   }
-  say(aud1 && aud2 ? aud1.pcm16 === aud2.pcm16 : false, "the synthesized audio is identical across sessions", aud1 ? `${aud1.frames} samples @ ${aud1.sampleRate} Hz` : "no audio");
+  // A silent piece (a still, a loop, a logo) has nothing to compare; a score that appears in one
+  // session and not the other is still a failure.
+  if (!aud1 && !aud2) note("no score in this piece", "audio check not applicable");
+  else say(aud1 && aud2 ? aud1.pcm16 === aud2.pcm16 : false, "the synthesized audio is identical across sessions", aud1 ? `${aud1.frames} samples @ ${aud1.sampleRate} Hz` : "no audio");
   await s2.close();
 
   const nFiles = contractScan();
-  deadAir(resolve(opt.mp4 ?? `out/${film.replace(/([A-Z])/g, "-$1").toLowerCase()}.mp4`));
+  if (N === 1) { head(3, "DEAD AIR  something visibly moves in every second"); note("a still, one frame long", "dead air not applicable"); }
+  else deadAir(resolve(opt.mp4 ?? `out/${film.replace(/([A-Z])/g, "-$1").toLowerCase()}.mp4`));
 
   if (art) {
     head(4, `ARTIFACT  what this adapter delivers`);

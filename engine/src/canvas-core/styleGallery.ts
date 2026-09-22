@@ -9,13 +9,14 @@ import { drawWren } from "./wren";
 import { drawMoonPhases } from "./moonPhases";
 import { drawFox } from "./fox";
 import { drawLighthouse } from "./lighthouse";
+import { drawMellan } from "./mellan";
 
-// THE STYLE GALLERY. Eight subjects, eight hands, one engine, laid out as a contact sheet.
+// THE STYLE GALLERY. Nine styles, each on its own subject, laid out as a contact sheet.
 // The sheet is itself a film drawn by code: every tile is its subject's own pure draw function,
 // rendered at full size into an offscreen surface and set down on the sheet, so the gallery is
 // exactly as asset-free and as reproducible as the pictures on it. Nothing here is a photograph.
 
-const TILE = 1000, GUT = 44, LAB = 92, HEAD = 150, COLS = 4, ROWS = 2;
+const TILE = 1000, GUT = 44, LAB = 92, HEAD = 150, COLS = 3, ROWS = 3;
 const GW = COLS * TILE + (COLS + 1) * GUT, GH = HEAD + ROWS * (TILE + LAB) + (ROWS + 1) * GUT;
 const SHEET = "#eee8dc", INKC = "#2a2521", MUTED = "#8a7f72";
 
@@ -28,6 +29,7 @@ const PLATES: { draw: (ctx: Ctx, f: number, env: Env) => void; style: string; su
   { draw: drawMoonPhases, style: "CHALKBOARD", subject: "PHASES OF THE MOON" },
   { draw: drawFox, style: "CUT-PAPER COLLAGE", subject: "FOX AT DUSK" },
   { draw: drawLighthouse, style: "RISOGRAPH", subject: "LIGHTHOUSE AT SUNSET" },
+  { draw: (ctx, f, env) => drawMellan(ctx, f, env, 1), style: "SINGLE-LINE ENGRAVING", subject: "THE MOON, ONE UNBROKEN SPIRAL" },
 ];
 
 export const drawStyleGallery = (ctx: Ctx, _frame: number, env: Env) => {
@@ -53,8 +55,8 @@ export const drawStyleGallery = (ctx: Ctx, _frame: number, env: Env) => {
     letter(g, p.style, x + 64, y + TILE + 30, { cap: 26, color: INKC, seed: 910 + i, w: 2.4, opacity: 0.95 });
     letter(g, p.subject, x + 64, y + TILE + 66, { cap: 17, color: MUTED, seed: 920 + i, w: 1.6, opacity: 0.9 });
   });
-  letter(g, "ANIDOODLE  /  EIGHT HANDS, ONE ENGINE", GUT, 52, { cap: 46, color: INKC, seed: 1, w: 3.2, opacity: 0.95 });
-  letter(g, "EVERY MARK DRAWN IN CODE. NO PHOTOGRAPHS, NO IMAGE OR AUDIO ASSETS, EVERY PLATE DETERMINISTIC.", GUT, 118, { cap: 19, color: MUTED, seed: 2, w: 1.7, opacity: 0.9 });
+  letter(g, "ANIDOODLE  /  NINE STYLES TO CHOOSE FROM", GUT, 52, { cap: 46, color: INKC, seed: 1, w: 3.2, opacity: 0.95 });
+  letter(g, "EVERY MARK DRAWN IN CODE. EVERY PLATE REBUILDS PIXEL FOR PIXEL FROM ITS OWN SOURCE.", GUT, 118, { cap: 19, color: MUTED, seed: 2, w: 1.7, opacity: 0.9 });
 };
 
 export const styleGallery: Film = {

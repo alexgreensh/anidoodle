@@ -35,7 +35,7 @@ export const pageChecks = (html) => {
     { ok: has(/fetch\(|XMLHttpRequest|importScripts/g) === 0, label: "no network call in the bundle", detail: `${has(/fetch\(|XMLHttpRequest|importScripts/g)} found` },
     { ok: assets ? assets[1].trim() === "{}" : false, label: "the asset manifest is empty", detail: assets ? assets[1].trim() : "manifest absent" },
     { ok: /window\.FILM\s*=/.test(html), label: "exposes window.FILM so any host can drive it", detail: "" },
-    { ok: /audio\s*[:(]/.test(html), label: "carries its own audio, synthesized in the page", detail: "" },
+    { ok: /audio\s*[:(]/.test(html), label: "any score is synthesized in the page, never loaded", detail: "" },
   ];
 };
 

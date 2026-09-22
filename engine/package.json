@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Portable art core + backend adapters for a film drawn entirely by code.",
+  "description": "Portable art core + backend adapters for illustrations, animations and films drawn entirely in code.",
   "scripts": {
     "still": "node tools/still.mjs",
     "gate": "node tools/gate.mjs",

@@ -1,5 +1,12 @@
-// node tools/render.mjs [film] [--scale 1] [--workers 4] [--out out/x.mp4]
+// node tools/render.mjs [film] [--scale 1] [--workers 4] [--out out/x.mp4|.gif|.webm|.apng] [--gif-fps 15] [--width 640]
 // Auto-detects a backend, renders every frame through it, encodes with ffmpeg, then VERIFIES.
+//   .mp4   the film, with its score
+//   .gif   loops and README heroes: silent, loops forever, ONE palette built from the whole piece
+//          so a wash does not band differently from frame to frame
+//   .webm  VP9 with its alpha kept: stickers and overlays. Leave the background unpainted and
+//          whatever sits behind the page shows through
+//   .apng  animated PNG, alpha kept, loops forever, plays in every browser
+// --width only applies to the silent formats; the MP4 is always the film's own size.
 import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { cpus } from "node:os";
@@ -10,7 +17,7 @@ import * as playwright from "./adapters/playwright.mjs";
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const film = process.argv[2] && !process.argv[2].startsWith("--") ? process.argv[2] : "fixtures";
-const scale = Number(arg("scale", 1)), workers = Number(arg("workers", Math.max(1, Math.min(4, Math.floor(cpus().length / 2))))), out = resolve(arg("out", `out/${film}.mp4`));
+const scale = Number(arg("scale", 1)), fmt = (arg("out", "").match(/\.(gif|webm|apng)$/i)?.[1] ?? "mp4").toLowerCase(), workers = Number(arg("workers", Math.max(1, Math.min(4, Math.floor(cpus().length / 2))))), out = resolve(arg("out", `out/${film}.mp4`));
 
 const env = detect();
 console.log("backends found:"); for (const [k, v] of Object.entries(env.report)) console.log(`  ${k.padEnd(11)} ${v}`);
@@ -27,7 +34,16 @@ mkdirSync(resolve(".tmp"), { recursive: true }); const wav = resolve(`.tmp/${fil
 if (a) { const pcm = Buffer.from(a.pcm16, "base64"), h = Buffer.alloc(44); h.write("RIFF", 0); h.writeUInt32LE(36 + pcm.length, 4); h.write("WAVEfmt ", 8); h.writeUInt32LE(16, 16); h.writeUInt16LE(1, 20); h.writeUInt16LE(2, 22); h.writeUInt32LE(a.sampleRate, 24); h.writeUInt32LE(a.sampleRate * 4, 28); h.writeUInt16LE(4, 32); h.writeUInt16LE(16, 34); h.write("data", 36); h.writeUInt32LE(pcm.length, 40); writeFileSync(wav, Buffer.concat([h, pcm])); }
 
 mkdirSync(join(out, ".."), { recursive: true });
-const ff = spawn(env.ffmpeg.bin, ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(meta.fps), "-c:v", "png", "-i", "-", ...(a ? ["-i", wav] : []), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", "-preset", "medium", ...(a ? ["-c:a", "aac", "-b:a", "192k", "-shortest"] : []), "-movflags", "+faststart", out], { stdio: ["pipe", "inherit", "inherit"] });
+const input = ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(meta.fps), "-c:v", "png", "-i", "-"];
+const gifFps = Math.min(meta.fps, Number(arg("gif-fps", 15))), width = Number(arg("width", Math.min(640, Math.round(meta.W * scale))));
+const size = `scale=${width}:-2:flags=lanczos`;
+const encode = {
+  gif: [...input, "-vf", `fps=${gifFps},${size},split[a][b];[a]palettegen=stats_mode=full[p];[b][p]paletteuse=dither=sierra2_4a`, "-loop", "0", out],
+  webm: [...input, "-vf", size, "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-b:v", "0", "-crf", "30", "-an", out],
+  apng: [...input, "-vf", size, "-f", "apng", "-plays", "0", out],
+  mp4: [...input, ...(a ? ["-i", wav] : []), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", "-preset", "medium", ...(a ? ["-c:a", "aac", "-b:a", "192k", "-shortest"] : []), "-movflags", "+faststart", out],
+}[fmt];
+const ff = spawn(env.ffmpeg.bin, encode, { stdio: ["pipe", "inherit", "inherit"] });
 const done = new Promise((res, rej) => ff.on("close", (c) => (c ? rej(new Error(`ffmpeg exited ${c}`)) : res())));
 
 // frames render in parallel across pages, and are fed to ffmpeg strictly in order

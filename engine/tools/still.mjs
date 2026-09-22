@@ -1,5 +1,5 @@
 // STILL. One frame of one film, at full resolution, to a path a human can open.
-//   node tools/still.mjs <film> --shot <id> --out out/x.png [--scale 1]
+//   node tools/still.mjs <film> [--shot <id>] [--frame N] [--out out/x.png] [--scale 1]
 // The look still is rendered many times before a single frame of motion is, so
 // this does exactly that and nothing else: build the page, draw the frame, write the PNG, print
 // the draw cost and the frame's hash so a re-render can be proved identical.
@@ -14,11 +14,12 @@ const VAL = new Set(["shot", "out", "scale", "frame"]);
 const pos = [], opt = {};
 for (let i = 2; i < process.argv.length; i++) { const a = process.argv[i]; if (a.startsWith("--")) opt[a.slice(2)] = VAL.has(a.slice(2)) ? process.argv[++i] : true; else pos.push(a); }
 const die = (m) => { console.error(`still: ${m}`); process.exit(1); };
-const film = pos[0] ?? die("usage: node tools/still.mjs <film> --shot <id> --out out/x.png [--scale 1]");
+const film = pos[0] ?? die("usage: node tools/still.mjs <film> [--shot <id>] [--frame N] [--out out/x.png] [--scale 1]");
 const scale = Number(opt.scale ?? 1);
 
 const env = detect();
-if (!env.chosen) die("no render backend found; the HTML player still works: node tools/build-page.mjs " + film);
+// A still needs a browser and nothing else: ffmpeg only matters once there is motion to encode.
+if (!env.pw.ok || !env.browser.ok) die(`no browser to draw in.\n  playwright: ${env.report.playwright}\n  browser:    ${env.report.browser}\n  fix: npm install, then npx playwright-core install chromium`);
 const page = await buildPage({ entry: `src/hosts/page-${film}.ts`, out: resolve(`dist/${film}.html`), title: film });
 const session = await playwright.open(env, page.out, { scale, workers: 1 });
 const meta = await session.info();
