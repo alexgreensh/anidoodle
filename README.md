@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.gif" width="100%" alt="anidoodle: an artist's table of code-drawn doodles, with the name writing itself in calligraphy"><br>
+</p>
+
 # anidoodle
 
 **A film, drawn entirely in code. Every pixel is painted by a function, every note is synthesized, and the same seed draws the same picture forever.**

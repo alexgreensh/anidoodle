@@ -11,7 +11,3 @@ _readme-preview.html
 _*.png
 .style-gallery-brief.md
 .banner-brief.md
-
-# work in progress, lands in a later release
-engine/src/canvas-core/banner.ts
-engine/src/hosts/page-banner.ts

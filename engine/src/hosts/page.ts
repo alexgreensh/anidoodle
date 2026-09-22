@@ -10,8 +10,9 @@ export const mountFilm = (film: Film) => {
   const canvas = document.getElementById("film") as HTMLCanvasElement, images = new Map<string, CanvasImageSource>();
   let env: Env, ctx: Ctx, current = 0;
   // Safari before 16.4 has no 2D OffscreenCanvas: fall back to a detached <canvas>. The core cannot tell the difference.
-  const surface = (w: number, h: number): Layer => { const c = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h }); return { canvas: c, ctx: c.getContext("2d") as unknown as Ctx } as Layer; };
-  const mount = (scale = 1) => { canvas.width = Math.round(film.meta.W * scale); canvas.height = Math.round(film.meta.H * scale); ctx = canvas.getContext("2d")!; env = { W: film.meta.W, H: film.meta.H, scale, cache: new Map(), canvas: surface, image: (n) => images.get(n) }; return film.meta; };
+  const opts = film.meta.raster === "cpu" ? { willReadFrequently: true } : undefined;   // see Film.meta.raster
+  const surface = (w: number, h: number): Layer => { const c = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h }); return { canvas: c, ctx: c.getContext("2d", opts) as unknown as Ctx } as Layer; };
+  const mount = (scale = 1) => { canvas.width = Math.round(film.meta.W * scale); canvas.height = Math.round(film.meta.H * scale); ctx = canvas.getContext("2d", opts) as CanvasRenderingContext2D; env = { W: film.meta.W, H: film.meta.H, scale, cache: new Map(), canvas: surface, image: (n) => images.get(n) }; return film.meta; };
   // contract rule 4: every asset is loaded AND decoded before frame 0, or the film refuses to start
   const ready = (async () => {
     const problems = validate(film); if (problems.length) throw new Error("timeline: " + problems.join("; "));

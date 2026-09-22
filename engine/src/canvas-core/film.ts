@@ -4,7 +4,11 @@ import type { Ctx, Env } from "./core";
 
 export type Shot = { id: string; start: number; end: number; draw: (ctx: Ctx, local: number, env: Env) => void }; // frames, end exclusive
 export type Assets = { images: Record<string, string>; fonts?: Record<string, string> }; // name -> url (the page build inlines them)
-export type Film = { meta: { title: string; W: number; H: number; fps: number; bpm: number; durationFrames: number }; assets: Assets; shots: Shot[]; audio?: (sampleRate: number) => [Float32Array, Float32Array] };
+// raster "cpu": every canvas of the film is rasterised in software. Chromium gives each page a
+// GPU canvas budget, and when several pages render at once with big layer pools some surfaces
+// silently fall back to software, which antialiases differently: the same frame then comes out
+// in more than one way depending on timing. Software everywhere is the same everywhere.
+export type Film = { meta: { title: string; W: number; H: number; fps: number; bpm: number; durationFrames: number; raster?: "gpu" | "cpu" }; assets: Assets; shots: Shot[]; audio?: (sampleRate: number) => [Float32Array, Float32Array] };
 
 // Cheap structural checks every adapter runs before frame 0. (The full gate is Phase 2.)
 export const validate = (film: Film): string[] => {
