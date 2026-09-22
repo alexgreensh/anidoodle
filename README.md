@@ -74,7 +74,9 @@ Every format ships from the same source: PNG, MP4 with its score, GIF, WebM and 
   </tr>
 </table>
 
-<p align="center"><strong>▶ <a href="assets/mechanical-lepidoptera.mp4">Watch the full 47-second film</a></strong> · 1080×1080 with an original score, every frame and sample generated in code</p>
+**▶ The full 47-second film**, sound on. 1080×1080 with an original score, every frame and sample generated in code:
+
+https://github.com/user-attachments/assets/019d46d3-536a-4843-9f68-8e8f5f5c3401
 
 One pure function paints each frame, so a finished illustration is that function called once, a sticker is the same function on a loop, and a film is it with a story and a score. The same guarantees hold for all three.
 
