@@ -1,0 +1,17 @@
+# build + render output
+engine/node_modules/
+engine/out/
+engine/dist/
+engine/.tmp/
+**/*.log
+.DS_Store
+
+# local scratch (internal, never ship)
+_readme-preview.html
+_*.png
+.style-gallery-brief.md
+.banner-brief.md
+
+# work in progress, lands in a later release
+engine/src/canvas-core/banner.ts
+engine/src/hosts/page-banner.ts
