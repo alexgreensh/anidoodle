@@ -8,6 +8,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadRegistry, ROOT } from "./registry.mjs";
+import { relative } from "node:path";
 
 const registry = loadRegistry(), COUNT = registry.length;
 let fails = 0;
@@ -42,7 +43,9 @@ const numRe = (lex) => {
 };
 const numVal = (tok, lex) => /^\d/.test(tok) ? parseInt(tok.replace(/[.,]/g, ""), 10) : lex[tok.toLowerCase()];
 
-const docs = ["SKILL.md", ...readdirSync(ROOT).filter((f) => /^README.*\.md$/.test(f)).sort()];
+// READMEs live beside SKILL.md in a plain skill folder, or at the repo root when the skill ships as a plugin (skills/<name>/).
+const README_DIR = readdirSync(ROOT).some((f) => /^README.*\.md$/.test(f)) ? ROOT : join(ROOT, "..", "..");
+const docs = ["SKILL.md", ...readdirSync(README_DIR).filter((f) => /^README.*\.md$/.test(f)).sort().map((f) => relative(ROOT, join(README_DIR, f)))];
 const WINDOW = 45;
 let claims = 0;
 for (const doc of docs) {

@@ -58,14 +58,14 @@ Ask in plain words, *"a risograph lighthouse for our careers page, 1600×900"* o
 
 The engine is the easy half. The craft is the part anidoodle carries for you, six lessons, each one earned by getting a piece wrong first and written down so you start where the last project ended:
 
-- **Story** gives every piece a point. One idea and one focal subject for a still; one transformation, one payoff and one returning token for a film. → [`storytelling.md`](references/storytelling.md)
-- **Realism** comes from naming it. The anatomy, the view and the reference you opened, so a butterfly reads as a creature with a body and veins. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **Style** lives in the mark. Thirty-one full recipes, a guide for picking one per job, and the steps for inventing your own. → [`styles.md`](references/styles.md)
-- **Music** is composed as notes and synthesized in code: a modelled piano and a dozen instruments, every major and minor mode, moods per section, and a theme that fits any length. → [`music/README.md`](references/music/README.md)
-- **Determinism** is the guarantee. Pure functions and a seeded random, so anyone with the source rebuilds the exact same piece. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
-- **Method** keeps you fast. Prove the look on one still, build straight through, and spend approval where being wrong is expensive. → [`working-method.md`](references/working-method.md)
+- **Story** gives every piece a point. One idea and one focal subject for a still; one transformation, one payoff and one returning token for a film. → [`storytelling.md`](skills/anidoodle/references/storytelling.md)
+- **Realism** comes from naming it. The anatomy, the view and the reference you opened, so a butterfly reads as a creature with a body and veins. → [`realism-and-craft.md`](skills/anidoodle/references/realism-and-craft.md)
+- **Style** lives in the mark. Thirty-one full recipes, a guide for picking one per job, and the steps for inventing your own. → [`styles.md`](skills/anidoodle/references/styles.md)
+- **Music** is composed as notes and synthesized in code: a modelled piano and a dozen instruments, every major and minor mode, moods per section, and a theme that fits any length. → [`music/README.md`](skills/anidoodle/references/music/README.md)
+- **Determinism** is the guarantee. Pure functions and a seeded random, so anyone with the source rebuilds the exact same piece. → [`determinism-and-contract.md`](skills/anidoodle/references/determinism-and-contract.md)
+- **Method** keeps you fast. Prove the look on one still, build straight through, and spend approval where being wrong is expensive. → [`working-method.md`](skills/anidoodle/references/working-method.md)
 
-Every format ships from the same source: PNG, MP4 with its score, GIF, WebM and animated PNG with transparency, and one self-contained HTML file. → [`formats.md`](references/formats.md)
+Every format ships from the same source: PNG, MP4 with its score, GIF, WebM and animated PNG with transparency, and one self-contained HTML file. → [`formats.md`](skills/anidoodle/references/formats.md)
 
 ## It draws, then it moves
 
@@ -129,7 +129,7 @@ Four backends share one art core, and the core stays blissfully unaware of which
 
 ## The example film
 
-`example/` holds **Mechanical Lepidoptera**: 1,410 frames, 47 seconds, a clockwork butterfly that drafts itself, comes alive in watercolour, and leaves its blueprint in the grass. It is the whole engine in one piece: control points placed by hand over real anatomy, a cache key that names every input a pixel depends on, a score built from the recipe, and one unbroken move from built to alive. The style plates sit beside the engine in `engine/src/canvas-core/`, each with its recipe written at the top. Open any of them, change a number, and watch what moves.
+`skills/anidoodle/example/` holds **Mechanical Lepidoptera**: 1,410 frames, 47 seconds, a clockwork butterfly that drafts itself, comes alive in watercolour, and leaves its blueprint in the grass. It is the whole engine in one piece: control points placed by hand over real anatomy, a cache key that names every input a pixel depends on, a score built from the recipe, and one unbroken move from built to alive. The style plates sit beside the engine in `skills/anidoodle/engine/src/canvas-core/`, each with its recipe written at the top. Open any of them, change a number, and watch what moves.
 
 ## Honest by design
 

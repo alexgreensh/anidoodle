@@ -1,8 +1,8 @@
 # build + render output
-engine/node_modules/
-engine/out/
-engine/dist/
-engine/.tmp/
+skills/anidoodle/engine/node_modules/
+skills/anidoodle/engine/out/
+skills/anidoodle/engine/dist/
+skills/anidoodle/engine/.tmp/
 **/*.log
 .DS_Store
 
@@ -14,11 +14,11 @@ _*.png
 
 # PRIVATE, never ship: the owner's personal recreations and studies of others' artwork
 # (Louis keepsakes, the orchard frame study, the Clawd lesson). Kept locally only.
-engine/src/canvas-core/cat*.ts
-engine/src/hosts/page-cat*.ts
-engine/src/canvas-core/folkTaleStudy*.ts
-engine/src/hosts/page-folkTaleStudy.ts
-engine/src/canvas-core/lessonClawd*.ts
-engine/src/hosts/page-lessonClawd*.ts
+skills/anidoodle/engine/src/canvas-core/cat*.ts
+skills/anidoodle/engine/src/hosts/page-cat*.ts
+skills/anidoodle/engine/src/canvas-core/folkTaleStudy*.ts
+skills/anidoodle/engine/src/hosts/page-folkTaleStudy.ts
+skills/anidoodle/engine/src/canvas-core/lessonClawd*.ts
+skills/anidoodle/engine/src/hosts/page-lessonClawd*.ts
 # agent worktrees
 .claude/

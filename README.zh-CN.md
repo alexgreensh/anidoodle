@@ -58,14 +58,14 @@
 
 引擎只是简单的那一半。真正的功夫，是 anidoodle 替你背下来的六条心得，每一条都是先画砸了一次才换来的经验，写下来是为了让你从上一个项目结束的地方接着开始：
 
-- **故事**，让每件作品都有一个重点。一张静态图只讲一个想法、聚焦一个主体；一部短片只有一次转变、一个高潮，和一个反复出现的意象。→ [`storytelling.md`](references/storytelling.md)
-- **写实感**，来自把它说清楚。解剖结构、观察视角，以及你参考过的资料，都要交代明白，这样一只蝴蝶读起来才像是一个有身体、有翅脉的真实生物。→ [`realism-and-craft.md`](references/realism-and-craft.md)
-- **风格**，活在笔触里。31 套完整配方，外加一份按场合挑风格的指南，以及自创风格的步骤。→ [`styles.md`](references/styles.md)
-- **音乐**，先写成音符，再由代码合成：建模钢琴和十余种乐器、所有大小调、每个段落各自的情绪，以及能适配任意时长的主题旋律。→ [`music/README.md`](references/music/README.md)
-- **确定性**，是这套系统的承诺。纯函数加上带种子的随机数，任何人拿到源码都能重建出一模一样的作品。→ [`determinism-and-contract.md`](references/determinism-and-contract.md)
-- **方法**，让你保持速度。先用一张静态图验证效果，再一路做到底，把审批环节留给那些出错代价高的地方。→ [`working-method.md`](references/working-method.md)
+- **故事**，让每件作品都有一个重点。一张静态图只讲一个想法、聚焦一个主体；一部短片只有一次转变、一个高潮，和一个反复出现的意象。→ [`storytelling.md`](skills/anidoodle/references/storytelling.md)
+- **写实感**，来自把它说清楚。解剖结构、观察视角，以及你参考过的资料，都要交代明白，这样一只蝴蝶读起来才像是一个有身体、有翅脉的真实生物。→ [`realism-and-craft.md`](skills/anidoodle/references/realism-and-craft.md)
+- **风格**，活在笔触里。31 套完整配方，外加一份按场合挑风格的指南，以及自创风格的步骤。→ [`styles.md`](skills/anidoodle/references/styles.md)
+- **音乐**，先写成音符，再由代码合成：建模钢琴和十余种乐器、所有大小调、每个段落各自的情绪，以及能适配任意时长的主题旋律。→ [`music/README.md`](skills/anidoodle/references/music/README.md)
+- **确定性**，是这套系统的承诺。纯函数加上带种子的随机数，任何人拿到源码都能重建出一模一样的作品。→ [`determinism-and-contract.md`](skills/anidoodle/references/determinism-and-contract.md)
+- **方法**，让你保持速度。先用一张静态图验证效果，再一路做到底，把审批环节留给那些出错代价高的地方。→ [`working-method.md`](skills/anidoodle/references/working-method.md)
 
-每种格式都出自同一份源码：PNG、带配乐的 MP4、GIF、透明的 WebM 和动态 PNG，还有一个自包含的 HTML 文件。→ [`formats.md`](references/formats.md)
+每种格式都出自同一份源码：PNG、带配乐的 MP4、GIF、透明的 WebM 和动态 PNG，还有一个自包含的 HTML 文件。→ [`formats.md`](skills/anidoodle/references/formats.md)
 
 ## 先画，后动
 
@@ -129,7 +129,7 @@ node tools/gate.mjs   hero                                 # determinism, contra
 
 ## 示例短片
 
-`example/` 目录里放着**机械鳞翅目**（Mechanical Lepidoptera）：1,410 帧，47 秒，一只机械蝴蝶自己画出自己的图纸，在水彩中苏醒过来，又把蓝图留在了草丛里。这一部作品，就是整个引擎的缩影：控制点是按照真实解剖结构手工摆放的，缓存键记录了每个像素依赖的每一个输入，配乐按照配方生成，从画成到活过来，是一气呵成的一个动作。风格样图和引擎放在一起，都在 `engine/src/canvas-core/` 里，每一张的顶部都写着自己的配方。随便打开一个，改一个数字，看看会发生什么变化。
+`skills/anidoodle/example/` 目录里放着**机械鳞翅目**（Mechanical Lepidoptera）：1,410 帧，47 秒，一只机械蝴蝶自己画出自己的图纸，在水彩中苏醒过来，又把蓝图留在了草丛里。这一部作品，就是整个引擎的缩影：控制点是按照真实解剖结构手工摆放的，缓存键记录了每个像素依赖的每一个输入，配乐按照配方生成，从画成到活过来，是一气呵成的一个动作。风格样图和引擎放在一起，都在 `skills/anidoodle/engine/src/canvas-core/` 里，每一张的顶部都写着自己的配方。随便打开一个，改一个数字，看看会发生什么变化。
 
 ## 诚实是设计出来的
 

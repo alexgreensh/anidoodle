@@ -58,14 +58,14 @@ Demandez avec vos propres mots, *« un phare en risographie pour notre page carr
 
 Le moteur, c'est la partie facile. Le métier, c'est ce qu'anidoodle porte pour vous : six leçons, chacune acquise en se trompant d'abord sur une pièce, puis couchée sur le papier pour que vous repreniez là où s'est arrêté le dernier projet :
 
-- **Le récit** donne un sens à chaque pièce. Une idée et un sujet focal pour une image fixe ; une transformation, une résolution et un motif qui revient pour un film. → [`storytelling.md`](references/storytelling.md)
-- **Le réalisme** vient du fait de le nommer. L'anatomie, l'angle de vue et la référence que vous avez ouverte, pour qu'un papillon se lise comme une créature avec un corps et des nervures. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **Le style** habite la trace. Trente et une recettes complètes, un guide pour en choisir une par projet, et la marche à suivre pour inventer la vôtre. → [`styles.md`](references/styles.md)
-- **La musique** se compose en notes et se synthétise par code : un piano modélisé et une douzaine d’instruments, toutes les tonalités majeures et mineures, une humeur par section et un thème adapté à toute durée. → [`music/README.md`](references/music/README.md)
-- **Le déterminisme** est la garantie. Des fonctions pures et un aléatoire à graine fixe, pour que quiconque a le code source reconstruise exactement la même pièce. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
-- **La méthode** vous fait gagner du temps. Prouvez le rendu sur une seule image fixe, construisez d'une traite, et réservez les validations aux endroits où se tromper coûte cher. → [`working-method.md`](references/working-method.md)
+- **Le récit** donne un sens à chaque pièce. Une idée et un sujet focal pour une image fixe ; une transformation, une résolution et un motif qui revient pour un film. → [`storytelling.md`](skills/anidoodle/references/storytelling.md)
+- **Le réalisme** vient du fait de le nommer. L'anatomie, l'angle de vue et la référence que vous avez ouverte, pour qu'un papillon se lise comme une créature avec un corps et des nervures. → [`realism-and-craft.md`](skills/anidoodle/references/realism-and-craft.md)
+- **Le style** habite la trace. Trente et une recettes complètes, un guide pour en choisir une par projet, et la marche à suivre pour inventer la vôtre. → [`styles.md`](skills/anidoodle/references/styles.md)
+- **La musique** se compose en notes et se synthétise par code : un piano modélisé et une douzaine d’instruments, toutes les tonalités majeures et mineures, une humeur par section et un thème adapté à toute durée. → [`music/README.md`](skills/anidoodle/references/music/README.md)
+- **Le déterminisme** est la garantie. Des fonctions pures et un aléatoire à graine fixe, pour que quiconque a le code source reconstruise exactement la même pièce. → [`determinism-and-contract.md`](skills/anidoodle/references/determinism-and-contract.md)
+- **La méthode** vous fait gagner du temps. Prouvez le rendu sur une seule image fixe, construisez d'une traite, et réservez les validations aux endroits où se tromper coûte cher. → [`working-method.md`](skills/anidoodle/references/working-method.md)
 
-Chaque format part de la même source : PNG, MP4 avec sa bande sonore, GIF, WebM et PNG animé avec transparence, et un fichier HTML autonome. → [`formats.md`](references/formats.md)
+Chaque format part de la même source : PNG, MP4 avec sa bande sonore, GIF, WebM et PNG animé avec transparence, et un fichier HTML autonome. → [`formats.md`](skills/anidoodle/references/formats.md)
 
 ## Ça dessine, puis ça bouge
 
@@ -129,7 +129,7 @@ Quatre moteurs de rendu partagent un même noyau artistique, et ce noyau ignore 
 
 ## Le film d'exemple
 
-`example/` contient **Mechanical Lepidoptera** : 1 410 images, 47 secondes, un papillon mécanique qui se dessine lui-même au trait technique, prend vie à l'aquarelle, et laisse son plan dans l'herbe. C'est tout le moteur réuni dans une seule pièce : des points de contrôle placés à la main sur une anatomie réelle, une clé de cache qui nomme chaque entrée dont dépend un pixel, une bande-son construite à partir de la recette, et un mouvement ininterrompu du plan à la vie. Les planches de style se trouvent à côté du moteur dans `engine/src/canvas-core/`, chacune avec sa recette écrite en haut. Ouvrez-en une, changez un chiffre, et regardez ce qui bouge.
+`skills/anidoodle/example/` contient **Mechanical Lepidoptera** : 1 410 images, 47 secondes, un papillon mécanique qui se dessine lui-même au trait technique, prend vie à l'aquarelle, et laisse son plan dans l'herbe. C'est tout le moteur réuni dans une seule pièce : des points de contrôle placés à la main sur une anatomie réelle, une clé de cache qui nomme chaque entrée dont dépend un pixel, une bande-son construite à partir de la recette, et un mouvement ininterrompu du plan à la vie. Les planches de style se trouvent à côté du moteur dans `skills/anidoodle/engine/src/canvas-core/`, chacune avec sa recette écrite en haut. Ouvrez-en une, changez un chiffre, et regardez ce qui bouge.
 
 ## Honnête par conception
 

@@ -58,14 +58,14 @@ Pídelo con tus propias palabras, *«un faro en risografía para nuestra página
 
 El motor es la mitad fácil. El oficio es la parte que anidoodle carga por ti: seis lecciones, cada una ganada a base de equivocarse primero con una pieza y anotarlo todo, para que tú empieces donde terminó el último proyecto:
 
-- **Historia** le da un sentido a cada pieza. Una idea y un motivo central para una imagen fija; una transformación, una recompensa y un elemento recurrente para una película. → [`storytelling.md`](references/storytelling.md)
-- **Realismo** viene de nombrarlo todo. La anatomía, el punto de vista y la referencia que abriste, para que una mariposa se lea como una criatura con cuerpo y venas. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **Estilo** vive en el trazo. Treinta y una recetas completas, una guía para elegir una según el encargo, y los pasos para inventar la tuya propia. → [`styles.md`](references/styles.md)
-- **Música** se compone en notas y se sintetiza con código: un piano modelado y una docena de instrumentos, todas las tonalidades mayores y menores, un ánimo para cada sección y un tema que se adapta a cualquier duración. → [`music/README.md`](references/music/README.md)
-- **Determinismo** es la garantía. Funciones puras y un aleatorio con semilla, para que cualquiera con la fuente reconstruya exactamente la misma pieza. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
-- **Método** te mantiene rápido. Demuestra el look en una sola imagen fija, construye de un tirón, y gasta las aprobaciones donde equivocarse sale caro. → [`working-method.md`](references/working-method.md)
+- **Historia** le da un sentido a cada pieza. Una idea y un motivo central para una imagen fija; una transformación, una recompensa y un elemento recurrente para una película. → [`storytelling.md`](skills/anidoodle/references/storytelling.md)
+- **Realismo** viene de nombrarlo todo. La anatomía, el punto de vista y la referencia que abriste, para que una mariposa se lea como una criatura con cuerpo y venas. → [`realism-and-craft.md`](skills/anidoodle/references/realism-and-craft.md)
+- **Estilo** vive en el trazo. Treinta y una recetas completas, una guía para elegir una según el encargo, y los pasos para inventar la tuya propia. → [`styles.md`](skills/anidoodle/references/styles.md)
+- **Música** se compone en notas y se sintetiza con código: un piano modelado y una docena de instrumentos, todas las tonalidades mayores y menores, un ánimo para cada sección y un tema que se adapta a cualquier duración. → [`music/README.md`](skills/anidoodle/references/music/README.md)
+- **Determinismo** es la garantía. Funciones puras y un aleatorio con semilla, para que cualquiera con la fuente reconstruya exactamente la misma pieza. → [`determinism-and-contract.md`](skills/anidoodle/references/determinism-and-contract.md)
+- **Método** te mantiene rápido. Demuestra el look en una sola imagen fija, construye de un tirón, y gasta las aprobaciones donde equivocarse sale caro. → [`working-method.md`](skills/anidoodle/references/working-method.md)
 
-Cada formato sale de la misma fuente: PNG, MP4 con su banda sonora, GIF, WebM y PNG animado con transparencia, y un archivo HTML autónomo. → [`formats.md`](references/formats.md)
+Cada formato sale de la misma fuente: PNG, MP4 con su banda sonora, GIF, WebM y PNG animado con transparencia, y un archivo HTML autónomo. → [`formats.md`](skills/anidoodle/references/formats.md)
 
 ## Primero dibuja, luego se mueve
 
@@ -129,7 +129,7 @@ Cuatro backends comparten un mismo núcleo de arte, y el núcleo vive felizmente
 
 ## La película de ejemplo
 
-`example/` contiene **Mechanical Lepidoptera**: 1.410 fotogramas, 47 segundos, una mariposa de relojería que se dibuja a sí misma, cobra vida en acuarela y deja su plano entre la hierba. Es el motor entero en una sola pieza: puntos de control colocados a mano sobre anatomía real, una clave de caché que nombra cada entrada de la que depende un píxel, una banda sonora construida a partir de la receta, y un movimiento continuo desde el boceto hasta la vida. Las láminas de estilo están junto al motor en `engine/src/canvas-core/`, cada una con su receta escrita en la parte de arriba. Abre cualquiera de ellas, cambia un número, y mira qué se mueve.
+`skills/anidoodle/example/` contiene **Mechanical Lepidoptera**: 1.410 fotogramas, 47 segundos, una mariposa de relojería que se dibuja a sí misma, cobra vida en acuarela y deja su plano entre la hierba. Es el motor entero en una sola pieza: puntos de control colocados a mano sobre anatomía real, una clave de caché que nombra cada entrada de la que depende un píxel, una banda sonora construida a partir de la receta, y un movimiento continuo desde el boceto hasta la vida. Las láminas de estilo están junto al motor en `skills/anidoodle/engine/src/canvas-core/`, cada una con su receta escrita en la parte de arriba. Abre cualquiera de ellas, cambia un número, y mira qué se mueve.
 
 ## Honesto por diseño
 

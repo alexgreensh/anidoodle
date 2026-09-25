@@ -58,14 +58,14 @@
 
 엔진은 쉬운 절반이에요. 진짜 어려운 건 손끝의 감각인데, anidoodle이 그걸 대신 짊어져요. 여섯 가지 교훈인데, 하나하나가 먼저 실패해보고 얻어낸 뒤 기록으로 남긴 거라, 지난 프로젝트가 끝난 지점에서 바로 시작할 수 있어요:
 
-- **스토리**는 모든 작품에 의미를 줘요. 스틸컷 하나에는 아이디어 하나와 초점이 되는 소재 하나, 영화에는 하나의 변화와 하나의 결말, 그리고 되돌아오는 상징 하나. → [`storytelling.md`](references/storytelling.md)
-- **사실감**은 이름을 붙이는 데서 나와요. 해부 구조, 시점, 그리고 펼쳐본 레퍼런스까지 정확히 짚어야, 나비 한 마리도 몸과 날개맥을 가진 생명체로 읽혀요. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **스타일**은 선 하나하나에 깃들어요. 31가지 완전한 레시피, 작업에 맞게 하나를 고르는 가이드, 그리고 나만의 스타일을 만드는 방법까지. → [`styles.md`](references/styles.md)
-- **음악**은 음표로 작곡하고 코드로 합성해요. 모델링한 피아노와 십여 가지 악기, 모든 장조와 단조, 구간별 분위기, 어떤 길이에도 맞는 테마까지 갖췄어요. → [`music/README.md`](references/music/README.md)
-- **결정론**은 우리의 보증이에요. 순수 함수와 시드값 기반 난수를 쓰니까, 소스만 있으면 누구든 완전히 똑같은 작품을 다시 만들어낼 수 있어요. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
-- **작업 방식**이 속도를 지켜줘요. 스틸컷 하나로 룩을 먼저 검증하고, 그다음은 막힘없이 쭉 밀고 나가고, 틀렸을 때 비용이 큰 지점에서만 승인을 받는 식으로요. → [`working-method.md`](references/working-method.md)
+- **스토리**는 모든 작품에 의미를 줘요. 스틸컷 하나에는 아이디어 하나와 초점이 되는 소재 하나, 영화에는 하나의 변화와 하나의 결말, 그리고 되돌아오는 상징 하나. → [`storytelling.md`](skills/anidoodle/references/storytelling.md)
+- **사실감**은 이름을 붙이는 데서 나와요. 해부 구조, 시점, 그리고 펼쳐본 레퍼런스까지 정확히 짚어야, 나비 한 마리도 몸과 날개맥을 가진 생명체로 읽혀요. → [`realism-and-craft.md`](skills/anidoodle/references/realism-and-craft.md)
+- **스타일**은 선 하나하나에 깃들어요. 31가지 완전한 레시피, 작업에 맞게 하나를 고르는 가이드, 그리고 나만의 스타일을 만드는 방법까지. → [`styles.md`](skills/anidoodle/references/styles.md)
+- **음악**은 음표로 작곡하고 코드로 합성해요. 모델링한 피아노와 십여 가지 악기, 모든 장조와 단조, 구간별 분위기, 어떤 길이에도 맞는 테마까지 갖췄어요. → [`music/README.md`](skills/anidoodle/references/music/README.md)
+- **결정론**은 우리의 보증이에요. 순수 함수와 시드값 기반 난수를 쓰니까, 소스만 있으면 누구든 완전히 똑같은 작품을 다시 만들어낼 수 있어요. → [`determinism-and-contract.md`](skills/anidoodle/references/determinism-and-contract.md)
+- **작업 방식**이 속도를 지켜줘요. 스틸컷 하나로 룩을 먼저 검증하고, 그다음은 막힘없이 쭉 밀고 나가고, 틀렸을 때 비용이 큰 지점에서만 승인을 받는 식으로요. → [`working-method.md`](skills/anidoodle/references/working-method.md)
 
-모든 포맷이 같은 소스에서 나와요: PNG, 스코어가 포함된 MP4, GIF, 투명 배경을 지원하는 WebM과 애니메이션 PNG, 그리고 그 자체로 완결된 HTML 파일 하나까지. → [`formats.md`](references/formats.md)
+모든 포맷이 같은 소스에서 나와요: PNG, 스코어가 포함된 MP4, GIF, 투명 배경을 지원하는 WebM과 애니메이션 PNG, 그리고 그 자체로 완결된 HTML 파일 하나까지. → [`formats.md`](skills/anidoodle/references/formats.md)
 
 ## 먼저 그려지고, 그다음 움직여요
 
@@ -129,7 +129,7 @@ Node 20 이상이 필요해요. 스틸컷은 위에서 설치한 브라우저만
 
 ## 예제 영화
 
-`example/` 폴더에는 **Mechanical Lepidoptera**가 들어있어요: 1,410개 프레임, 47초 분량으로, 스스로 설계도를 그리다가 수채화 속에서 살아나고, 풀밭에 자신의 청사진을 남기고 떠나는 태엽 나비 이야기예요. 엔진 전체가 이 한 작품 안에 담겨 있어요. 실제 해부 구조 위에 손으로 찍은 제어점, 픽셀 하나가 무엇에 의존하는지 전부 이름 붙인 캐시 키, 레시피로 만든 스코어, 그리고 설계도에서 생명으로 끊김 없이 이어지는 움직임까지요. 스타일 플레이트는 `engine/src/canvas-core/` 안에 엔진과 나란히 놓여 있고, 각각 맨 위에 레시피가 적혀 있어요. 아무거나 열어서 숫자 하나만 바꿔보면, 뭐가 움직이는지 바로 보여요.
+`skills/anidoodle/example/` 폴더에는 **Mechanical Lepidoptera**가 들어있어요: 1,410개 프레임, 47초 분량으로, 스스로 설계도를 그리다가 수채화 속에서 살아나고, 풀밭에 자신의 청사진을 남기고 떠나는 태엽 나비 이야기예요. 엔진 전체가 이 한 작품 안에 담겨 있어요. 실제 해부 구조 위에 손으로 찍은 제어점, 픽셀 하나가 무엇에 의존하는지 전부 이름 붙인 캐시 키, 레시피로 만든 스코어, 그리고 설계도에서 생명으로 끊김 없이 이어지는 움직임까지요. 스타일 플레이트는 `skills/anidoodle/engine/src/canvas-core/` 안에 엔진과 나란히 놓여 있고, 각각 맨 위에 레시피가 적혀 있어요. 아무거나 열어서 숫자 하나만 바꿔보면, 뭐가 움직이는지 바로 보여요.
 
 ## 설계부터 정직하게
 

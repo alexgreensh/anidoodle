@@ -21,7 +21,7 @@ that prevents each of those.
 
 Read `references/workflows/start-here.md` and run its intake: one question at a time, only
 what the request leaves open, your recommendation first. **What** are they making, in **which
-style** (show `assets/gallery/styles.jpg`; the list is `references/styles/INDEX.md`), what
+style** (show `assets/styles.jpg`; the list is `references/styles/INDEX.md`), what
 **shape** (1x1, 9x16, 16x9, 4x5 or any W x H), how **long** (any length; never cap it), what
 **sound** (silent or a music style and mood), which **characters**. "You pick" means pick and
 say why in one line. Write the answers into a short brief before drawing.
