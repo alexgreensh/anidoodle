@@ -152,7 +152,7 @@ const fineliner = (g: Gfx, a: P, b: P) => rod(g, a, b, [
   { t0: 0.82, t1: 0.95, r0: 7, r1: 2.6, c: "#8d8d90", sh: "#48484b" }, { t0: 0.95, t1: 1, r0: 1, r1: 0.7, c: "#bdbdbd", sh: "#6c6c6c" }]);
 const brush = (g: Gfx, a: P, b: P, handle: string, hsh: string, tip: string) => rod(g, a, b, [
   { t0: 0, t1: 0.62, r0: 3, r1: 6, c: handle, sh: hsh }, { t0: 0.62, t1: 0.8, r0: 6.4, r1: 5.8, c: "#d6d0c4", sh: "#817b72" }, { t0: 0.8, t1: 1, r0: 5.8, r1: 0.4, c: tip, sh: mix(tip, "#000000", 0.5), round: true }]);
-const dipPen = (g: Gfx, tip: P, ang: number, s: State) => {
+export const dipPen = (g: Gfx, tip: P, ang: number, s: Pick<State, "glint" | "glintT">) => {
   const back: P = [tip[0] - Math.cos(ang) * 340, tip[1] - Math.sin(ang) * 340];
   const pt = rod(g, back, tip, [{ t0: 0, t1: 0.66, r0: 3.2, r1: 6, c: "#4a2f26", sh: "#1f1411" }, { t0: 0.66, t1: 0.8, r0: 6.4, r1: 5, c: "#c2a063", sh: "#7a6234" }]);
   const nib = [pt(0.8, -4.8), pt(0.87, -5), pt(0.95, -2.5), pt(1, 0), pt(0.95, 2.5), pt(0.87, 5), pt(0.8, 4.8)];
