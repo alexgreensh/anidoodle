@@ -1,0 +1,423 @@
+{
+ "note": "features measured by analyze-style.mjs --calibrate on each plate's own rendered still; subject and composition are baked into these numbers, so treat the match as a hint",
+ "plates": {
+  "balloon": {
+   "module": "engine/src/canvas-core/balloon.ts",
+   "medium": "crayon: scribble fills that skip the paper's valleys",
+   "source": "balloonDraw-still.png",
+   "sha256": "a1169bd2bece29be0093612953e7d8495776519e0a05ea5a759f65b7eb2a2acc",
+   "features": {
+    "linePresence": 0.0521,
+    "hard": 0.47,
+    "pooledRim": 0.44,
+    "coherence": 0.65,
+    "peakShare": 0.68,
+    "speckleLight": 0.139,
+    "chroma": 0.101,
+    "paperL": 0.84,
+    "contrast": 0.48,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "blueprint": {
+   "module": "engine/src/canvas-core/blueprint.ts",
+   "medium": "cyanotype blueprint: ruling pen on blue",
+   "source": "blueprint-still.png",
+   "sha256": "00c6654ca813e01a286638bd853268b6ed56fdbf067b8541bd58c54548f5a4c0",
+   "features": {
+    "linePresence": 0.0076,
+    "hard": 0.79,
+    "pooledRim": 0.15,
+    "coherence": 0.71,
+    "peakShare": 0.47,
+    "speckleLight": 0.044,
+    "chroma": 0.051,
+    "paperL": 0.3,
+    "contrast": 0.38,
+    "colours": 6,
+    "halftone": 0
+   }
+  },
+  "brokenColour": {
+   "module": "engine/src/canvas-core/brokenColour.ts",
+   "medium": "broken-colour pastel: separate dabs, optical mixing",
+   "source": "brokenColour-still.png",
+   "sha256": "27b749839a6e9ae84d327844df0da7d160648e4fe9fd2fc041caf55f8a2658cd",
+   "features": {
+    "linePresence": 0.0221,
+    "hard": 0.31,
+    "pooledRim": 0.35,
+    "coherence": 0.6,
+    "peakShare": 0.69,
+    "speckleLight": 0.046,
+    "chroma": 0.063,
+    "paperL": 0.73,
+    "contrast": 0.32,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "charcoalErasure": {
+   "module": "engine/src/canvas-core/charcoalErasure.ts",
+   "medium": "charcoal with eraser drawing: lights lifted out",
+   "source": "charcoalErasure-still.png",
+   "sha256": "ac36ecec415e1f67ad407cc099364337bd234975d694b7511e9b1812e0909ab5",
+   "features": {
+    "linePresence": 0.038,
+    "hard": 0.33,
+    "pooledRim": 0.36,
+    "coherence": 0.15,
+    "peakShare": 0.26,
+    "speckleLight": 0.043,
+    "chroma": 0.015,
+    "paperL": 0.7,
+    "contrast": 0.35,
+    "colours": 7,
+    "halftone": 0
+   }
+  },
+  "colouredPencil": {
+   "module": "engine/src/canvas-core/colouredPencil.ts",
+   "medium": "coloured pencil: one-direction hatching on toothy cream paper",
+   "source": "colouredPencil-still.png",
+   "sha256": "0860945b292f44f392e411a5d4f14f7705c4590e21e7db519e5558bf4c80e3a2",
+   "features": {
+    "linePresence": 0.1299,
+    "hard": 0.54,
+    "pooledRim": 0.45,
+    "coherence": 0.68,
+    "peakShare": 0.81,
+    "speckleLight": 0.051,
+    "chroma": 0.04,
+    "paperL": 0.92,
+    "contrast": 0.49,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "embroidery": {
+   "module": "engine/src/canvas-core/embroidery.ts",
+   "medium": "embroidery: stitches on linen",
+   "source": "embroidery-still.png",
+   "sha256": "b2b5bc1630f8f29bbe82e4820511dc5158e8188942162ea0142c67c2bcbd7aed",
+   "features": {
+    "linePresence": 0.1237,
+    "hard": 0.37,
+    "pooledRim": 0.35,
+    "coherence": 0.06,
+    "peakShare": 0.52,
+    "speckleLight": 0.542,
+    "chroma": 0.039,
+    "paperL": 0.74,
+    "contrast": 0.35,
+    "colours": 7,
+    "halftone": 0
+   }
+  },
+  "flatVector": {
+   "module": "engine/src/canvas-core/flatVector.ts",
+   "medium": "flat vector: geometric fills, no texture",
+   "source": "flatVector-still.png",
+   "sha256": "5687a56b660b2beda5f58172d665ecfce448a8134d48356037515909df91016c",
+   "features": {
+    "linePresence": 0.0161,
+    "hard": 0.25,
+    "pooledRim": 0.19,
+    "coherence": 0.69,
+    "peakShare": 0.66,
+    "speckleLight": 0.012,
+    "chroma": 0.077,
+    "paperL": 0.93,
+    "contrast": 0.54,
+    "colours": 6,
+    "halftone": 1
+   }
+  },
+  "fox": {
+   "module": "engine/src/canvas-core/fox.ts",
+   "medium": "cut-paper collage: torn pieces, no drawn line",
+   "source": "foxDraw-still.png",
+   "sha256": "a9623300d4391305bed288967943b01cbc39952d6ab738ae9c8e748471a452c9",
+   "features": {
+    "linePresence": 0.0186,
+    "hard": 0.68,
+    "pooledRim": 0.18,
+    "coherence": 0.64,
+    "peakShare": 0.45,
+    "speckleLight": 0.005,
+    "chroma": 0.074,
+    "paperL": 0.88,
+    "contrast": 0.51,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "halftone": {
+   "module": "engine/src/canvas-core/halftone.ts",
+   "medium": "halftone print: dot screens",
+   "source": "halftone-still.png",
+   "sha256": "92498c0fb7e1b2c9c8f1c34d69cb5697b2eb2d970e1fbf0191197756d08fae2f",
+   "features": {
+    "linePresence": 0.2998,
+    "hard": 0.31,
+    "pooledRim": 0.28,
+    "coherence": 0.07,
+    "peakShare": 0.35,
+    "speckleLight": 0.339,
+    "chroma": 0.031,
+    "paperL": 0.89,
+    "contrast": 0.71,
+    "colours": 8,
+    "halftone": 1
+   }
+  },
+  "koi": {
+   "module": "engine/src/canvas-core/koi.ts",
+   "medium": "marker comic: flat cel fills, hard shadow edge, heavy contour",
+   "source": "koiDraw-still.png",
+   "sha256": "32daa1034d5b873877503b9d8c3ee4ce3222abae8d9f084f8d145f47b218af4c",
+   "features": {
+    "linePresence": 0.0415,
+    "hard": 0.55,
+    "pooledRim": 0.44,
+    "coherence": 0.8,
+    "peakShare": 0.33,
+    "speckleLight": 0.024,
+    "chroma": 0.085,
+    "paperL": 0.52,
+    "contrast": 0.66,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "lighthouse": {
+   "module": "engine/src/canvas-core/lighthouse.ts",
+   "medium": "risograph: one drum per ink, halftone, overprint",
+   "source": "lighthouse-still.png",
+   "sha256": "8b53ab98fe2b9638da3a0af2d7740b579570180e83f59e03a513188cbf4f616b",
+   "features": {
+    "linePresence": 0.1989,
+    "hard": 0.6,
+    "pooledRim": 0.24,
+    "coherence": 0.04,
+    "peakShare": 0.29,
+    "speckleLight": 0.407,
+    "chroma": 0.085,
+    "paperL": 0.79,
+    "contrast": 0.47,
+    "colours": 8,
+    "halftone": 1
+   }
+  },
+  "mellan": {
+   "module": "engine/src/canvas-core/mellan.ts",
+   "medium": "single-line engraving: one spiral, width = tone",
+   "source": "mellan-still.png",
+   "sha256": "0ce1fd502c013a31d6e64b3741e4a5808c0cd44701f08d061f4cbfadef9b02a9",
+   "features": {
+    "linePresence": 0.4032,
+    "hard": 0.38,
+    "pooledRim": 0.08,
+    "coherence": 0.91,
+    "peakShare": 0.44,
+    "speckleLight": 0.605,
+    "chroma": 0.015,
+    "paperL": 0.94,
+    "contrast": 0.75,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "midCentury": {
+   "module": "engine/src/canvas-core/midCentury.ts",
+   "medium": "mid-century print: flat shapes, offset, grain",
+   "source": "midCentury-still.png",
+   "sha256": "0a1b231048d9e97c3cedf3661d531054e7c15051406159dd33059b760e173c0d",
+   "features": {
+    "linePresence": 0.0243,
+    "hard": 0.39,
+    "pooledRim": 0.35,
+    "coherence": 0.44,
+    "peakShare": 0.35,
+    "speckleLight": 0.008,
+    "chroma": 0.097,
+    "paperL": 0.89,
+    "contrast": 0.41,
+    "colours": 7,
+    "halftone": 0
+   }
+  },
+  "moonPhases": {
+   "module": "engine/src/canvas-core/moonPhases.ts",
+   "medium": "chalkboard: side-of-chalk scumble on a dark board",
+   "source": "moonPhasesDraw-still.png",
+   "sha256": "43b7d735ecb7622a3f63fd0157789c593fa375d89c511346deb99a867a3ca2bd",
+   "features": {
+    "linePresence": 0.0324,
+    "hard": 0.48,
+    "pooledRim": 0.23,
+    "coherence": 0.59,
+    "peakShare": 0.38,
+    "speckleLight": 0.011,
+    "chroma": 0.031,
+    "paperL": 0.8,
+    "contrast": 0.47,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "paperCraft": {
+   "module": "engine/src/canvas-core/paperCraft.ts",
+   "medium": "paper craft: folded, layered card with depth shadows",
+   "source": "paperCraft-still.png",
+   "sha256": "2e97c54d9b679437fa3aa6c505adce425368984147576cf5e7107da7a258f10c",
+   "features": {
+    "linePresence": 0.0323,
+    "hard": 0.5,
+    "pooledRim": 0.37,
+    "coherence": 0.46,
+    "peakShare": 0.45,
+    "speckleLight": 0.037,
+    "chroma": 0.067,
+    "paperL": 0.66,
+    "contrast": 0.37,
+    "colours": 8,
+    "halftone": 1
+   }
+  },
+  "pocketWatch": {
+   "module": "engine/src/canvas-core/pocketWatch.ts",
+   "medium": "ballpoint: one biro, tone from where hatching sits",
+   "source": "pocketWatchDraw-still.png",
+   "sha256": "30670dad2ef8e75aa43414e682dead964436c0075001a938a8e93266fa9a9b1c",
+   "features": {
+    "linePresence": 0.0422,
+    "hard": 0.65,
+    "pooledRim": 0.38,
+    "coherence": 0.53,
+    "peakShare": 0.5,
+    "speckleLight": 0.015,
+    "chroma": 0.041,
+    "paperL": 0.95,
+    "contrast": 0.22,
+    "colours": 4,
+    "halftone": 0
+   }
+  },
+  "ranunculus": {
+   "module": "engine/src/canvas-core/ranunculus.ts",
+   "medium": "pencil & watercolour: washes that miss their outline, graphite over paint",
+   "source": "ranunculusDraw-still.png",
+   "sha256": "051671d1121ee02cafb9a9ae88703deffa275576ccb2ba164351eef064124e3e",
+   "features": {
+    "linePresence": 0.0143,
+    "hard": 0.51,
+    "pooledRim": 0.6,
+    "coherence": 0.31,
+    "peakShare": 0.27,
+    "speckleLight": 0.002,
+    "chroma": 0.051,
+    "paperL": 0.93,
+    "contrast": 0.25,
+    "colours": 5,
+    "halftone": 0
+   }
+  },
+  "rubberHose": {
+   "module": "engine/src/canvas-core/rubberHose.ts",
+   "medium": "1930s rubber-hose cartoon: ink line, flat fills",
+   "source": "rubberHose-still.png",
+   "sha256": "e77fe78b6ee1b32c58e8c875bd1a43fa2006fdd17a82ddaa9fd4d121ff1feb00",
+   "features": {
+    "linePresence": 0.0764,
+    "hard": 0.54,
+    "pooledRim": 0.48,
+    "coherence": 0.56,
+    "peakShare": 0.42,
+    "speckleLight": 0.088,
+    "chroma": 0.031,
+    "paperL": 0.8,
+    "contrast": 0.63,
+    "colours": 8,
+    "halftone": 0
+   }
+  },
+  "scrapbook": {
+   "module": "engine/src/canvas-core/scrapbook.ts",
+   "medium": "vintage scrapbook: torn paper cards, tape, engravings, stamped type",
+   "source": "scrapbook-still.png",
+   "sha256": "56b3979ad6846cc8e2cc7301adda2c0d732713e9658b8a20b249c07cae3bca25",
+   "features": {
+    "linePresence": 0.0643,
+    "hard": 0.59,
+    "pooledRim": 0.46,
+    "coherence": 0.54,
+    "peakShare": 0.38,
+    "speckleLight": 0.028,
+    "chroma": 0.04,
+    "paperL": 0.85,
+    "contrast": 0.41,
+    "colours": 5,
+    "halftone": 1
+   }
+  },
+  "storybook": {
+   "module": "engine/src/canvas-core/storybook.ts",
+   "medium": "storybook pencil + watercolour character",
+   "source": "storybookDraw-still.png",
+   "sha256": "f3ceba63f6a1e09939bc2b181cc14006bda777b20e1de32d4b3fcfe53f9c71a1",
+   "features": {
+    "linePresence": 0.0513,
+    "hard": 0.5,
+    "pooledRim": 0.64,
+    "coherence": 0.41,
+    "peakShare": 0.31,
+    "speckleLight": 0.025,
+    "chroma": 0.037,
+    "paperL": 0.9,
+    "contrast": 0.55,
+    "colours": 6,
+    "halftone": 0
+   }
+  },
+  "sumiE": {
+   "module": "engine/src/canvas-core/sumiE.ts",
+   "medium": "sumi-e: loaded brush, wet-in-wet ink",
+   "source": "sumiE-still.png",
+   "sha256": "be1ee20bbdc6249e855de3aef280eb046201d971bf174ddddf6d4824249f841b",
+   "features": {
+    "linePresence": 0.0225,
+    "hard": 0.3,
+    "pooledRim": 0.42,
+    "coherence": 0.64,
+    "peakShare": 0.25,
+    "speckleLight": 0.013,
+    "chroma": 0.01,
+    "paperL": 0.92,
+    "contrast": 0.62,
+    "colours": 2,
+    "halftone": 0
+   }
+  },
+  "wren": {
+   "module": "engine/src/canvas-core/wren.ts",
+   "medium": "ink & line-wash: washes first, then a flexible nib",
+   "source": "wren-still.png",
+   "sha256": "6d432d1e8e447e5f103443e821144353876b46988c3929b07dba081713e59ef4",
+   "features": {
+    "linePresence": 0.0208,
+    "hard": 0.3,
+    "pooledRim": 0.48,
+    "coherence": 0.31,
+    "peakShare": 0.35,
+    "speckleLight": 0.006,
+    "chroma": 0.022,
+    "paperL": 0.93,
+    "contrast": 0.38,
+    "colours": 5,
+    "halftone": 0
+   }
+  }
+ }
+}

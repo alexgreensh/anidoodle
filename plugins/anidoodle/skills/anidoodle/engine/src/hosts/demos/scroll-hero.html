@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How a picture-book page is made · drawn as you scroll</title>
+<meta name="description" content="An anidoodle interactive demo: a storybook illustration that draws itself, pencil, paint and line, as you scroll.">
+<style>
+  :root { --paper: #fbf6ea; --ink: #3d3437; --ink-soft: #6b5f62; --rose: #c9566b; --butter: #f3d577; --sky: #a9cdea; --sage: #6fa874; --line: rgba(61,52,55,.18); }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); background: var(--paper); font: 18px/1.65 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; -webkit-font-smoothing: antialiased; }
+  .sans { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  nav { max-width: 1180px; margin: 0 auto; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
+  nav b { font-size: 19px; letter-spacing: -.01em; }
+  nav span { color: var(--ink-soft); }
+  .intro { max-width: 1180px; margin: 0 auto; padding: 8vh 28px 6vh; }
+  .intro small { display: block; font: 600 13px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 18px; }
+  .intro h1 { font-size: clamp(42px, 6.4vw, 86px); line-height: .98; letter-spacing: -.03em; margin: 0; font-weight: 600; max-width: 12ch; }
+  .intro h1 em { color: var(--rose); }
+  .intro p { max-width: 44ch; color: var(--ink-soft); font-size: 20px; margin: 22px 0 0; }
+  .cue { margin-top: 34px; display: inline-flex; gap: 10px; align-items: center; font: 600 14px/1 ui-sans-serif, system-ui, sans-serif; color: var(--ink-soft); }
+  .cue i { width: 22px; height: 34px; border: 2px solid var(--ink-soft); border-radius: 12px; position: relative; }
+  .cue i::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--ink-soft); animation: wheel 1.6s ease-in-out infinite; }
+  @keyframes wheel { 50% { transform: translateY(8px); opacity: .3; } }
+  @media (prefers-reduced-motion: reduce) { .cue i::after { animation: none; } }
+  #track { max-width: 1180px; margin: 0 auto; padding: 0 28px; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 48px; }
+  .steps article { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; padding: 10vh 0; }
+  .steps .n { font: 700 13px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 10px; color: var(--ink-soft); }
+  .steps .n::before { content: ""; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink); background: var(--c, #fff); }
+  .steps h2 { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.08; letter-spacing: -.02em; margin: 14px 0 12px; font-weight: 600; }
+  .steps p { margin: 0; color: var(--ink-soft); max-width: 40ch; }
+  .sticky { position: sticky; top: 7vh; height: 86vh; display: flex; align-items: center; }
+  .sticky ani-doodle { display: block; width: min(100%, 78vh); margin-left: auto; border-radius: 4px; box-shadow: 0 1px 0 rgba(61,52,55,.06), 0 30px 60px -30px rgba(61,52,55,.35); }
+  .outro { max-width: 760px; margin: 0 auto; padding: 16vh 28px 12vh; text-align: center; }
+  .outro h2 { font-size: clamp(32px, 4vw, 52px); letter-spacing: -.02em; line-height: 1.05; margin: 0 0 14px; font-weight: 600; }
+  .outro p { color: var(--ink-soft); margin: 0 auto; max-width: 46ch; }
+  footer { text-align: center; padding: 0 28px 48px; font: 13.5px/1.5 ui-sans-serif, system-ui, sans-serif; color: var(--ink-soft); }
+  @media (max-width: 860px) {
+    #track { grid-template-columns: 1fr; gap: 0; }
+    .sticky { order: -1; top: 0; height: auto; padding: 10px 0; background: var(--paper); z-index: 2; }
+    .sticky ani-doodle { width: min(100%, 46vh); margin: 0 auto; }
+    .steps article { min-height: 70vh; }
+  }
+</style>
+</head>
+<body>
+  <nav class="sans"><b class="serif">Marginalia Press</b><span>Picture books, made slowly</span></nav>
+
+  <header class="intro">
+    <small>How a page gets made</small>
+    <h1>Every picture starts with a <em>line</em>.</h1>
+    <p>Scroll down and this page will draw one of ours for you, the way an illustrator does: pencil first, then paint, then the line that holds it all together.</p>
+    <div class="cue"><i></i> Scroll to draw. Scroll back to undraw.</div>
+  </header>
+
+  <section id="track">
+    <div class="steps">
+      <article style="--c: #d9dbe6"><span class="n">Step one</span><h2>Loose ovals, and a line through them.</h2><p>Before anything has a face, it has a gesture. Two ovals for the head and body, a line for how he stands, a line for where the ground is. Nobody will notice these later. Everyone would notice without them.</p></article>
+      <article style="--c: #eee7d8"><span class="n">Step two</span><h2>A light pencil pass, head first.</h2><p>The drawing goes down faintly, so it can still change its mind. Head first, because the face decides everything else; then down, one stroke at a time.</p></article>
+      <article style="--c: #a9cdea"><span class="n">Step three</span><h2>Washes, from where the brush lands.</h2><p>Sky, warm light, grass, then the robot himself, back to front. Watercolour never quite fills its outline, and that is the charm.</p></article>
+      <article style="--c: #f3d577"><span class="n">Step four</span><h2>The final line, over dry paint.</h2><p>Full-weight graphite, head first again. This is the pass that makes it look finished, and the one that is hardest to fake.</p></article>
+      <article style="--c: #f2899c"><span class="n">Done</span><h2>Hello, Bit.</h2><p>The finished page is the very same picture as our printed plate, pixel for pixel. Scroll back up and the pencil will take it apart again.</p></article>
+    </div>
+    <div class="sticky"><ani-doodle piece="scroll-hero" scroll-track="#track"></ani-doodle></div>
+  </section>
+
+  <section class="outro">
+    <h2>No images were harmed in the making of this page.</h2>
+    <p>The illustration is drawn in code: every pencil stroke, every wash, the paper grain. The page downloads no pictures and no fonts; it is one file you could email.</p>
+  </section>
+  <footer>Marginalia Press is a made-up publisher. Bit and the meadow are the anidoodle storybook plate.</footer>
+<!--anidoodle-->
+</body>
+</html>

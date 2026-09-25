@@ -1,0 +1,96 @@
+{
+  "note": "Style records for the hands that predate `export const STYLE`. When a module grows its own STYLE export the scanned record wins on an id collision, and once every entry here has one, this file can go.",
+  "styles": [
+    {
+      "id": "ranunculus",
+      "name": "Pencil & watercolour",
+      "family": "watercolour",
+      "medium": "graphite and pan watercolour on cold-press: washes that never quite fill their outline, form shaded toward one light, graphite over the paint",
+      "nearest": "storybook",
+      "hero": "a ranunculus in bloom"
+    },
+    {
+      "id": "koi",
+      "name": "Marker comic",
+      "family": "marker comic",
+      "medium": "alcohol-marker cel fills with a hard shadow edge under one heavy contour that thickens away from the light",
+      "nearest": "lighthouse",
+      "hero": "a Sanke koi turning under lily pads"
+    },
+    {
+      "id": "pocketWatch",
+      "name": "Ballpoint sketch",
+      "family": "pen & ink",
+      "medium": "one blue ballpoint on cream cartridge, near-constant weight; tone only from where the hatching sits, plus the blob where a firm stroke stops",
+      "nearest": "wren",
+      "hero": "a pocket watch lying on a table"
+    },
+    {
+      "id": "balloon",
+      "name": "Crayon",
+      "family": "dry media",
+      "medium": "wax crayon on toothed paper: back-and-forth scribble fills that skip the valleys, a darker crayon on the shade side, a white one burnishing the highlight, a fat contour gone over twice",
+      "nearest": "moonPhases",
+      "hero": "a hot-air balloon"
+    },
+    {
+      "id": "wren",
+      "name": "Ink & line-wash",
+      "family": "ink",
+      "medium": "wet washes first that flood past the line and settle along each shape's bottom edge, backruns, then a flexible nib thick on the press and hair-thin on the lift",
+      "nearest": "ranunculus",
+      "hero": "a wren"
+    },
+    {
+      "id": "moonPhases",
+      "name": "Chalkboard",
+      "family": "chalk",
+      "medium": "side-of-the-chalk scumble on a slate board, lit limbs worked twice, every stroke broken by the board's tooth with dust either side, ghosts of old lessons",
+      "nearest": "balloon",
+      "hero": "the phases of the moon"
+    },
+    {
+      "id": "fox",
+      "name": "Cut-paper collage",
+      "family": "collage",
+      "medium": "zero drawn lines: torn pieces with a white fibrous edge, scissor pieces crisp, each lifting a soft shadow off the piece below",
+      "nearest": "lighthouse",
+      "hero": "a fox at dusk"
+    },
+    {
+      "id": "lighthouse",
+      "name": "Risograph",
+      "family": "print",
+      "medium": "soy ink, one layer per drum multiplied through its own registration offset; every other colour an overprint, tone a halftone screen per ink angle, white is bare paper",
+      "nearest": "fox",
+      "hero": "a lighthouse at sunset"
+    },
+    {
+      "id": "mellan",
+      "name": "Single-line engraving",
+      "family": "engraving",
+      "medium": "one unbroken engraved line whose width follows a procedural tone field: the whole picture is a single stroke",
+      "nearest": "pocketWatch",
+      "hero": "a moon spiralled out of one line",
+      "film": "mellanUnspool"
+    },
+    {
+      "id": "storybook",
+      "name": "Storybook pencil + watercolour",
+      "family": "watercolour",
+      "medium": "storybook graphite and gentle pan watercolour, drawn for a recurring character",
+      "nearest": "ranunculus",
+      "hero": "Bit, waving, in storybook pencil and watercolour"
+    },
+    {
+      "id": "blueprint",
+      "name": "Cyanotype blueprint",
+      "family": "technical drawing",
+      "medium": "ruling pen in white ink on Prussian-blue cyanotype stock: draftTooth and blueMottle tiles, inkGroup halos, inclined gothic lettering",
+      "nearest": "pocketWatch",
+      "hero": "the clockwork butterfly, the blueprint act of the worked film",
+      "module": "example/src/canvas-core/mechanicalLepidoptera.ts",
+      "film": null
+    }
+  ]
+}

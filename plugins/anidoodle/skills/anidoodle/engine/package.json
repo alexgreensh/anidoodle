@@ -1,0 +1,26 @@
+{
+  "name": "anidoodle-engine",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Portable art core + backend adapters for illustrations, animations and films drawn entirely in code.",
+  "scripts": {
+    "still": "node tools/still.mjs",
+    "gate": "node tools/gate.mjs",
+    "emit": "node tools/emit.mjs",
+    "render": "node tools/render.mjs"
+  },
+  "dependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.48.0",
+    "typescript": "^5.9.0"
+  },
+  "optionalDependencies": {
+    "@remotion/bundler": "4.0.522",
+    "@remotion/renderer": "4.0.522",
+    "react": "^19.0.0",
+    "remotion": "4.0.522"
+  }
+}

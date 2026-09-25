@@ -1,0 +1,26 @@
+{
+ "name": "pastel-blotch",
+ "title": "Pastel blotch watercolour",
+ "plate": "engine/src/canvas-core/adaptAquarelle.ts",
+ "nearest": "ranunculus",
+ "recipe": {
+  "mark": "a blotch: one loaded round brush set down and pushed about; one flat puddle of dilute pigment with a jagged coastline (big lobes plus a fine torn fringe); never an ellipse, never a directional stroke",
+  "edge": "hard-dry: the puddle dries with a crisp, darker rim where pigment migrates to the edge and a paler bloom inside; no soft blending into neighbours; no drawn line",
+  "order": "palest big puddles first; smaller, stronger puddles glazed over them (overlaps multiply into secondary colours); bare paper left between islands; a few spatter dots; white gouache sparkles with a halo last",
+  "paper": "warm cream cold-press (#f5f1e6), coldpress tile at 0.1, paper tile at 0.05",
+  "palette": ["#f7a86a", "#f7d77e", "#f5b5a6", "#eb97ad", "#cf95c6", "#b49ae0", "#a6e0bd", "#8fd3cc", "#9dbdec", "#5fb3b8", "#4f8fc4"],
+  "subject rule": "the focal subject is painted in the same puddles but a full value step darker than the ground, in the opposite temperature (warm magentas on a cool ground in the proof), with a bare-paper reserve round it"
+ },
+ "params": { "puddleAlpha": 0.62, "rim": 0.8, "rimDarken": 0.72, "fringePx": 13, "firstPassBlur": 1.6, "bareRests": "one place in three" },
+ "profile": { "file": "samples/adapt-teach/aquarelle/profile.json", "summary": "high key (mean L 0.84), contrast 0.23, 8 colours over 2%, chroma 0.064, no line, no measurable grain, edges 90% soft, no lattice; measured with the terminal window excluded" },
+ "provenance": {
+  "reference": "lightshot-aquarelle.png (1310x552), a pastel watercolour backdrop behind a terminal window",
+  "sha256": "397bc0daeac41e18f6c3001c03582a7a8ab617a2b97377e8b7152538e6a89ae4",
+  "broughtBy": "Alex Greenshpun (owner)",
+  "date": "2026-09-25",
+  "excludedFromAnalysis": "the terminal window, 228,188,854,176 (UI, not the hand)",
+  "embedded": false,
+  "copied": "nothing: the reference is an abstract backdrop; the proof subject (a moon jellyfish) and its composition are new"
+ },
+ "proof": ["samples/adapt-teach/aquarelle/adaptAquarelle-still.png", "samples/adapt-teach/aquarelle/compare-aquarelle.png"]
+}
