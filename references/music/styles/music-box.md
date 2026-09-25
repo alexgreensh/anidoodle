@@ -1,3 +1,13 @@
+# Style preset: music-box (the default)
+
+> The original anidoodle music recipe, kept **verbatim** below as one style preset among the eleven
+> in `engine/src/canvas-core/music/tables.ts` (`STYLES.musicBox`). Its numbers are what the
+> `musicBox` and `bell` instruments implement. Its ban list is now the rule for THIS preset only;
+> for every other style the bans became measured guards (see `../README.md`, "Guards"). The scar
+> story is kept because it is why the guards exist.
+
+---
+
 # The music recipe
 
 > Doctrine earned making MECHANICAL LEPIDOPTERA, the worked example in `example/`. Every rule

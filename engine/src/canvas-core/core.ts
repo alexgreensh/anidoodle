@@ -128,13 +128,16 @@ export const GRAPHITE = "#3d3437";
 export const TINT = { white: "#fffaf3", blush: "#f2899c", rose: "#e9a3ad", butter: "#f3d577", sky: "#a9c8e6", denim: "#6f93c4", sage: "#a9cfa6", lilac: "#c7b3e0", peach: "#f5b98a", glow: "#ffe9a3" };
 type PenOpts = { w?: number; color?: string; seed?: number; closed?: boolean; wobble?: number; boil?: number; taper?: number; opacity?: number; retrace?: boolean; progress?: number };
 
-type Rect = [number, number, number, number]; // device px: x0, y0, x1, y1
+export type Rect = [number, number, number, number]; // device px: x0, y0, x1, y1
 type Tracked = Layer & { dirty?: Rect | null };
 
 // PERFORMANCE RULE: nothing here touches a full-size surface unless it has to. Every primitive
 // marks the device-pixel box it drew into; blur, texture, compositing and clearing are then
 // confined to that box. (Phase 0 cleared and composited whole layers ~150 times per frame.)
 export class Gfx {
+  // `drawn`: union of every device box composited onto `main` since construction. Read-only for the
+  // art; the web profile (bake.ts) crops a part into a sprite by it. Setting it changes no pixel.
+  drawn: Rect | null = null;
   cur: Ctx; private pool: Tracked[] = []; private stack: [number, number, number][] = [[0, 0, 1]]; private box: Rect | null = null;
   constructor(public main: Ctx, public env: Env, public frame: number, public medium: Medium) {
     this.cur = main; this.base(main);
@@ -180,6 +183,7 @@ export class Gfx {
     if (opts.blur) r = this.soften(L, opts.blur, r);
     (opts.textures ?? []).forEach((t) => this.tooth(L, t, r));
     const m = this.main, w = r[2] - r[0], h = r[3] - r[1];
+    if (w > 0 && h > 0) { const ox = Math.round((opts.off?.[0] ?? 0) * this.env.scale), oy = Math.round((opts.off?.[1] ?? 0) * this.env.scale); this.drawn = this.join(this.drawn, this.clip([r[0] + ox, r[1] + oy, r[2] + ox, r[3] + oy])); }
     if (w > 0 && h > 0) { m.save(); this.dev(m); m.globalCompositeOperation = opts.blend ?? "source-over"; m.globalAlpha = opts.alpha ?? 1; m.drawImage(L.canvas as CanvasImageSource, r[0], r[1], w, h, r[0] + Math.round((opts.off?.[0] ?? 0) * this.env.scale), r[1] + Math.round((opts.off?.[1] ?? 0) * this.env.scale), w, h); m.restore(); }
     this.release(L, r);
   }
@@ -195,6 +199,7 @@ export class Gfx {
     this.dev(H.ctx); H.ctx.drawImage(L.canvas as CanvasImageSource, r[0], r[1], w, h, r[0], r[1], w, h);
     const rh = this.soften(H, o.blur ?? 1.8, r);
     (o.textures ?? ["draftTooth"]).forEach((t) => this.tooth(L, t, r));
+    this.drawn = this.join(this.drawn, this.join(rh, r));
     const m = this.main; m.save(); this.dev(m); m.globalCompositeOperation = "source-over";
     m.globalAlpha = o.alpha ?? 0.28; m.drawImage(H.canvas as CanvasImageSource, rh[0], rh[1], rh[2] - rh[0], rh[3] - rh[1], rh[0], rh[1], rh[2] - rh[0], rh[3] - rh[1]);
     m.globalAlpha = 1; m.drawImage(L.canvas as CanvasImageSource, r[0], r[1], w, h, r[0], r[1], w, h); m.restore(); this.base(m);

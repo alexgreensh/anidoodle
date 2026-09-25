@@ -14,10 +14,12 @@ import { join, resolve } from "node:path";
 import { buildPage } from "./build-page.mjs";
 import { detect } from "./detect.mjs";
 import * as playwright from "./adapters/playwright.mjs";
+import { defaultOutput } from "./names.mjs";
+import { float32Wav } from "./audio.mjs";
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const film = process.argv[2] && !process.argv[2].startsWith("--") ? process.argv[2] : "fixtures";
-const scale = Number(arg("scale", 1)), fmt = (arg("out", "").match(/\.(gif|webm|apng)$/i)?.[1] ?? "mp4").toLowerCase(), workers = Number(arg("workers", Math.max(1, Math.min(4, Math.floor(cpus().length / 2))))), out = resolve(arg("out", `out/${film}.mp4`));
+const scale = Number(arg("scale", 1)), fmt = (arg("out", "").match(/\.(gif|webm|apng)$/i)?.[1] ?? "mp4").toLowerCase(), workers = Number(arg("workers", Math.max(1, Math.min(4, Math.floor(cpus().length / 2))))), out = resolve(arg("out", defaultOutput(film)));
 
 const env = detect();
 console.log("backends found:"); for (const [k, v] of Object.entries(env.report)) console.log(`  ${k.padEnd(11)} ${v}`);
@@ -31,11 +33,11 @@ console.log(`film: "${meta.title}" ${meta.W}x${meta.H} @ ${meta.fps} fps, ${N} f
 
 // audio: pure JS in the page -> WAV here
 mkdirSync(resolve(".tmp"), { recursive: true }); const wav = resolve(`.tmp/${film}.wav`), a = await session.audio(48000);
-if (a) { const pcm = Buffer.from(a.pcm16, "base64"), h = Buffer.alloc(44); h.write("RIFF", 0); h.writeUInt32LE(36 + pcm.length, 4); h.write("WAVEfmt ", 8); h.writeUInt32LE(16, 16); h.writeUInt16LE(1, 20); h.writeUInt16LE(2, 22); h.writeUInt32LE(a.sampleRate, 24); h.writeUInt32LE(a.sampleRate * 4, 28); h.writeUInt16LE(4, 32); h.writeUInt16LE(16, 34); h.write("data", 36); h.writeUInt32LE(pcm.length, 40); writeFileSync(wav, Buffer.concat([h, pcm])); }
+if (a) writeFileSync(wav, float32Wav(a));
 
 mkdirSync(join(out, ".."), { recursive: true });
 const input = ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(meta.fps), "-c:v", "png", "-i", "-"];
-const gifFps = Math.min(meta.fps, Number(arg("gif-fps", 15))), width = Number(arg("width", Math.min(640, Math.round(meta.W * scale))));
+const gifFps = Math.min(meta.fps, Number(arg("gif-fps", meta.fps))), width = Number(arg("width", Math.round(meta.W * scale)));
 const size = `scale=${width}:-2:flags=lanczos`;
 const encode = {
   gif: [...input, "-vf", `fps=${gifFps},${size},split[a][b];[a]palettegen=stats_mode=full[p];[b][p]paletteuse=dither=sierra2_4a`, "-loop", "0", out],
@@ -62,7 +64,7 @@ console.log(`  slowest: ${slow}\n  budget: 150 ms draw per frame -> ${cost.every
 console.log(`  wall clock: ${wall.toFixed(1)} s for ${N} frames = ${(N / wall).toFixed(1)} fps end to end (build + launch + render + encode)`);
 
 // ---- verify: same frame, different order, different page. Standard = visually identical; hash equality is the cheap first test.
-const probe = [0, 44, 45, 89, 90, N - 1].filter((n) => n < N), fwd = [], rev = [];
+const probe = [...new Set([0, ...meta.shots.flatMap((s) => [s.start, s.end - 1]), ...((k) => Array.from({ length: k }, (_, i) => Math.round(i * (N - 1) / (k - 1 || 1))))(Math.min(6, N)), N - 1])].sort((a, b) => a - b), fwd = [], rev = [];
 for (const n of probe) fwd.push(await session.hash(n, 0)); for (const n of [...probe].reverse()) rev.unshift(await session.hash(n, session.workers - 1));
 const same = probe.filter((_, i) => fwd[i] === rev[i]).length;
 console.log(`\ndeterminism: ${same}/${probe.length} probe frames hash-identical (forward on page 0 vs reversed on page ${session.workers - 1})${same === probe.length ? "" : "  -> fall back to PSNR > 45 dB in the Phase 2 gate"}`);

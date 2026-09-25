@@ -29,19 +29,25 @@ const G: Record<string, Glyph> = {
   x: { l: [[[0.5, 1.8], [3.1, 4.8]], [[3.1, 1.8], [0.5, 4.8]]], w: 3.6 }, o: { c: [[[1.2, -0.2], [0.4, 0.5], [0.5, 1.5], [1.3, 2], [2.1, 1.4], [2.1, 0.4], [1.2, -0.2]]], w: 2.8 }, // x = times, o = degree
   "@": { c: [O], l: [[[0, 6.6], [4, -0.6]]] }, // diameter
   " ": { w: 2.6 },
+  // added for teaching captions (no existing plate spells these, so nothing already drawn changes)
+  "'": { l: [[[0.9, 0], [0.7, 1.7]]], w: 1.6 }, '"': { l: [[[0.6, 0], [0.5, 1.7]], [[1.8, 0], [1.7, 1.7]]], w: 2.4 },
+  "?": { c: [[[0.3, 1.2], [1.1, 0.1], [2.6, 0.1], [3.4, 1], [3.4, 2], [1.9, 3.1], [1.8, 4.3]]], l: [[[1.7, 5.5], [1.9, 5.9]]], w: 3.6 },
+  "!": { l: [[[1, 0], [0.9, 4.3]], [[0.8, 5.5], [1, 5.9]]], w: 1.9 }, ";": { l: [[[0.7, 2], [0.9, 2.4]], [[0.9, 5.4], [0.5, 6.8]]], w: 1.8 },
+  "+": { l: [[[0.3, 3.2], [3.3, 3.2]], [[1.8, 1.7], [1.8, 4.7]]], w: 3.6 }, "=": { l: [[[0.4, 2.4], [3.2, 2.4]], [[0.4, 4], [3.2, 4]]], w: 3.6 },
+  "%": { l: [[[3.4, 0.2], [0.2, 5.8]]], c: [[[0.9, 0.2], [0.3, 0.8], [0.9, 1.6], [1.5, 0.8], [0.9, 0.2]], [[2.8, 4.3], [2.2, 5], [2.8, 5.8], [3.4, 5], [2.8, 4.3]]], w: 3.6 },
 };
-export type LetterOpts = { cap?: number; color?: string; seed?: number; align?: "left" | "center" | "right"; w?: number; opacity?: number; track?: number; progress?: number };
+export type LetterOpts = { cap?: number; color?: string; seed?: number; align?: "left" | "center" | "right"; w?: number; opacity?: number; track?: number; progress?: number; slant?: number };
 const strokes = (ch: string): number => { const g = G[ch] ?? G[ch.toUpperCase()] ?? G["-"]; return (g.l ?? []).reduce((a, st) => a + st.length - 1, 0) + (g.c ?? []).length; };
 export const strokeCount = (text: string): number => [...text].reduce((a, ch) => a + strokes(ch), 0);
 export const width = (text: string, cap = 12, track = 1.25) => { const s = cap / 6; return [...text].reduce((a, ch) => a + ((G[ch] ?? G[ch.toUpperCase()] ?? G["-"]).w ?? 4) * s + track * s, 0) - track * s; };
 // progress writes the line stroke by stroke, in the order a hand makes them: never a fade.
 export const letter = (g: Gfx, text: string, x: number, y: number, o: LetterOpts = {}) => {
-  const { cap = 12, color = "#eef6fb", seed = 1, align = "left", opacity = 0.95, track = 1.25, progress = 1 } = o, s = cap / 6, r = rng(seed * 131 + 7), W = width(text, cap, track);
+  const { cap = 12, color = "#eef6fb", seed = 1, align = "left", opacity = 0.95, track = 1.25, progress = 1, slant = 0.2 } = o, s = cap / 6, r = rng(seed * 131 + 7), W = width(text, cap, track);
   if (progress <= 0) return;
   let cx = align === "center" ? x - W / 2 : align === "right" ? x - W : x, written = progress >= 1 ? Infinity : progress * strokeCount(text);
   [...text].forEach((ch0, i) => {
     const gl = G[ch0] ?? G[ch0.toUpperCase()] ?? G["-"], dy = (r() - 0.5) * cap * 0.07, k = 1 + (r() - 0.5) * 0.06;
-    const T = ([px, py]: P): P => [cx + (px + (6 - py) * 0.2) * s * k, y + dy + py * s * k]; // 0.2 = the 68 degree slant of inclined lettering
+    const T = ([px, py]: P): P => [cx + (px + (6 - py) * slant) * s * k, y + dy + py * s * k]; // 0.2 = the 68 degree slant of inclined lettering; 0 = upright
     const pen = (pts: P[], j: number) => { const p = written === Infinity ? 1 : Math.max(0, Math.min(1, written)); written === Infinity || (written -= 1); if (p > 0) g.pen(pts.map(T), { w: o.w ?? Math.max(1.1, cap * 0.115), color, seed: seed + i * 37 + j * 11, wobble: 0.25, boil: 0, taper: 0.35, opacity, progress: p }); };
     let j = 0; (gl.l ?? []).forEach((st) => { for (let q = 1; q < st.length; q++) pen([st[q - 1], st[q]], j++); }); (gl.c ?? []).forEach((st) => pen(st, j++));
     cx += ((gl.w ?? 4) + track) * s;

@@ -22,9 +22,9 @@ export const mountFilm = (film: Film) => {
   const seek = (frame: number) => { const t0 = performance.now(); const shot = renderFrame(film, ctx, frame, env); ctx.getImageData(0, 0, 1, 1); current = frame; return { shot, ms: performance.now() - t0 }; }; // getImageData forces the deferred raster so the timing is real
   const hash = () => { const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data; let h = 0x811c9dc5; for (let i = 0; i < d.length; i++) { h ^= d[i]; h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(16); };
   const b64 = (u8: Uint8Array) => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode(...u8.subarray(i, i + 0x8000)); return btoa(s); };
-  const audio = (sr: number) => { if (!film.audio) return null; const [L, R] = film.audio(sr), pcm = new Int16Array(L.length * 2); for (let i = 0; i < L.length; i++) { pcm[i * 2] = Math.max(-1, Math.min(1, L[i])) * 32767; pcm[i * 2 + 1] = Math.max(-1, Math.min(1, R[i])) * 32767; } return { sampleRate: sr, frames: L.length, pcm16: b64(new Uint8Array(pcm.buffer)) }; };
+  const audio = (sr: number) => { if (!film.audio) return null; const [L, R] = film.audio(sr); if (L.length !== R.length) throw new Error("audio channels have different lengths"); const pcm = new Float32Array(L.length * 2); for (let i = 0; i < L.length; i++) { pcm[i * 2] = L[i]; pcm[i * 2 + 1] = R[i]; } return { sampleRate: sr, frames: L.length, float32: b64(new Uint8Array(pcm.buffer)) }; };
   const warm = () => film.shots.forEach((s) => { seek(s.start); seek(s.start + ((s.end - s.start) >> 1)); }); // first + middle frame of every shot: builds tiles, pre-allocates the layer pool
-  window.FILM = { meta: film.meta, ready, mount, seek, hash, audio, warm, png: () => canvas.toDataURL("image/png").slice(22), frame: () => current };
+  window.FILM = { meta: { ...film.meta, shots: film.shots.map(({ id, start, end }) => ({ id, start, end })) }, ready, mount, seek, hash, audio, warm, png: () => canvas.toDataURL("image/png").slice(22), frame: () => current };
 
   // ---- the player: click or space to play, arrows to step, ?frame=N to open on a frame
   ready.then(() => {

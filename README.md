@@ -7,7 +7,7 @@
 <p align="center"><strong>Hand-drawn art, written as code.</strong></p>
 
 <p align="center">
-  Illustrations, animations and short films in nine hand-drawn styles.<br>
+  Illustrations, drawing timelapses, films, explainers and interactive web art in 31 styles.<br>
   Every mark is a function and every note is arithmetic, so the same source<br>
   redraws the same picture on every machine, at every size, for good.
 </p>
@@ -22,20 +22,20 @@
 <p align="center"><b>English</b> · <a href="README.ja-JP.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko-KR.md">한국어</a> · <a href="README.fr-FR.md">Français</a> · <a href="README.es-ES.md">Español</a></p>
 
 <p align="center">
-  <a href="#nine-styles-to-choose-from">Styles</a> ·
+  <a href="#31-styles-to-choose-from">Styles</a> ·
   <a href="#what-you-can-make">What you can make</a> ·
   <a href="#what-it-packs">What it packs</a> ·
   <a href="#it-draws-then-it-moves">Motion</a> ·
   <a href="#get-started">Get started</a>
 </p>
 
-## Nine styles to choose from
+## 31 styles to choose from
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="Nine illustrations, each in its own style: pencil and watercolour ranunculus, marker comic koi, ballpoint pocket watch, crayon hot-air balloon, ink and line-wash wren, chalkboard moon phases, cut-paper fox, risograph lighthouse, and a single-line engraved moon">
+  <img src="assets/styles.jpg" width="100%" alt="31 illustrations, each in its own style, from pencil and watercolour, marker comic and risograph to pixel art, toy brick, woodcut, sumi-e, scratchboard, embroidery, painted oil and a folk-tale storybook">
 </p>
 
-Each style is its own way of making a mark: the taper of a nib, the bleed of a wash, the scumble of chalk on slate, the torn edge of cut paper, the halftone of a risograph drum, one engraved line spiralling out to become a moon. The subject changes shape in each hand, the way it would for nine different illustrators. Pick one for your brand and every picture after it arrives in the same hand. Every plate above, and the contact sheet itself, is drawn by code in this repo.
+Each style is its own way of making a mark: the taper of a nib, the bleed of a wash, the scumble of chalk on slate, the torn edge of cut paper, the halftone of a risograph drum, one engraved line spiralling out to become a moon. The subject changes shape in each hand, the way it would for thirty-one different illustrators. Every style also ships a film of its picture being drawn, mark by mark, in the order an artist in that medium works. Pick one for your brand and every picture after it arrives in the same hand. Every plate above, and the contact sheet itself, is drawn by code in this repo.
 
 ## What you can make
 
@@ -46,7 +46,11 @@ Each style is its own way of making a mark: the taper of a nib, the bleed of a w
 | **Your brand** | A logo that draws itself on, a title sequence, a social card template that stays on brand for every post. |
 | **Social and chat** | Endless loops, GIFs and transparent animated stickers, sized for the feed. |
 | **Decks and docs** | A family of section illustrations from one program. A new seed gives a sister image in the same style. |
-| **Stories** | Storyboards and animatics that grow into a finished short film with an original score. |
+| **Stories** | Storyboards and animatics that grow into a finished film of any length, with an original score. |
+| **Your own image** | Bring a picture and get its style on a new subject, or bring a photo and get it recreated in any of the 31 hands, every mark drawn in code. |
+| **Web pages** | Interactive illustrations that watch the cursor, react to clicks and forms, or draw themselves as the page scrolls. |
+| **Learning** | Drawing lessons: step sheets and timelapses that teach how a picture is built, with what to look for and the common mistakes. |
+| **Characters** | One character, built once and kept identical across shots, poses and styles. |
 
 Ask in plain words, *"a risograph lighthouse for our careers page, 1600×900"* or *"a chalkboard explainer of how our pricing tiers stack up"*, and anidoodle routes it to the right workflow and style recipe, asking only for what the request leaves open.
 
@@ -56,8 +60,8 @@ The engine is the easy half. The craft is the part anidoodle carries for you, si
 
 - **Story** gives every piece a point. One idea and one focal subject for a still; one transformation, one payoff and one returning token for a film. → [`storytelling.md`](references/storytelling.md)
 - **Realism** comes from naming it. The anatomy, the view and the reference you opened, so a butterfly reads as a creature with a body and veins. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **Style** lives in the mark. Nine full recipes, a guide for picking one per job, and the steps for inventing your own. → [`styles.md`](references/styles.md)
-- **Music** follows a recipe. Major key, plucked, a phrase that asks a question and resolves home, warm and sure. → [`music-recipe.md`](references/music-recipe.md)
+- **Style** lives in the mark. Thirty-one full recipes, a guide for picking one per job, and the steps for inventing your own. → [`styles.md`](references/styles.md)
+- **Music** is composed as notes and synthesized in code: a modelled piano and a dozen instruments, every major and minor mode, moods per section, and a theme that fits any length. → [`music/README.md`](references/music/README.md)
 - **Determinism** is the guarantee. Pure functions and a seeded random, so anyone with the source rebuilds the exact same piece. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
 - **Method** keeps you fast. Prove the look on one still, build straight through, and spend approval where being wrong is expensive. → [`working-method.md`](references/working-method.md)
 
@@ -88,16 +92,27 @@ A picture model spends tokens and compute on every frame of every render, and it
 
 ## Get started
 
-anidoodle is an agent skill: one folder with a `SKILL.md` at the top. For Claude Code, clone it into your skills folder:
+**Claude Code:**
 
 ```bash
-git clone https://github.com/alexgreensh/anidoodle ~/.claude/skills/anidoodle
+/plugin marketplace add alexgreensh/anidoodle
+/plugin install anidoodle@alexgreensh-anidoodle
 ```
+
+**Codex:**
+
+```bash
+codex plugin marketplace add alexgreensh/anidoodle
+```
+
+Then in the Codex TUI: `/plugins` and install anidoodle.
+
+**Any other agent:** anidoodle is a standard skill folder (`skills/anidoodle/SKILL.md`), so it can be copied into any harness that reads skills.
 
 Then ask for what you want: *"draw a pencil & watercolour pear for our recipes page"*. To drive the engine yourself:
 
 ```bash
-node ~/.claude/skills/anidoodle/engine/tools/scaffold.mjs ~/art --still hero --film intro
+node <anidoodle>/engine/tools/scaffold.mjs ~/art --still hero --film intro --format 9x16 --duration 60
 cd ~/art && npm install && npx playwright-core install chromium
 
 node tools/still.mjs  hero  --out out/hero.png --scale 2   # a finished illustration, print size
@@ -114,7 +129,7 @@ Four backends share one art core, and the core stays blissfully unaware of which
 
 ## The example film
 
-`example/` holds **Mechanical Lepidoptera**: 1,410 frames, 47 seconds, a clockwork butterfly that drafts itself, comes alive in watercolour, and leaves its blueprint in the grass. It is the whole engine in one piece: control points placed by hand over real anatomy, a cache key that names every input a pixel depends on, a score built from the recipe, and one unbroken move from built to alive. The nine style plates sit beside the engine in `engine/src/canvas-core/`, each with its recipe written at the top. Open any of them, change a number, and watch what moves.
+`example/` holds **Mechanical Lepidoptera**: 1,410 frames, 47 seconds, a clockwork butterfly that drafts itself, comes alive in watercolour, and leaves its blueprint in the grass. It is the whole engine in one piece: control points placed by hand over real anatomy, a cache key that names every input a pixel depends on, a score built from the recipe, and one unbroken move from built to alive. The style plates sit beside the engine in `engine/src/canvas-core/`, each with its recipe written at the top. Open any of them, change a number, and watch what moves.
 
 ## Honest by design
 

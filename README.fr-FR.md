@@ -7,7 +7,7 @@
 <p align="center"><strong>De l'art dessiné à la main, écrit en code.</strong></p>
 
 <p align="center">
-  Illustrations, animations et courts métrages dans neuf styles dessinés à la main.<br>
+  Illustrations, accélérés de dessin, films, vidéos explicatives et art web interactif dans 31 styles.<br>
   Chaque trait est une fonction et chaque note un calcul, si bien que la même source<br>
   redessine la même image sur toute machine, à toute taille, pour de bon.
 </p>
@@ -22,20 +22,20 @@
 <p align="center"><a href="README.md">English</a> · <a href="README.ja-JP.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko-KR.md">한국어</a> · <b>Français</b> · <a href="README.es-ES.md">Español</a></p>
 
 <p align="center">
-  <a href="#neuf-styles-au-choix">Styles</a> ·
+  <a href="#31-styles-au-choix">Styles</a> ·
   <a href="#ce-que-vous-pouvez-créer">Ce que vous pouvez créer</a> ·
   <a href="#ce-quil-embarque">Ce qu'il embarque</a> ·
   <a href="#ça-dessine-puis-ça-bouge">Mouvement</a> ·
   <a href="#démarrer">Démarrer</a>
 </p>
 
-## Neuf styles au choix
+## 31 styles au choix
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="Neuf illustrations, chacune dans son propre style : renoncule au crayon et à l'aquarelle, carpe koï façon bande dessinée au marqueur, montre à gousset au stylo bille, montgolfière au crayon de couleur, roitelet à l'encre et au lavis, phases de lune à la craie, renard en papier découpé, phare en risographie, et une lune gravée d'un seul trait">
+  <img src="assets/styles.jpg" width="100%" alt="31 illustrations, chacune dans son style, du crayon et de l’aquarelle, de la BD au marqueur et de la risographie au pixel art, aux briques de jeu, à la gravure sur bois, au sumi-e, à la carte à gratter, à la broderie, à la peinture à l’huile et au livre de contes populaires">
 </p>
 
-Chaque style est une façon bien à lui de poser une trace : l'effilement d'une plume, le débordement d'un lavis, le grain de la craie sur l'ardoise, le bord déchiré du papier découpé, la trame d'un tambour de risographie, un seul trait gravé qui s'enroule pour devenir une lune. Le sujet change de forme selon la main qui le dessine, comme il le ferait pour neuf illustrateurs différents. Choisissez-en un pour votre marque, et toutes les images suivantes arriveront de la même main. Chaque planche ci-dessus, et la planche-contact elle-même, est dessinée par du code dans ce dépôt.
+Chaque style est une façon bien à lui de poser une trace : l'effilement d'une plume, le débordement d'un lavis, le grain de la craie sur l'ardoise, le bord déchiré du papier découpé, la trame d'un tambour de risographie, un seul trait gravé qui s'enroule pour devenir une lune. Le sujet change de forme selon la main qui le dessine, comme il le ferait pour trente et un illustrateurs différents. Chaque style s’accompagne aussi d’un film où son image se dessine trait après trait, dans l’ordre de travail d’un artiste qui emploie ce médium. Choisissez-en un pour votre marque, et toutes les images suivantes arriveront de la même main. Chaque planche ci-dessus, et la planche-contact elle-même, est dessinée par du code dans ce dépôt.
 
 ## Ce que vous pouvez créer
 
@@ -46,7 +46,11 @@ Chaque style est une façon bien à lui de poser une trace : l'effilement d'une 
 | **Votre marque** | Un logo qui se dessine tout seul, un générique, un gabarit de carte sociale qui reste fidèle à votre marque à chaque publication. |
 | **Réseaux sociaux et messagerie** | Des boucles infinies, des GIF et des stickers animés transparents, aux bonnes dimensions pour le fil d'actualité. |
 | **Présentations et documents** | Une famille d'illustrations de section issues d'un seul programme. Une nouvelle graine donne une image sœur dans le même style. |
-| **Récits** | Des storyboards et des animatics qui grandissent jusqu'à devenir un court métrage fini, avec une bande originale. |
+| **Récits** | Des storyboards et des animatics qui grandissent jusqu’à devenir un film achevé, de n’importe quelle durée, avec une bande originale. |
+| **Votre propre image** | Apportez un dessin et reprenez son style pour un nouveau sujet, ou apportez une photo et recréez-la dans l’une des 31 manières, chaque trait tracé par le code. |
+| **Pages web** | Des illustrations interactives qui suivent le curseur, réagissent aux clics et aux formulaires, ou se dessinent au fil du défilement. |
+| **Apprentissage** | Des leçons de dessin en étapes et en accéléré, pour comprendre la construction d’une image, les points à observer et les erreurs courantes. |
+| **Personnages** | Un personnage créé une fois, qui reste identique d’un plan, d’une pose et d’un style à l’autre. |
 
 Demandez avec vos propres mots, *« un phare en risographie pour notre page carrières, 1600×900 »* ou *« un schéma à la craie qui explique comment s'articulent nos formules tarifaires »*, et anidoodle l'oriente vers le bon flux de travail et la bonne recette de style, en ne vous questionnant que sur ce que la demande laisse ouvert.
 
@@ -56,8 +60,8 @@ Le moteur, c'est la partie facile. Le métier, c'est ce qu'anidoodle porte pour 
 
 - **Le récit** donne un sens à chaque pièce. Une idée et un sujet focal pour une image fixe ; une transformation, une résolution et un motif qui revient pour un film. → [`storytelling.md`](references/storytelling.md)
 - **Le réalisme** vient du fait de le nommer. L'anatomie, l'angle de vue et la référence que vous avez ouverte, pour qu'un papillon se lise comme une créature avec un corps et des nervures. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **Le style** habite la trace. Neuf recettes complètes, un guide pour en choisir une par projet, et la marche à suivre pour inventer la vôtre. → [`styles.md`](references/styles.md)
-- **La musique** suit une recette. Tonalité majeure, cordes pincées, une phrase qui pose une question et se résout sur la tonique, chaleureuse et sûre d'elle. → [`music-recipe.md`](references/music-recipe.md)
+- **Le style** habite la trace. Trente et une recettes complètes, un guide pour en choisir une par projet, et la marche à suivre pour inventer la vôtre. → [`styles.md`](references/styles.md)
+- **La musique** se compose en notes et se synthétise par code : un piano modélisé et une douzaine d’instruments, toutes les tonalités majeures et mineures, une humeur par section et un thème adapté à toute durée. → [`music/README.md`](references/music/README.md)
 - **Le déterminisme** est la garantie. Des fonctions pures et un aléatoire à graine fixe, pour que quiconque a le code source reconstruise exactement la même pièce. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
 - **La méthode** vous fait gagner du temps. Prouvez le rendu sur une seule image fixe, construisez d'une traite, et réservez les validations aux endroits où se tromper coûte cher. → [`working-method.md`](references/working-method.md)
 
@@ -88,16 +92,27 @@ Un modèle d'image dépense des tokens et du calcul à chaque image de chaque re
 
 ## Démarrer
 
-anidoodle est une compétence d'agent (agent skill) : un seul dossier avec un `SKILL.md` à la racine. Pour Claude Code, clonez-la dans votre dossier de compétences :
+**Claude Code:**
 
 ```bash
-git clone https://github.com/alexgreensh/anidoodle ~/.claude/skills/anidoodle
+/plugin marketplace add alexgreensh/anidoodle
+/plugin install anidoodle@alexgreensh-anidoodle
 ```
+
+**Codex:**
+
+```bash
+codex plugin marketplace add alexgreensh/anidoodle
+```
+
+Puis, dans l’interface Codex, ouvrez `/plugins` et installez anidoodle.
+
+**Tout autre agent :** anidoodle est un dossier de compétence standard (`skills/anidoodle/SKILL.md`) ; vous pouvez le copier dans tout environnement capable de lire les compétences.
 
 Ensuite, demandez ce que vous voulez : *« dessine une poire au crayon et à l'aquarelle pour notre page de recettes »*. Pour piloter le moteur vous-même :
 
 ```bash
-node ~/.claude/skills/anidoodle/engine/tools/scaffold.mjs ~/art --still hero --film intro
+node <anidoodle>/engine/tools/scaffold.mjs ~/art --still hero --film intro --format 9x16 --duration 60
 cd ~/art && npm install && npx playwright-core install chromium
 
 node tools/still.mjs  hero  --out out/hero.png --scale 2   # a finished illustration, print size
@@ -114,7 +129,7 @@ Quatre moteurs de rendu partagent un même noyau artistique, et ce noyau ignore 
 
 ## Le film d'exemple
 
-`example/` contient **Mechanical Lepidoptera** : 1 410 images, 47 secondes, un papillon mécanique qui se dessine lui-même au trait technique, prend vie à l'aquarelle, et laisse son plan dans l'herbe. C'est tout le moteur réuni dans une seule pièce : des points de contrôle placés à la main sur une anatomie réelle, une clé de cache qui nomme chaque entrée dont dépend un pixel, une bande-son construite à partir de la recette, et un mouvement ininterrompu du plan à la vie. Les neuf planches de style se trouvent à côté du moteur dans `engine/src/canvas-core/`, chacune avec sa recette écrite en haut. Ouvrez-en une, changez un chiffre, et regardez ce qui bouge.
+`example/` contient **Mechanical Lepidoptera** : 1 410 images, 47 secondes, un papillon mécanique qui se dessine lui-même au trait technique, prend vie à l'aquarelle, et laisse son plan dans l'herbe. C'est tout le moteur réuni dans une seule pièce : des points de contrôle placés à la main sur une anatomie réelle, une clé de cache qui nomme chaque entrée dont dépend un pixel, une bande-son construite à partir de la recette, et un mouvement ininterrompu du plan à la vie. Les planches de style se trouvent à côté du moteur dans `engine/src/canvas-core/`, chacune avec sa recette écrite en haut. Ouvrez-en une, changez un chiffre, et regardez ce qui bouge.
 
 ## Honnête par conception
 

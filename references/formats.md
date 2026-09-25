@@ -45,7 +45,7 @@ the craft table, then show it.
 ## Films: the story ones
 
 30 to 90 seconds, a transformation, a score, the full workflow in `SKILL.md`, the doctrine in
-`storytelling.md`, `music-recipe.md` and `working-method.md`. `example/` is the worked one.
+`storytelling.md`, `music/README.md` and `working-method.md`. `example/` is the worked one.
 
 ## Delivering
 

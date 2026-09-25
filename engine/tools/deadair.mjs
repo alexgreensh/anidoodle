@@ -2,32 +2,27 @@
 // GATE G-AIR. Decodes the rendered MP4 and measures, per frame, the fraction of pixels that
 // changed since the previous frame. Two identical frames anywhere, or any window of `win`
 // frames whose changed area never reaches `min` percent, is dead air and fails.
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { changedArea } from "./motion.mjs";
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const a0 = process.argv[2];
-if (!a0) { console.error("usage: node tools/deadair.mjs <film|path.mp4> [--win 15] [--min 0.5] [--exempt 525:540]"); process.exit(2); }
+if (!a0) { console.error("usage: node tools/deadair.mjs <film|path.mp4> [--win frames] [--min 0.5] [--exempt from:to]"); process.exit(2); }
 const file = resolve(a0.endsWith(".mp4") ? a0 : `out/${a0}.mp4`);
 if (!existsSync(file)) { console.error(`no such file: ${file}`); process.exit(2); }
-const WIN = Number(arg("win", 15)), MIN = Number(arg("min", 0.5)) / 100, THRESH = Number(arg("thresh", 4)), SIZE = Number(arg("size", 270));
+const stream = JSON.parse(execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height,avg_frame_rate", "-of", "json", file])).streams[0];
+const [fpsNum, fpsDen] = stream.avg_frame_rate.split("/").map(Number);
+const WIN = Number(arg("win", Math.max(2, Math.round(fpsNum / fpsDen / 2)))), MIN = Number(arg("min", 0.5)) / 100, THRESH = Number(arg("thresh", 4)), SIZE = Number(arg("size", 270));
 const exempt = (arg("exempt", "") || "").split(",").filter(Boolean).map((s) => s.split(":").map(Number));
 
 // decode small: 135x135 grey is plenty to see whether anything moved, and it keeps this honest
-const W = SIZE, H = SIZE, px = W * H;
-const out = spawnSync("ffmpeg", ["-v", "error", "-i", file, "-vf", `scale=${W}:${H}`, "-pix_fmt", "gray", "-f", "rawvideo", "-"], { maxBuffer: 1 << 30 });
-if (out.status) { console.error(out.stderr.toString()); process.exit(2); }
-const buf = out.stdout, n = Math.floor(buf.length / px);
+const W = SIZE, H = Math.max(2, Math.round(SIZE * stream.height / stream.width));
+const changed = await changedArea(file, W, H, THRESH), n = changed.length;
 const probe = execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=nb_frames,duration", "-of", "csv=p=0", file]).toString().trim();
 console.log(`${file}\n  ${n} frames decoded at ${W}x${H} grey, threshold ${THRESH}/255 (${probe})`);
 
-const changed = [0];
-for (let f = 1; f < n; f++) {
-  const a = buf.subarray((f - 1) * px, f * px), b = buf.subarray(f * px, (f + 1) * px);
-  let c = 0; for (let i = 0; i < px; i++) if (Math.abs(a[i] - b[i]) > THRESH) c++;
-  changed.push(c / px);
-}
 const inExempt = (f) => exempt.some(([a, b]) => f >= a && f < b);
 const still = [], windows = [];
 for (let f = 1; f < n; f++) if (changed[f] === 0 && !inExempt(f)) still.push(f);

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "alexgreensh-anidoodle",
+  "owner": {
+    "name": "Alex Greenshpun",
+    "email": "alexgreensh@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "Hand-drawn art, written as code"
+  },
+  "plugins": [
+    {
+      "name": "anidoodle",
+      "source": "./",
+      "description": "Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 31 styles, with scores composed in code.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Alex Greenshpun",
+        "url": "https://linkedin.com/in/alexgreensh"
+      },
+      "homepage": "https://github.com/alexgreensh/anidoodle",
+      "repository": "https://github.com/alexgreensh/anidoodle",
+      "license": "Apache-2.0",
+      "keywords": ["illustration", "animation", "film", "drawing", "art", "music", "explainer"],
+      "category": "design"
+    }
+  ]
+}

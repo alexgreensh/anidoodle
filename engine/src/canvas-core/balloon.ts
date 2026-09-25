@@ -1,6 +1,6 @@
 import { Gfx, fractal, rng, type Ctx, type Env, type Medium, type P } from "./core";
 import type { Film } from "./film";
-import { blob, bounds, clamp, fillShape, hatchRuns, inside, lerp, lerpP, mix, smooth } from "./gallery";
+import { blob, bounds, clamp, clipped, fillShape as fillShape0, hatchRuns, inside, lerp, lerpP, mix, smooth } from "./gallery";
 
 // HOT-AIR BALLOON · crayon. Wax on toothy paper: every fill is a back-and-forth scribble that
 // skips the valleys of the sheet, a second, darker crayon is worked across the shade side, a
@@ -15,20 +15,41 @@ import { blob, bounds, clamp, fillShape, hatchRuns, inside, lerp, lerpP, mix, sm
 const CRAYON_M: Medium = { nib: 2.9, taper: 0.3, pressure: 0.8, retrace: true, wobble: 2.2, rough: 1.3 };
 const K = { red: "#e5392d", orange: "#f68b1f", yellow: "#ffd21f", green: "#3dae49", blue: "#2f7de1", sky: "#69c3f2", purple: "#8d4fc7", pink: "#ff78ae", brown: "#8b5a3c", white: "#fffdf4", black: "#262233", leaf: "#2f8a3b" };
 const PAPER = "#fdf8ea";
+// OPTIONAL draw-on clock (balloonDraw.ts). Absent, every mark is drawn whole and the still is byte-identical.
+// Present, each scribble and line asks it how far along it is (0 = not yet, 1 = done), in drawing order.
+export type CrayonKind = "fill" | "shade" | "burnish" | "line";
+export type BalloonClock = { n: number; sec: string; p: (kind: CrayonKind, i: number, pts: P[]) => number; lay: (i: number, pts: P[]) => number };
+type Clocked = Gfx & { clk?: BalloonClock };
+// a solid crayon patch: under the clock it is coloured in from its left edge; paper knock-outs are always there
+const fillShape = (g: Gfx, pts: P[], color: string, alpha?: number) => {
+  const clk = (g as Clocked).clk;
+  if (clk && color !== PAPER) {
+    const p = clk.p("fill", clk.n++, pts); if (p <= 0) return;
+    if (p < 1) { const b = bounds(pts), x = b.x0 - 2 + (b.x1 - b.x0 + 4) * p; clipped(g, [[b.x0 - 2, b.y0 - 2], [x, b.y0 - 2], [x, b.y1 + 2], [b.x0 - 2, b.y1 + 2]], () => fillShape0(g, pts, color, alpha)); return; }
+  }
+  fillShape0(g, pts, color, alpha);
+};
 const dark = (c: string) => mix(c, "#2a1d3a", 0.45);
 
 // ---------------------------------------------------------------- the crayon
 // A scribble fill: hatch runs joined end to end into one back-and-forth stroke, drawn in short
 // passes so the pressure (alpha) wanders the way a child's hand does.
-const scribble = (g: Gfx, region: P[], color: string, o: { angle: number; gap: number; w: number; alpha: number; seed: number; keep?: (x: number, y: number) => boolean; over?: number }) => {
+const scribble = (g: Gfx, region: P[], color: string, o: { angle: number; gap: number; w: number; alpha: number; seed: number; keep?: (x: number, y: number) => boolean; over?: number; kind?: CrayonKind }) => {
+  const clk = (g as Clocked).clk, p = clk ? clk.p(o.kind ?? "fill", clk.n++, region) : 1;   // the draw-on clock: how much of this scribble exists yet
+  if (p <= 0) return;
   const { angle, gap, w, alpha, seed, keep = () => true, over = 1.035 } = o, r = rng(seed), b = bounds(region);
   const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, grown = region.map(([x, y]) => [cx + (x - cx) * over, cy + (y - cy) * over] as P);
-  const runs = hatchRuns({ x0: b.x0 - 8, y0: b.y0 - 8, x1: b.x1 + 8, y1: b.y1 + 8 }, angle, gap, (x, y) => inside(grown, x, y) && keep(x, y), 5, seed);
+  // the runs are pure geometry of this call site (region, angle, gap, seed, colour, and its keep rule, which is fixed per site): computed once per page
+  const rk = `balloon:runs:${seed}:${angle}:${gap}:${over}:${color}:${region.length}:${region[0][0].toFixed(3)},${region[0][1].toFixed(3)}:${region[region.length >> 1][0].toFixed(3)}`;
+  let runs = g.env.cache.get(rk) as P[][] | undefined;
+  if (!runs) { runs = hatchRuns({ x0: b.x0 - 8, y0: b.y0 - 8, x1: b.x1 + 8, y1: b.y1 + 8 }, angle, gap, (x, y) => inside(grown, x, y) && keep(x, y), 5, seed); g.env.cache.set(rk, runs); }
   const c = g.cur; g.touch(b.x0 - 14, b.y0 - 14, b.x1 + 14, b.y1 + 14);
   c.save(); c.lineCap = "round"; c.lineJoin = "round"; c.strokeStyle = color; c.lineWidth = w;
-  let prev: P | null = null;
+  let prev: P | null = null; const lim = p * runs.length;
   runs.forEach((run, i) => {
-    const pts = (i % 2 ? [...run].reverse() : run).filter((_, k, a) => k % 3 === 0 || k === a.length - 1).map(([x, y]) => [x + (r() - 0.5) * 1.6, y + (r() - 0.5) * 1.6] as P);
+    if (i >= lim) return;
+    let pts = (i % 2 ? [...run].reverse() : run).filter((_, k, a) => k % 3 === 0 || k === a.length - 1).map(([x, y]) => [x + (r() - 0.5) * 1.6, y + (r() - 0.5) * 1.6] as P);
+    if (lim - i < 1) pts = pts.slice(0, Math.max(2, Math.ceil(pts.length * (lim - i))));
     const jump = prev ? Math.hypot(pts[0][0] - prev[0], pts[0][1] - prev[1]) : 0;
     c.globalAlpha = alpha * (0.72 + r() * 0.4);
     c.beginPath();
@@ -38,7 +59,14 @@ const scribble = (g: Gfx, region: P[], color: string, o: { angle: number; gap: n
   });
   c.restore();
 };
-const line = (g: Gfx, pts: P[], color: string, w: number, seed: number, op = 0.92, wob = 1) => g.pen(pts, { w, color, seed, wobble: wob, boil: 0, opacity: op, retrace: true, taper: 1 });
+const line = (g: Gfx, pts: P[], color: string, w: number, seed: number, op = 0.92, wob = 1) => {
+  const clk = (g as Clocked).clk;
+  if (!clk) return g.pen(pts, { w, color, seed, wobble: wob, boil: 0, opacity: op, retrace: true, taper: 1 });
+  // drawn on: a thin light lay-in of the contour first, then the fat line gone over twice, which replaces it
+  const i = clk.n++, full = clk.p("line", i, pts), lay = clk.lay(i, pts);
+  if (full < 1 && lay > 0) g.pen(pts, { w: w * 0.45, color, seed, wobble: wob, boil: 0, opacity: op * 0.6, retrace: false, taper: 1, progress: lay });
+  if (full > 0) g.pen(pts, { w, color, seed, wobble: wob, boil: 0, opacity: op, retrace: true, taper: 1, progress: full });
+};
 // wax skips the valleys of the sheet: every crayon layer is punched by the paper's tooth
 const wax = (g: Gfx, fn: () => void) => g.group("plain", fn, { textures: ["pencilTooth"] });
 
@@ -60,12 +88,12 @@ const envelope = (g: Gfx) => {
       scribble(g, gore, col, { angle: -0.35 + (k % 2) * 0.2, gap: 9, w: 5, alpha: 0.5, seed: 101 + k * 7 });
       // the shade crayon, worked across the side away from the light and under the belly
       const sh = (x: number, y: number) => { const u = (x - CX) / R, v = (y - EQ) / R; return u * 0.9 + v * 0.8 + (fractal(9, x, y, 0.02, 0.02, 2) - 0.5) * 0.35 > 0.15 + litG * 0.4; };
-      scribble(g, gore, dark(col), { angle: 0.55, gap: 6.5, w: 5, alpha: 0.72, seed: 102 + k * 7, keep: sh });
+      scribble(g, gore, dark(col), { angle: 0.55, gap: 6.5, w: 5, alpha: 0.72, kind: "shade", seed: 102 + k * 7, keep: sh });
       const deep = (x: number, y: number) => { const u = (x - CX) / R, v = (y - EQ) / R; return u * 0.9 + v * 0.9 > 0.75 + litG * 0.35; };
-      scribble(g, gore, mix(dark(col), K.black, 0.3), { angle: -0.6, gap: 7, w: 4.4, alpha: 0.6, seed: 103 + k * 7, keep: deep });
+      scribble(g, gore, mix(dark(col), K.black, 0.3), { angle: -0.6, gap: 7, w: 4.4, alpha: 0.6, kind: "shade", seed: 103 + k * 7, keep: deep });
       // burnished highlight: white crayon pressed hard over the colour, upper left
       const hi = (x: number, y: number) => { const u = (x - CX) / R + 0.42, v = (y - EQ) / R + 0.52; return u * u * 1.4 + v * v < 0.1 + (fractal(10, x, y, 0.03, 0.03, 2) - 0.5) * 0.06; };
-      scribble(g, gore, K.white, { angle: 1.0, gap: 5, w: 4.5, alpha: 0.75, seed: 104 + k * 7, keep: hi, over: 1 });
+      scribble(g, gore, K.white, { angle: 1.0, gap: 5, w: 4.5, alpha: 0.75, kind: "burnish", seed: 104 + k * 7, keep: hi, over: 1 });
     });
   }
   // seams: load tapes down every meridian, a few latitude tapes, the crown ring, the outline twice
@@ -87,11 +115,11 @@ const rigging = (g: Gfx) => {
     [[-tw * 0.9, bk.x0 + 4], [-tw * 0.3, bk.x0 + 40], [tw * 0.3, bk.x1 - 40], [tw * 0.9, bk.x1 - 4]].forEach(([a, b2], i) => line(g, [[CX + a, throatY + 30], [lerp(CX + a, b2, 0.5), lerp(throatY + 30, bk.y0, 0.5)], [b2, bk.y0]], "#4a3a36", 0.9, 300 + i, 0.85, 0.6));
     fillShape(g, skirt, PAPER);
     scribble(g, skirt, K.red, { angle: 1.4, gap: 5, w: 5.5, alpha: 0.9, seed: 310 });
-    scribble(g, skirt, dark(K.red), { angle: 0.4, gap: 6, w: 4.5, alpha: 0.65, seed: 311, keep: (x) => x > CX });
+    scribble(g, skirt, dark(K.red), { angle: 0.4, gap: 6, w: 4.5, alpha: 0.65, kind: "shade", seed: 311, keep: (x) => x > CX });
     line(g, [...skirt, skirt[0]], K.black, 1.8, 312, 0.9, 0.8);
     // the burner, and its flame roaring up into the throat
     const burner: P[] = [[CX - 26, 790], [CX + 26, 790], [CX + 22, 806], [CX - 22, 806]];
-    fillShape(g, burner, "#aab4c4"); scribble(g, burner, "#7f8aa0", { angle: 0.3, gap: 4, w: 3.5, alpha: 0.8, seed: 320, keep: (x) => x > CX - 4 });
+    fillShape(g, burner, "#aab4c4"); scribble(g, burner, "#7f8aa0", { angle: 0.3, gap: 4, w: 3.5, alpha: 0.8, kind: "shade", seed: 320, keep: (x) => x > CX - 4 });
     line(g, [...burner, burner[0]], K.black, 1.4, 321, 0.9, 0.5);
     const flame = smooth([[CX - 17, 792], [CX - 19, 772], [CX - 8, 754], [CX + 1, 736], [CX + 9, 752], [CX + 19, 770], [CX + 17, 792]], true, 8);  // it disappears up into the skirt
     fillShape(g, flame, PAPER);
@@ -107,7 +135,7 @@ const rigging = (g: Gfx) => {
     [[CX - 40, K.pink, 1], [CX + 40, K.blue, -1]].forEach(([x, c, s], i) => {
       const hx = x as number, hy = bk.y0 - 30;
       fillShape(g, blob(hx, hy + 18, 13, 14, 340 + i, 0.1, 10), PAPER); scribble(g, blob(hx, hy + 18, 13, 14, 340 + i, 0.1, 10), c as string, { angle: 1.2, gap: 4, w: 4, alpha: 0.9, seed: 341 + i });
-      fillShape(g, blob(hx, hy, 11, 12, 345 + i, 0.08, 10), "#f6c8a0"); scribble(g, blob(hx, hy, 11, 12, 345 + i, 0.08, 10), "#e8a37c", { angle: 0.4, gap: 5, w: 3.4, alpha: 0.6, seed: 346 + i, keep: (xx) => xx > hx });
+      fillShape(g, blob(hx, hy, 11, 12, 345 + i, 0.08, 10), "#f6c8a0"); scribble(g, blob(hx, hy, 11, 12, 345 + i, 0.08, 10), "#e8a37c", { angle: 0.4, gap: 5, w: 3.4, alpha: 0.6, kind: "shade", seed: 346 + i, keep: (xx) => xx > hx });
       line(g, blob(hx, hy, 11, 12, 345 + i, 0.08, 10), "#6b3e2e", 1.3, 347 + i, 0.85, 0.5);
       fillShape(g, blob(hx - 2, hy - 9, 11, 5, 348 + i, 0.2, 10), i ? K.brown : K.orange);
       if (s === 1) { line(g, [[hx - 9, hy + 16], [hx - 24, hy + 2], [hx - 30, hy - 20]], "#e8a37c", 2.6, 349, 0.95, 0.5); fillShape(g, blob(hx - 31, hy - 24, 5, 5, 356, 0.1, 8), "#f6c8a0"); } // waving
@@ -116,9 +144,9 @@ const rigging = (g: Gfx) => {
     fillShape(g, basket, PAPER);
     scribble(g, basket, "#c98f4e", { angle: 1.4, gap: 4.5, w: 5, alpha: 0.9, seed: 350 });
     for (let yy = bk.y0 + 8; yy < bk.y1 - 3; yy += 8) for (let xx = bk.x0 + 4 + ((yy / 8) % 2) * 6; xx < bk.x1 - 6; xx += 12) line(g, [[xx, yy], [xx + 7, yy + 3]], K.brown, 1.0, 351 + xx * 3 + yy, 0.75, 0.3); // the weave
-    scribble(g, basket, K.brown, { angle: 0.35, gap: 6, w: 4, alpha: 0.6, seed: 352, keep: (x) => x > CX + 12 });
+    scribble(g, basket, K.brown, { angle: 0.35, gap: 6, w: 4, alpha: 0.6, kind: "shade", seed: 352, keep: (x) => x > CX + 12 });
     const rim: P[] = [[bk.x0 - 5, bk.y0 - 9], [bk.x1 + 5, bk.y0 - 9], [bk.x1 + 5, bk.y0 + 5], [bk.x0 - 5, bk.y0 + 5]];
-    fillShape(g, rim, "#7a4a2c"); scribble(g, rim, "#5a3420", { angle: 0.1, gap: 3, w: 3, alpha: 0.7, seed: 353, keep: (x) => x > CX });
+    fillShape(g, rim, "#7a4a2c"); scribble(g, rim, "#5a3420", { angle: 0.1, gap: 3, w: 3, alpha: 0.7, kind: "shade", seed: 353, keep: (x) => x > CX });
     line(g, [...basket, basket[0]], "#4a2c1c", 1.9, 354, 0.9, 0.7); line(g, [...rim, rim[0]], "#3a2216", 1.6, 355, 0.9, 0.6);
   });
 };
@@ -133,7 +161,7 @@ const sky = (g: Gfx) => {
   // the sun, where the light comes from
   wax(g, () => {
     const sun = blob(150, 140, 62, 60, 20, 0.05, 16);
-    fillShape(g, sun, PAPER); scribble(g, sun, K.yellow, { angle: 0.9, gap: 4.5, w: 5.5, alpha: 0.95, seed: 21 }); scribble(g, sun, K.orange, { angle: -0.7, gap: 7, w: 4, alpha: 0.45, seed: 22, keep: (x, y) => (x - 150) + (y - 140) > 20 });
+    fillShape(g, sun, PAPER); scribble(g, sun, K.yellow, { angle: 0.9, gap: 4.5, w: 5.5, alpha: 0.95, seed: 21 }); scribble(g, sun, K.orange, { angle: -0.7, gap: 7, w: 4, alpha: 0.45, kind: "shade", seed: 22, keep: (x, y) => (x - 150) + (y - 140) > 20 });
     line(g, sun.filter((_, i) => i % 3 === 0), K.orange, 1.8, 23, 0.9, 1);
     for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2 + 0.15, r0 = 80, r1 = 106 + (i % 2) * 16; line(g, [[150 + Math.cos(a) * r0, 140 + Math.sin(a) * r0], [150 + Math.cos(a) * (r0 + r1) / 2, 140 + Math.sin(a) * (r0 + r1) / 2 + 2], [150 + Math.cos(a) * r1, 140 + Math.sin(a) * r1]], K.yellow, 2.4, 24 + i, 0.95, 1.2); }
   });
@@ -143,7 +171,7 @@ const sky = (g: Gfx) => {
     for (let i = 0; i < 6; i++) puffs.push(blob(cx + (i - 2.5) * 32 * s + (r() - 0.5) * 10, cy - Math.sin((i / 5) * Math.PI) * 28 * s + (r() - 0.5) * 8, (34 + r() * 16) * s, (28 + r() * 10) * s, seed + i, 0.08, 12));
     wax(g, () => {
       puffs.forEach((p) => fillShape(g, p, PAPER));
-      puffs.forEach((p, i) => scribble(g, p, "#b9cde6", { angle: 0.2, gap: 6, w: 4.5, alpha: 0.55, seed: seed + 10 + i, keep: (x, y) => y > cy + 4 * s }));
+      puffs.forEach((p, i) => scribble(g, p, "#b9cde6", { angle: 0.2, gap: 6, w: 4.5, alpha: 0.55, kind: "shade", seed: seed + 10 + i, keep: (x, y) => y > cy + 4 * s }));
       puffs.forEach((p, i) => {
         // walk this puff's edge and keep only the stretches no other puff covers: the silhouette
         let run: P[] = []; const runs: P[][] = [];
@@ -172,16 +200,16 @@ const land = (g: Gfx) => {
   const back: P[] = smooth([[0, 900], [180, 868], [420, 884], [700, 852], [900, 866], [1080, 846], [1080, 1080], [0, 1080]], true, 10);
   const front: P[] = smooth([[0, 968], [220, 930], [480, 958], [760, 936], [1080, 972], [1080, 1080], [0, 1080]], true, 10);
   wax(g, () => {
-    fillShape(g, back, PAPER); scribble(g, back, "#8ccf5a", { angle: 0.15, gap: 5.5, w: 6, alpha: 0.9, seed: 400, over: 1 }); scribble(g, back, K.green, { angle: -0.4, gap: 8, w: 5, alpha: 0.5, seed: 401, over: 1, keep: (x, y) => y > 890 + Math.sin(x * 0.01) * 12 });
+    fillShape(g, back, PAPER); scribble(g, back, "#8ccf5a", { angle: 0.15, gap: 5.5, w: 6, alpha: 0.9, seed: 400, over: 1 }); scribble(g, back, K.green, { angle: -0.4, gap: 8, w: 5, alpha: 0.5, kind: "shade", seed: 401, over: 1, keep: (x, y) => y > 890 + Math.sin(x * 0.01) * 12 });
     line(g, back.filter((_, i) => i % 4 === 0 && back[i][1] < 1000), "#2f7a33", 1.8, 402, 0.85, 1);
     // trees on the far hill: round crowns on stubby trunks, each shaded on its right
     [[160, 872, 1], [214, 880, 0.8], [760, 858, 0.9], [982, 852, 1.1]].forEach(([x, y, s], i) => {
       line(g, [[x, y + 2], [x + 1, y - 18 * s]], K.brown, 2.2, 410 + i, 0.95, 0.4);
       const c = blob(x, y - 34 * s, 22 * s, 24 * s, 420 + i, 0.12, 12);
-      fillShape(g, c, PAPER); scribble(g, c, K.green, { angle: 1.1, gap: 4, w: 4.5, alpha: 0.9, seed: 430 + i }); scribble(g, c, K.leaf, { angle: 0.3, gap: 5, w: 3.6, alpha: 0.7, seed: 440 + i, keep: (xx) => xx > x + 2 });
+      fillShape(g, c, PAPER); scribble(g, c, K.green, { angle: 1.1, gap: 4, w: 4.5, alpha: 0.9, seed: 430 + i }); scribble(g, c, K.leaf, { angle: 0.3, gap: 5, w: 3.6, alpha: 0.7, kind: "shade", seed: 440 + i, keep: (xx) => xx > x + 2 });
       line(g, c.filter((_, k) => k % 3 === 0), "#1f5a28", 1.4, 450 + i, 0.85, 0.8);
     });
-    fillShape(g, front, PAPER); scribble(g, front, K.green, { angle: -0.12, gap: 5, w: 6.5, alpha: 0.92, seed: 460, over: 1 }); scribble(g, front, K.leaf, { angle: 0.5, gap: 7, w: 5, alpha: 0.55, seed: 461, over: 1, keep: (x, y) => y > 985 });
+    fillShape(g, front, PAPER); scribble(g, front, K.green, { angle: -0.12, gap: 5, w: 6.5, alpha: 0.92, seed: 460, over: 1 }); scribble(g, front, K.leaf, { angle: 0.5, gap: 7, w: 5, alpha: 0.55, kind: "shade", seed: 461, over: 1, keep: (x, y) => y > 985 });
     // a winding path, and grass flicked up along the hill's edge
     const path = smooth([[610, 1080], [560, 1030], [620, 990], [590, 950]], false, 10);
     const pw: P[] = [...path.map(([x, y], i) => [x - 22 + i * 0.35, y] as P), ...path.map(([x, y], i) => [x + 22 - i * 0.35, y] as P).reverse()];
@@ -191,11 +219,13 @@ const land = (g: Gfx) => {
   });
 };
 
-export const drawBalloon = (ctx: Ctx, _frame: number, env: Env) => {
-  const g = new Gfx(ctx, env, 0, CRAYON_M);
+export const drawBalloon = (ctx: Ctx, _frame: number, env: Env, clock?: BalloonClock) => {
+  const g = new Gfx(ctx, env, 0, CRAYON_M) as Clocked;
+  if (clock) { clock.n = 0; g.clk = clock; }
+  const sec = (s: string) => { if (clock) clock.sec = s; };
   ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0);
   ctx.fillStyle = PAPER; ctx.fillRect(0, 0, 1080, 1080);
-  sky(g); land(g); envelope(g); rigging(g);
+  sec("sky"); sky(g); sec("land"); land(g); sec("envelope"); envelope(g); sec("rigging"); rigging(g);
   g.paper("paper", 0.08);
 };
 

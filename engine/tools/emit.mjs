@@ -86,8 +86,8 @@ say(bad.length === 0, `${frames.length} frames across the film hash the same as 
 
 const sr = 48000;
 const [aShip, aGold] = [await shipped.page.evaluate((s) => window.FILM.audio(s), sr), await golden.page.evaluate((s) => window.FILM.audio(s), sr)];
-const sameAudio = aShip && aGold && aShip.frames === aGold.frames && aShip.sampleRate === aGold.sampleRate;
-say(!!sameAudio, "the page synthesizes the same score, in the page", sameAudio ? `${aShip.frames} samples @ ${aShip.sampleRate} Hz` : "audio missing or different");
+const sameAudio = !aShip && !aGold || aShip && aGold && aShip.frames === aGold.frames && aShip.sampleRate === aGold.sampleRate && aShip.float32 === aGold.float32;
+say(!!sameAudio, "the page synthesizes the same score, in the page", sameAudio ? (aShip ? `${aShip.frames} samples @ ${aShip.sampleRate} Hz` : "silent film") : "audio missing or different");
 
 await browser.close();
 console.log(`\n${"=".repeat(58)}\nEMIT: ${fails ? `FAIL   ${fails} of ${checks} checks failed` : `PASS   ${checks}/${checks} checks`}   ${out}`);

@@ -1,14 +1,39 @@
-// A tiny pure-JS score for the fixtures film: plucks on the beat, a bell on the last cut.
-// No Web Audio, no Node APIs: just maths into two Float32Arrays, so it runs under ANY backend.
-export const fixturesScore = (fps: number, bpm: number, frames: number) => (sr: number): [Float32Array, Float32Array] => {
-  const n = Math.ceil((frames / fps) * sr), L = new Float32Array(n), R = new Float32Array(n), beat = 60 / bpm;
-  const note = (t0: number, hz: number, dur: number, gain: number, pan: number, bell = false) => {
-    const i0 = Math.floor(t0 * sr), len = Math.floor(dur * sr);
-    for (let i = 0; i < len && i0 + i < n; i++) { const t = i / sr, env = Math.exp(-t * (bell ? 2.2 : 7)) * Math.min(1, t * 400), v = (Math.sin(2 * Math.PI * hz * t) + (bell ? 0.5 * Math.sin(2 * Math.PI * hz * 2.76 * t) + 0.25 * Math.sin(2 * Math.PI * hz * 5.4 * t) : 0.3 * Math.sin(2 * Math.PI * hz * 2 * t))) * env * gain; L[i0 + i] += v * (1 - pan); R[i0 + i] += v * pan; }
-  };
-  const scale = [261.63, 329.63, 392.0, 329.63, 293.66, 349.23, 440.0, 349.23, 392.0, 523.25];
-  for (let b = 0; b * beat < frames / fps; b++) { note(b * beat, scale[b % scale.length], 0.5, 0.22, 0.35 + 0.3 * (b % 2)); if (b % 2 === 0) note(b * beat, scale[b % scale.length] / 2, 0.7, 0.16, 0.5); }
-  note(6 * beat, 1046.5, 2.2, 0.2, 0.5, true); // DING on the cut into the last shot
-  for (let i = 0; i < n; i++) { L[i] = Math.tanh(L[i] * 1.4); R[i] = Math.tanh(R[i] * 1.4); }
-  return [L, R];
-};
+// The scaffold score: a two-section MusicPlan on the music module, so every new film starts with the
+// breadth visible (spec 08 section 12). Section A: music box, JOY, C major, I-IV-V-I. Section B: the
+// same box turns WISTFUL in D dorian (same notes, new home; the B natural is the colour). Notes are
+// data; the plan fits ANY film length (tempo, then repeats); pure in (frames, sampleRate).
+//
+// CHANGE NOTE: until the music module landed, this file was 14 lines of sine plucks on a fixed
+// C-major arpeggio plus a bell. Nothing imported it, so no shipped film changes sound. The worked
+// butterfly film keeps its own score (example/.../alive/score.ts), untouched: it sounds the same.
+import { line, type Piece } from "./music/plan";
+import { filmAudio } from "./music/render";
+
+const B = 4; // 12/8: four dotted-quarter beats a bar, triplet subdivisions
+const arp = (r: string, f: string, t: string) => Array.from({ length: 12 }, (_, i) => `${[r, f, t, f][i % 4]}:1/3`).join(" ");
+
+export const fixturesPiece = (bpm = 120): Piece => ({
+  title: "Fixtures: joy, then wistful", seed: 3, tail: 1.6,
+  harmony: [[0, "C"], [4, "F"], [8, "G"], [12, "C"], [16, "Dm"], [20, "G/D"], [24, "Dm"], [28, "Dm"]].map(([t, name]) => ({ t: t as number, name: name as string })),
+  plan: {
+    style: "musicBox", tempo: bpm, meter: "12/8", ritard: 0.85,
+    sections: [
+      { id: "joy", bars: 4, mood: "joy", key: "C", mode: "major", melody: ["hook", "arpeggio"], dyn: [0.75, 0.8], repeatable: true },
+      { id: "wistful", bars: 4, mood: "wistful", key: "D", mode: "dorian", melody: ["themeTransformation"], dyn: [0.7, 0.6], ending: "button", repeatable: true, optional: true },
+    ],
+  },
+  parts: [
+    // the hook (E-G-A-G), answered; then the same hook re-seated on D dorian
+    { id: "melody", inst: "musicBox", role: "melody", opts: { grid: true }, notes: line(0, [
+      "E5:1 G5:2/3 A5:1/3 G5:1 E5:1", "A5:1 C6:2/3 A5:1/3 F5:2", "G5:1 A5:2/3 G5:1/3 D5:1 B5:1", "C6:4",
+      "F5:1 A5:2/3 B5:1/3 A5:1 F5:1", "B5:1 D6:2/3 B5:1/3 G5:2", "A5:1 B5:2/3 A5:1/3 E5:1 F5:1", "D5:4"].join(" | "), { role: "melody", v: 0.75, bpb: B }) },
+    { id: "arp", inst: "musicBox", role: "accomp", gainDb: -7, opts: { grid: true }, notes: line(0, [
+      arp("C5", "G5", "E5"), arp("C5", "A5", "F5"), arp("B4", "G5", "D5"), arp("C5", "G5", "E5"),
+      arp("D5", "A5", "F5"), arp("D5", "B5", "G5"), arp("D5", "A5", "F5"), "D5:1/3 A5:1/3 F5:1/3"].join(" | "), { role: "accomp", v: 0.5, bpb: B }) },
+    { id: "bass", inst: "musicBox", role: "bass", gainDb: -8, opts: { grid: true }, notes: line(0, "C3:2 G3:2 | F3:2 C3:2 | G3:2 D3:2 | C3:4 | D3:2 A3:2 | G3:2 D3:2 | D3:2 A3:2 | D3:1", { role: "bass", v: 0.62, bpb: B }) },
+    { id: "bell", inst: "bell", role: "color", notes: line(28, "D6:1", { role: "color", v: 0.7, bpb: B }) },
+  ],
+});
+
+/** A film's `audio`: exactly the film's length at any sample rate. The same signature as before. */
+export const fixturesScore = (fps: number, bpm: number, frames: number) => filmAudio(fixturesPiece(bpm), frames / fps);

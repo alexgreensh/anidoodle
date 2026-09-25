@@ -1,6 +1,6 @@
 // SCAFFOLD. Turn the skill's engine into a working project: a still, a film, or both.
 //
-//   node <skill>/engine/tools/scaffold.mjs <dir> [--still myPicture] [--film myFilm] [--example]
+//   node <skill>/engine/tools/scaffold.mjs <dir> [--still myPicture] [--film myFilm] [--duration seconds] [--size WxH | --format 9x16] [--fps N] [--bpm N] [--example]
 //
 // The engine ships as parts, not as a project: `engine/src` holds the portable art core and the
 // one page host, `example/src` holds the worked butterfly. A film needs them in ONE tree, because
@@ -20,14 +20,24 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ENGINE = resolve(HERE, "..");
 const SKILL = resolve(ENGINE, "..");
 
-const VAL = new Set(["film", "still"]);
+const VAL = new Set(["film", "still", "duration", "size", "format", "fps", "bpm"]);
 const pos = [], opt = {};
 for (let i = 2; i < process.argv.length; i++) { const a = process.argv[i]; if (a.startsWith("--")) opt[a.slice(2)] = VAL.has(a.slice(2)) ? process.argv[++i] : true; else pos.push(a); }
 const die = (m) => { console.error(`scaffold: ${m}`); process.exit(1); };
-const target = resolve(pos[0] ?? die("usage: node tools/scaffold.mjs <dir> [--still myPicture] [--film myFilm] [--example]"));
+const target = resolve(pos[0] ?? die("usage: node tools/scaffold.mjs <dir> [--still name] [--film name] [--duration seconds] [--size WxH | --format 1x1|9x16|16x9|4x5] [--fps N] [--bpm N] [--example]"));
 const name = (flag) => { const v = opt[flag] && opt[flag] !== true ? String(opt[flag]) : null; if (v && !/^[a-zA-Z][a-zA-Z0-9]*$/.test(v)) die(`--${flag} '${v}' must be a bare identifier: it becomes a module name and an export name`); return v; };
 const film = name("film"), still = name("still");
 if (film && still && film === still) die("--film and --still need different names");
+const formats = { "1x1": [1080, 1080], "9x16": [1080, 1920], "16x9": [1920, 1080], "4x5": [1080, 1350] };
+if (opt.format && !formats[opt.format]) die("--format must be 1x1, 9x16, 16x9 or 4x5");
+if (opt.size && opt.format) die("choose --size or --format");
+const size = opt.size ? String(opt.size).match(/^(\d+)x(\d+)$/i)?.slice(1).map(Number) : formats[opt.format ?? "1x1"];
+if (!size || size.some((x) => !Number.isSafeInteger(x) || x < 2)) die("--size must be positive WxH dimensions");
+const fps = Number(opt.fps ?? 30), bpm = Number(opt.bpm ?? 60), duration = Number(opt.duration ?? 8);
+if (!Number.isSafeInteger(fps) || fps < 1) die("--fps must be a positive integer");
+if (!Number.isFinite(bpm) || bpm <= 0 || !Number.isInteger(60 * fps / bpm)) die("--bpm must give a whole-frame beat at this fps");
+if (!Number.isFinite(duration) || duration <= 0 || !Number.isSafeInteger(Math.round(duration * fps))) die("--duration must be positive seconds with a finite frame count");
+const durationFrames = Math.max(1, Math.round(duration * fps));
 
 mkdirSync(target, { recursive: true });
 cpSync(join(ENGINE, "src"), join(target, "src"), { recursive: true });
@@ -49,8 +59,7 @@ if (film) {
   writeFileSync(mod, `import { Ctx, Env, rng } from "./core";
 import { Film } from "./film";
 
-// 120 bpm at 30 fps is a 15-frame beat. Cuts land on multiples of 15, events on multiples of 5.
-const FPS = 30, BPM = 120, BEAT = (60 / BPM) * FPS, DURATION = BEAT * 32;
+const FPS = ${fps}, BPM = ${bpm}, DURATION = ${durationFrames};
 
 const draw = (ctx: Ctx, local: number, env: Env) => {
   const W = env.W * env.scale, H = env.H * env.scale, r = rng(1);
@@ -68,10 +77,10 @@ const draw = (ctx: Ctx, local: number, env: Env) => {
 };
 
 export const ${film}: Film = {
-  meta: { title: "${film}", W: 1080, H: 1080, fps: FPS, bpm: BPM, durationFrames: DURATION },
+  meta: { title: "${film}", W: ${size[0]}, H: ${size[1]}, fps: FPS, bpm: BPM, durationFrames: DURATION },
   assets: { images: {} },
   shots: [{ id: "one", start: 0, end: DURATION, draw }],
-  // audio: (sampleRate) => [left, right],   // see references/music-recipe.md before writing a note
+  // audio: (sampleRate) => [left, right],   // see references/music/README.md before writing a note
 };
 `);
   writeFileSync(join(target, "src/hosts", `page-${film}.ts`), `import { ${film} } from "../canvas-core/${film}";\nimport { mountFilm } from "./page";\nmountFilm(${film});\n`);
@@ -103,6 +112,8 @@ export const draw${still[0].toUpperCase() + still.slice(1)} = (ctx: Ctx, _frame:
   const g = new Gfx(ctx, env, 0, PENCIL);
   ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0);
   ctx.fillStyle = "#fbf6ec"; ctx.fillRect(0, 0, env.W, env.H);
+  const fit = Math.min(env.W, env.H) / 1080;
+  g.push((env.W - 1080 * fit) / 2, (env.H - 1080 * fit) / 2, fit);
 
   // 1. the cast shadow first, so the fruit sits ON the table and never floats over it
   g.group("paint", () => g.wash(oval(600, 772, 190, 34, 16), "#a79db8", { seed: 3, alpha: 0.42, dx: 0, dy: 0, shrink: 1 }));
@@ -120,13 +131,14 @@ export const draw${still[0].toUpperCase() + still.slice(1)} = (ctx: Ctx, _frame:
     g.pen(LEAF, { seed: 13, closed: true, w: 0.9, opacity: 0.55, boil: 0 });
     g.pen(line([536, 270], [660, 230], -6), { seed: 14, w: 0.6, opacity: 0.45, boil: 0, retrace: false });
   });
+  g.pop();
   // 4. the sheet itself, over everything
   g.paper("paper", 0.12);
   g.paper("coldpress", 0.18);
 };
 
 export const ${still}: Film = {
-  meta: { title: "${still}", W: 1080, H: 1080, fps: 30, bpm: 120, durationFrames: 1 },
+  meta: { title: "${still}", W: ${size[0]}, H: ${size[1]}, fps: ${fps}, bpm: ${bpm}, durationFrames: 1 },
   assets: { images: {} },
   shots: [{ id: "${still}", start: 0, end: 1, draw: draw${still[0].toUpperCase() + still.slice(1)} }],
 };
@@ -138,5 +150,5 @@ const tree = (dir, depth = 0) => readdirSync(dir, { withFileTypes: true }).filte
 console.log(`scaffolded ${target}\n${tree(target)}\n`);
 console.log(`next:\n  cd ${target}\n  npm install`);
 if (still) console.log(`  node tools/still.mjs ${still} --out out/${still}.png      # the picture; --scale 2 for print size`);
-if (film) console.log(`  node tools/still.mjs ${film} --out out/look.png      # the ONE look still\n  node tools/gate.mjs ${film} --mp4 out/${film.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()}.mp4`);
+if (film) console.log(`  node tools/still.mjs ${film} --out out/look.png\n  node tools/gate.mjs ${film}`);
 if (opt.example) console.log(`  node tools/gate.mjs mechanicalLepidoptera --mp4 out/mechanical-lepidoptera.mp4   # the worked example`);

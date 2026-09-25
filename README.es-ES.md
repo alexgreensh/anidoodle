@@ -7,7 +7,7 @@
 <p align="center"><strong>Arte dibujado a mano, escrito en código.</strong></p>
 
 <p align="center">
-  Ilustraciones, animaciones y cortometrajes en nueve estilos dibujados a mano.<br>
+  Ilustraciones, timelapses de dibujo, películas, vídeos explicativos y arte web interactivo en 31 estilos.<br>
   Cada trazo es una función y cada nota es aritmética, así que la misma fuente<br>
   redibuja la misma imagen en cualquier máquina, a cualquier tamaño, para siempre.
 </p>
@@ -22,20 +22,20 @@
 <p align="center"><a href="README.md">English</a> · <a href="README.ja-JP.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko-KR.md">한국어</a> · <a href="README.fr-FR.md">Français</a> · <b>Español</b></p>
 
 <p align="center">
-  <a href="#nueve-estilos-entre-los-que-elegir">Estilos</a> ·
+  <a href="#31-estilos-entre-los-que-elegir">Estilos</a> ·
   <a href="#qué-puedes-crear">Qué puedes crear</a> ·
   <a href="#qué-trae-dentro">Qué trae dentro</a> ·
   <a href="#primero-dibuja-luego-se-mueve">Movimiento</a> ·
   <a href="#empieza-aquí">Empieza aquí</a>
 </p>
 
-## Nueve estilos entre los que elegir
+## 31 estilos entre los que elegir
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="Nueve ilustraciones, cada una en su propio estilo: un ranúnculo en lápiz y acuarela, una carpa koi de cómic en rotulador, un reloj de bolsillo en bolígrafo, un globo aerostático en ceras, un chochín en tinta y aguada, las fases de la luna en tiza, un zorro en papel recortado, un faro en risografía, y una luna grabada en una sola línea">
+  <img src="assets/styles.jpg" width="100%" alt="31 ilustraciones, cada una con su estilo, desde lápiz y acuarela, cómic con rotulador y risografía hasta pixel art, bloques de juguete, xilografía, sumi-e, esgrafiado, bordado, óleo y libros de cuentos populares">
 </p>
 
-Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, el sangrado de una aguada, el rozado de la tiza sobre la pizarra, el borde rasgado del papel recortado, la trama de un tambor de risografía, una sola línea grabada que se enrosca hasta convertirse en luna. El motivo cambia de forma según la mano que lo dibuje, igual que le pasaría con nueve ilustradores distintos. Elige uno para tu marca y cada imagen que venga después llegará de la misma mano. Cada lámina de arriba, y la propia hoja de contactos, está dibujada por código en este repositorio.
+Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, el sangrado de una aguada, el rozado de la tiza sobre la pizarra, el borde rasgado del papel recortado, la trama de un tambor de risografía, una sola línea grabada que se enrosca hasta convertirse en luna. El motivo cambia de forma según la mano que lo dibuje, igual que le pasaría con treinta y un ilustradores distintos. Cada estilo incluye además una película en la que su imagen se dibuja trazo a trazo, siguiendo el orden de trabajo de un artista de ese medio. Elige uno para tu marca y cada imagen que venga después llegará de la misma mano. Cada lámina de arriba, y la propia hoja de contactos, está dibujada por código en este repositorio.
 
 ## Qué puedes crear
 
@@ -46,7 +46,11 @@ Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, e
 | **Tu marca** | Un logo que se dibuja solo, una secuencia de títulos, una plantilla de tarjeta social que mantiene tu marca en cada publicación. |
 | **Redes y chat** | Loops sin fin, GIFs y stickers animados transparentes, con el tamaño justo para el feed. |
 | **Presentaciones y documentos** | Una familia de ilustraciones de sección desde un solo programa. Una nueva semilla da una imagen hermana en el mismo estilo. |
-| **Historias** | Storyboards y animatics que crecen hasta convertirse en un cortometraje terminado con banda sonora original. |
+| **Historias** | Storyboards y animatics que crecen hasta convertirse en una película terminada de cualquier duración, con banda sonora original. |
+| **Tu propia imagen** | Trae un dibujo para aplicar su estilo a otro motivo, o una foto para recrearla en cualquiera de las 31 formas de dibujar, con cada trazo hecho en código. |
+| **Páginas web** | Ilustraciones interactivas que siguen el cursor, reaccionan a clics y formularios, o se dibujan al desplazarte por la página. |
+| **Aprendizaje** | Lecciones de dibujo con láminas paso a paso y timelapses que enseñan cómo se construye una imagen, qué observar y qué errores evitar. |
+| **Personajes** | Un personaje creado una sola vez que se mantiene idéntico entre planos, poses y estilos. |
 
 Pídelo con tus propias palabras, *«un faro en risografía para nuestra página de empleo, 1600×900»* o *«un explicativo en tiza de cómo se comparan nuestros planes de precios»*, y anidoodle lo dirige al flujo de trabajo y la receta de estilo adecuados, preguntando solo por lo que la petición deje abierto.
 
@@ -56,8 +60,8 @@ El motor es la mitad fácil. El oficio es la parte que anidoodle carga por ti: s
 
 - **Historia** le da un sentido a cada pieza. Una idea y un motivo central para una imagen fija; una transformación, una recompensa y un elemento recurrente para una película. → [`storytelling.md`](references/storytelling.md)
 - **Realismo** viene de nombrarlo todo. La anatomía, el punto de vista y la referencia que abriste, para que una mariposa se lea como una criatura con cuerpo y venas. → [`realism-and-craft.md`](references/realism-and-craft.md)
-- **Estilo** vive en el trazo. Nueve recetas completas, una guía para elegir una según el encargo, y los pasos para inventar la tuya propia. → [`styles.md`](references/styles.md)
-- **Música** sigue una receta. Tono mayor, punteado, una frase que pregunta y resuelve en la tónica, cálida y segura. → [`music-recipe.md`](references/music-recipe.md)
+- **Estilo** vive en el trazo. Treinta y una recetas completas, una guía para elegir una según el encargo, y los pasos para inventar la tuya propia. → [`styles.md`](references/styles.md)
+- **Música** se compone en notas y se sintetiza con código: un piano modelado y una docena de instrumentos, todas las tonalidades mayores y menores, un ánimo para cada sección y un tema que se adapta a cualquier duración. → [`music/README.md`](references/music/README.md)
 - **Determinismo** es la garantía. Funciones puras y un aleatorio con semilla, para que cualquiera con la fuente reconstruya exactamente la misma pieza. → [`determinism-and-contract.md`](references/determinism-and-contract.md)
 - **Método** te mantiene rápido. Demuestra el look en una sola imagen fija, construye de un tirón, y gasta las aprobaciones donde equivocarse sale caro. → [`working-method.md`](references/working-method.md)
 
@@ -88,16 +92,27 @@ Un modelo de imágenes gasta tokens y cómputo en cada fotograma de cada render,
 
 ## Empieza aquí
 
-anidoodle es una skill de agente: una carpeta con un `SKILL.md` en la raíz. Para Claude Code, clónala en tu carpeta de skills:
+**Claude Code:**
 
 ```bash
-git clone https://github.com/alexgreensh/anidoodle ~/.claude/skills/anidoodle
+/plugin marketplace add alexgreensh/anidoodle
+/plugin install anidoodle@alexgreensh-anidoodle
 ```
+
+**Codex:**
+
+```bash
+codex plugin marketplace add alexgreensh/anidoodle
+```
+
+Después, en la interfaz de Codex, abre `/plugins` e instala anidoodle.
+
+**Cualquier otro agente:** anidoodle es una carpeta de skill estándar (`skills/anidoodle/SKILL.md`), así que puedes copiarla a cualquier entorno que lea skills.
 
 Luego pide lo que quieras: *«dibuja una pera en lápiz y acuarela para nuestra página de recetas»*. Para manejar el motor tú mismo:
 
 ```bash
-node ~/.claude/skills/anidoodle/engine/tools/scaffold.mjs ~/art --still hero --film intro
+node <anidoodle>/engine/tools/scaffold.mjs ~/art --still hero --film intro --format 9x16 --duration 60
 cd ~/art && npm install && npx playwright-core install chromium
 
 node tools/still.mjs  hero  --out out/hero.png --scale 2   # a finished illustration, print size
@@ -114,7 +129,7 @@ Cuatro backends comparten un mismo núcleo de arte, y el núcleo vive felizmente
 
 ## La película de ejemplo
 
-`example/` contiene **Mechanical Lepidoptera**: 1.410 fotogramas, 47 segundos, una mariposa de relojería que se dibuja a sí misma, cobra vida en acuarela y deja su plano entre la hierba. Es el motor entero en una sola pieza: puntos de control colocados a mano sobre anatomía real, una clave de caché que nombra cada entrada de la que depende un píxel, una banda sonora construida a partir de la receta, y un movimiento continuo desde el boceto hasta la vida. Las nueve láminas de estilo están junto al motor en `engine/src/canvas-core/`, cada una con su receta escrita en la parte de arriba. Abre cualquiera de ellas, cambia un número, y mira qué se mueve.
+`example/` contiene **Mechanical Lepidoptera**: 1.410 fotogramas, 47 segundos, una mariposa de relojería que se dibuja a sí misma, cobra vida en acuarela y deja su plano entre la hierba. Es el motor entero en una sola pieza: puntos de control colocados a mano sobre anatomía real, una clave de caché que nombra cada entrada de la que depende un píxel, una banda sonora construida a partir de la receta, y un movimiento continuo desde el boceto hasta la vida. Las láminas de estilo están junto al motor en `engine/src/canvas-core/`, cada una con su receta escrita en la parte de arriba. Abre cualquiera de ellas, cambia un número, y mira qué se mueve.
 
 ## Honesto por diseño
 

@@ -39,12 +39,22 @@ const fibres = (g: Gfx, shape: P[], color: string, seed: number, density: number
   });
 };
 
-// one layer of paper: every piece's shadow first (soft, down and right), then the pieces
-const layer = (g: Gfx, pieces: Piece[]) => {
-  const shapes = pieces.map((p) => (p.torn ? tear(p.shape, p.torn, p.seed) : cut(p.shape, p.seed)));
-  g.group("plain", () => pieces.forEach((p, i) => { const l = p.lift ?? 1; fillShape(g, shapes[i].map(([x, y]) => [x + 3 * l, y + 5 * l] as P), SHADOW, 0.5); }), { blur: 4, alpha: 0.55 });
+// one layer of paper: every piece's shadow first (soft, down and right), then the pieces.
+// An optional Stage (foxDraw) says, per piece, whether it is down yet and how high it is held:
+// undefined = settled (the still), null = not placed, a Pose = in the hand. Without one the
+// output is byte-identical to the still.
+export type Pose = { dx: number; dy: number; lift: number };
+export type Stage = { n: number; pose: (layer: number, piece: number) => Pose | null | undefined; count?: number[] };
+const layerOf = (g: Gfx, pieces: Piece[], st?: Stage) => {
+  const li = st ? st.n++ : 0; st?.count?.push(pieces.length);
+  const poses = pieces.map((_, j) => (st ? st.pose(li, j) : undefined));
+  if (poses.every((q) => q === null)) return;
+  const mv = (s: P[], q: Pose | null | undefined): P[] => (q ? s.map(([x, y]) => [x + q.dx, y + q.dy] as P) : s);
+  const shapes = pieces.map((p, i) => mv(p.torn ? tear(p.shape, p.torn, p.seed) : cut(p.shape, p.seed), poses[i]));
+  g.group("plain", () => pieces.forEach((p, i) => { if (poses[i] === null) return; const l = (p.lift ?? 1) * (poses[i]?.lift ?? 1); fillShape(g, shapes[i].map(([x, y]) => [x + 3 * l, y + 5 * l] as P), SHADOW, 0.5); }), { blur: 4, alpha: 0.55 });
   g.group("plain", () => pieces.forEach((p, i) => {
-    if (p.torn) fillShape(g, tear(p.shape, p.torn * 0.8, p.seed + 1, p.torn * 0.7), PAPER_CORE);     // the white core where the sheet tore
+    if (poses[i] === null) return;
+    if (p.torn) fillShape(g, mv(tear(p.shape, p.torn * 0.8, p.seed + 1, p.torn * 0.7), poses[i]), PAPER_CORE);     // the white core where the sheet tore
     fillShape(g, shapes[i], p.color);
     fibres(g, shapes[i], p.color, p.seed + 2, p.fibre ?? 1);
   }));
@@ -52,7 +62,8 @@ const layer = (g: Gfx, pieces: Piece[]) => {
 const P0 = (pts: P[], per = 6) => smooth(pts, true, per);
 
 // ---------------------------------------------------------------- the dusk
-const sky = (g: Gfx) => {
+const sky = (g: Gfx, st?: Stage) => {
+  const layer = (g2: Gfx, pc: Piece[]) => layerOf(g2, pc, st);
   layer(g, [{ shape: [[-20, -20], [1100, -20], [1100, 1100], [-20, 1100]], color: "#23485a", seed: 1, fibre: 0.6 }]);
   layer(g, [
     { shape: P0([[-30, 300], [300, 280], [700, 300], [1110, 270], [1110, 1100], [-30, 1100]]), color: "#3d6b74", torn: 3, seed: 2, fibre: 0.5 },
@@ -66,7 +77,8 @@ const sky = (g: Gfx) => {
   layer(g, [[420, 120], [860, 180], [700, 90], [980, 330], [560, 210]].map(([x, y], i) => ({ shape: Array.from({ length: 10 }, (_, k) => { const a = -Math.PI / 2 + (k / 10) * Math.PI * 2, rr = k % 2 ? 4.5 : 11; return [x + Math.cos(a) * rr, y + Math.sin(a) * rr] as P; }), color: "#f2cf6e", seed: 20 + i, lift: 0.3 })));
 };
 
-const hills = (g: Gfx) => {
+const hills = (g: Gfx, st?: Stage) => {
+  const layer = (g2: Gfx, pc: Piece[]) => layerOf(g2, pc, st);
   layer(g, [{ shape: P0([[-30, 600], [170, 548], [380, 574], [600, 540], [820, 566], [1110, 530], [1110, 1100], [-30, 1100]]), color: "#5f7f76", torn: 3.4, seed: 30 }]);
   // pines along the ridge: tiers of torn dark-green paper, each tier its own scrap
   const pine = (x: number, base: number, h: number, seed: number): Piece[] => {
@@ -82,7 +94,8 @@ const hills = (g: Gfx) => {
 
 // ---------------------------------------------------------------- the fox
 const RUST = "#cf5a22", RUST_D = "#9c3c17", RUST_L = "#ec8d45", CREAM = "#f2e2c0", BLACK = "#231813", AMBER = "#e3a53a";
-const figure = (g: Gfx) => {
+const figure = (g: Gfx, st?: Stage) => {
+  const layer = (g2: Gfx, pc: Piece[]) => layerOf(g2, pc, st);
   // the brush in two parts: the far sweep behind the haunch, and the near sweep that lies IN
   // FRONT of the paws, curling round them to its white tip, as a sitting fox wraps its feet
   const tailBack: P[] = P0([[700, 650], [794, 712], [822, 812], [780, 886], [700, 910], [640, 880], [700, 846], [742, 790], [728, 706]]);
@@ -127,7 +140,8 @@ const figure = (g: Gfx) => {
 };
 
 // ---------------------------------------------------------------- the foreground
-const foreground = (g: Gfx) => {
+const foreground = (g: Gfx, st?: Stage) => {
+  const layer = (g2: Gfx, pc: Piece[]) => layerOf(g2, pc, st);
   // fallen leaves cut from three papers, and torn grass blades across the fox's feet
   const leaf = (cx: number, cy: number, s: number, a: number, color: string, seed: number): Piece => {
     const pts: P[] = [[0, -1], [0.26, -0.64], [0.6, -0.72], [0.44, -0.32], [0.9, -0.12], [0.46, 0.12], [0.62, 0.52], [0.18, 0.34], [0, 0.9], [-0.18, 0.34], [-0.62, 0.52], [-0.46, 0.12], [-0.9, -0.12], [-0.44, -0.32], [-0.6, -0.72], [-0.26, -0.64]];
@@ -140,6 +154,10 @@ const foreground = (g: Gfx) => {
   layer(g, blades);
   void inside; void lerpP;
 };
+
+// the whole collage, in the order it is laid down; foxDraw passes a Stage
+export const foxScene = (g: Gfx, st?: Stage) => { sky(g, st); hills(g, st); figure(g, st); foreground(g, st); };
+export const PAPER_BOARD = PAPER_CORE;
 
 export const drawFox = (ctx: Ctx, _frame: number, env: Env) => {
   const g = new Gfx(ctx, env, 0, PENCIL);

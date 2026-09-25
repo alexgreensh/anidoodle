@@ -47,7 +47,7 @@ const glitter = (x: number, y: number) => { const col = clamp(1 - Math.abs(x - S
 const foam = (x: number, y: number) => sea(x, y) && shore(x, y) < Math.max(0, fractal(61, x, y, 0.035, 0.05, 3) - 0.38) * 70 + (fractal(62, x, y, 0.2, 0.2, 2) > 0.62 ? 5 : 0);   // broken, bunched where the swell breaks
 
 // ---------------------------------------------------------------- the three plates
-const yellowPlate = (g: Gfx) => drum(g, REG.yellow, () => {
+export const yellowPlate = (g: Gfx) => drum(g, REG.yellow, () => {
   const all = { x0: 0, y0: 0, x1: W, y1: W };
   // sky: warmer toward the horizon and the sun, the beam laid in as light
   screen(g, all, PITCH, ANG.yellow, (x, y) => { if (y >= HY || occluded(x, y) || inSun(x, y)) return 0; return 0.12 + 0.62 * Math.pow(y / HY, 1.6) + 0.5 * Math.exp(-Math.pow(sunD(x, y) / 260, 2)) + 0.45 * beam(x, y); }, INK.yellow);
@@ -62,7 +62,7 @@ const yellowPlate = (g: Gfx) => drum(g, REG.yellow, () => {
   [[150, 532, 26, 22], [212, 532, 26, 22]].forEach(([x, y, w, h]) => fillShape(g, [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], INK.yellow));
 });
 
-const pinkPlate = (g: Gfx) => drum(g, REG.pink, () => {
+export const pinkPlate = (g: Gfx) => drum(g, REG.pink, () => {
   const all = { x0: 0, y0: 0, x1: W, y1: W };
   // sky: a band of pink across the middle of the dusk, deeper round the sun
   screen(g, all, PITCH, ANG.pink, (x, y) => { if (y >= HY || occluded(x, y)) return 0; if (inSun(x, y)) return 0.18 + 0.7 * clamp((y - (SUN[1] - SR * 0.3)) / (SR * 0.9)); return 0.3 * (1 - y / HY) + 0.6 * Math.exp(-Math.pow((y - 430) / 170, 2)) + 0.35 * Math.exp(-Math.pow(sunD(x, y) / 220, 2)) + 0.08; }, INK.pink);
@@ -79,7 +79,7 @@ const pinkPlate = (g: Gfx) => drum(g, REG.pink, () => {
   ROCKS.forEach((rk) => screen(g, all, PITCH, ANG.pink, (x) => { const b = rk.reduce((m, p) => Math.max(m, p[0]), -1e9), a = rk.reduce((m, p) => Math.min(m, p[0]), 1e9); return 0.15 + 0.6 * clamp((x - a) / (b - a)); }, INK.pink, rk));
 });
 
-const bluePlate = (g: Gfx) => drum(g, REG.blue, () => {
+export const bluePlate = (g: Gfx) => drum(g, REG.blue, () => {
   const all = { x0: 0, y0: 0, x1: W, y1: W };
   // sky: night coming down from the top, pulled back where the beam cuts through
   screen(g, all, PITCH, ANG.blue, (x, y) => { if (y >= HY || occluded(x, y) || inSun(x, y)) return 0; return (0.05 + 0.66 * Math.pow(1 - y / HY, 1.4)) * (1 - 0.8 * beam(x, y)); }, INK.blue);

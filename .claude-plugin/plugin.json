@@ -1,0 +1,13 @@
+{
+  "name": "anidoodle",
+  "description": "Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 31 styles, with scores composed in code.",
+  "author": {
+    "name": "Alex Greenshpun",
+    "url": "https://linkedin.com/in/alexgreensh"
+  },
+  "homepage": "https://github.com/alexgreensh/anidoodle",
+  "repository": "https://github.com/alexgreensh/anidoodle",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
+  "keywords": ["illustration", "animation", "film", "drawing", "art", "music", "explainer", "generative", "deterministic"]
+}

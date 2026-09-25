@@ -39,11 +39,12 @@ const loadFilm = async (film) => {
   return (await import("data:text/javascript;base64," + Buffer.from(out).toString("base64"))).film;
 };
 
-const pcm16 = (film, sr) => {
+const float32 = (film, sr) => {
   if (!film.audio) return null;
-  const [L, R] = film.audio(sr), pcm = new Int16Array(L.length * 2);
-  for (let i = 0; i < L.length; i++) { pcm[i * 2] = Math.max(-1, Math.min(1, L[i])) * 32767; pcm[i * 2 + 1] = Math.max(-1, Math.min(1, R[i])) * 32767; }
-  return { sampleRate: sr, frames: L.length, pcm16: Buffer.from(pcm.buffer).toString("base64") };
+  const [L, R] = film.audio(sr), pcm = new Float32Array(L.length * 2);
+  if (L.length !== R.length) throw new Error("audio channels have different lengths");
+  for (let i = 0; i < L.length; i++) { pcm[i * 2] = L[i]; pcm[i * 2 + 1] = R[i]; }
+  return { sampleRate: sr, frames: L.length, float32: Buffer.from(pcm.buffer).toString("base64") };
 };
 
 // Bundling is per FILM, not per session: the gate opens an adapter many times in one process and
@@ -104,12 +105,12 @@ export const open = async (film, opts = {}) => {
 
   return {
     workers: browsers.length,
-    info: () => data.meta,
+    info: () => ({ ...data.meta, shots: data.shots.map(({ id, start, end }) => ({ id, start, end })) }),
     frame: async (n, w = 0) => { const r = await still(n, w); return { png: r.png, shot: (data.shots.find((s) => n >= s.start && n < s.end) ?? {}).id ?? null, drawMs: r.drawMs }; },
     // Hashed through the PNG the renderer wrote: that file IS what this backend produces, so
     // hashing anything else would be grading something the backend does not actually deliver.
     hash: async (n, w = 0) => createHash("sha256").update((await still(n, w)).png).digest("hex").slice(0, 16),
-    audio: async (sr) => pcm16(data, sr),
+    audio: async (sr) => float32(data, sr),
     artifact: () => null, /* like playwright: a means to an MP4, not a deliverable of its own */
     close: async () => { for (const b of browsers) await b.close({ silent: true }); },
   };

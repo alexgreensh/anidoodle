@@ -21,7 +21,7 @@ the same. A session is:
   info(),                        // -> film.meta
   frame(n, w),                   // -> { png: Buffer, shot, drawMs }
   hash(n, w),                    // -> stable hex digest of the drawn pixels
-  audio(sampleRate),             // -> { sampleRate, frames, pcm16 } | null
+  audio(sampleRate),             // -> { sampleRate, frames, float32 } | null (interleaved stereo)
   artifact(),                    // -> { path, kind, bytes, checks: [{ok,label,detail}] } | null
   close() }
 ```

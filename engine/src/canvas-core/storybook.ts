@@ -3,7 +3,7 @@
 // control points, so any difference you see is the MEDIUM, not the drawing.
 import { Env, GRAPHITE, Gfx, P, PENCIL, TINT, arc, heart, line, oval, rng, tube, turn, Ctx } from "./core";
 
-const SHADE = { white: "#c9d2e4", rose: "#cf8291", denim: "#52739f", butter: "#d9b24f" };
+export const SHADE = { white: "#c9d2e4", rose: "#cf8291", denim: "#52739f", butter: "#d9b24f" };
 const at = (o: P, pts: P[]): P[] => pts.map(([x, y]) => [o[0] + x, o[1] + y]);
 const dir = (a: P, b: P) => Math.atan2(b[1] - a[1], b[0] - a[0]);
 const HEAD: P[] = [[-70, -40], [-52, -58], [-10, -65], [34, -63], [62, -51], [75, -22], [77, 14], [67, 44], [34, 58], [-8, 61], [-46, 56], [-70, 39], [-79, 6], [-78, -20]];
@@ -19,7 +19,7 @@ const handShape = (pose: Pose, k: number) => {
   pts.push(on(1.15, R), on(1.9, R * 0.98), [5 * k, 11 * k], [0, 7.5 * k]);
   return { pts, valleys, c };
 };
-const hand = (g: Gfx, wrist: P, angle: number, pose: Pose, seed: number) => {
+export const hand = (g: Gfx, wrist: P, angle: number, pose: Pose, seed: number) => {
   const flip = Math.cos(angle) < 0 ? -1 : 1, place = (pts: P[]): P[] => turn(pts.map(([x, y]) => [wrist[0] + x, wrist[1] + y * flip] as P), wrist[0], wrist[1], (angle * 180) / Math.PI);
   const h = handShape(pose, 1), shape = place(h.pts), cuff = place([[-7, -9.5], [3, -10.5], [4, 0], [3, 10.5], [-7, 9.5], [-8, 0]]);
   g.group("paint", () => { g.form(shape, TINT.white, SHADE.white, { seed, light: [-3, -4] }); g.form(cuff, TINT.rose, SHADE.rose, { seed: seed + 1, light: [-2, -3] }); });
@@ -30,7 +30,7 @@ const hand = (g: Gfx, wrist: P, angle: number, pose: Pose, seed: number) => {
     [-0.45, 0.45].forEach((t, i) => g.pen(place(line([-5.5, t * 9], [2, t * 9.6])), { w: 1.6, seed: seed + 8 + i, wobble: 0.2, opacity: 0.65, retrace: false }));
   });
 };
-const limb = (g: Gfx, from: P, to: P, bend: number, r: number, seed: number) => {
+export const limb = (g: Gfx, from: P, to: P, bend: number, r: number, seed: number) => {
   const mid = line(from, to, bend)[1], shape = tube([from, mid, to], r, r * 0.86, false);
   const along = (t: number): P => { const a = t < 0.5 ? from : mid, b = t < 0.5 ? mid : to, u = t < 0.5 ? t * 2 : (t - 0.5) * 2; return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]; };
   g.group("paint", () => g.form(shape, TINT.white, SHADE.white, { seed, light: [-3, -3] }));

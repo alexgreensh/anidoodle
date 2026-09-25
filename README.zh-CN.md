@@ -7,7 +7,7 @@
 <p align="center"><strong>手绘的艺术，用代码写成。</strong></p>
 
 <p align="center">
-  插画、动画和短片，九种手绘风格任你挑选。<br>
+  插画、绘画延时视频、影片、讲解视频和互动网页艺术，31 种风格任你挑选。<br>
   每一笔都是一个函数，每一个音符都是一次算术运算，于是同一份源码<br>
   在任何机器、任何尺寸下，都会重新画出同一张画，永远如此。
 </p>
@@ -22,20 +22,20 @@
 <p align="center"><a href="README.md">English</a> · <a href="README.ja-JP.md">日本語</a> · <b>简体中文</b> · <a href="README.ko-KR.md">한국어</a> · <a href="README.fr-FR.md">Français</a> · <a href="README.es-ES.md">Español</a></p>
 
 <p align="center">
-  <a href="#九种风格随你挑选">风格</a> ·
+  <a href="#31-种风格随你挑选">风格</a> ·
   <a href="#你能做出什么">你能做出什么</a> ·
   <a href="#它自带了什么">它自带了什么</a> ·
   <a href="#先画后动">动态效果</a> ·
   <a href="#开始使用">开始使用</a>
 </p>
 
-## 九种风格，随你挑选
+## 31 种风格，随你挑选
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="九幅插画，各有各的风格：铅笔与水彩画成的陆莲花、马克笔漫画风的锦鲤、圆珠笔画的怀表、蜡笔热气球、墨水与淡彩画的鹪鹩、粉笔黑板上的月相图、剪纸狐狸、孔版印刷风格的灯塔，还有一枚用单线雕刻而成的月亮">
+  <img src="assets/styles.jpg" width="100%" alt="31 幅各具风格的插画，从铅笔水彩、马克笔漫画和孔版印刷，到像素画、玩具积木、木刻、墨绘、刮画、刺绣、油画和民间故事绘本">
 </p>
 
-每种风格都有自己独特的落笔方式：笔尖的收锋、水彩的晕染、粉笔在石板上的揉擦、剪纸边缘的撕裂感、孔版印刷滚筒的网点、一条雕刻线螺旋展开变成一轮月亮。同一个主题，在不同的风格里会呈现出完全不同的样子，就像出自九位不同插画师之手。为你的品牌选定一种风格，之后的每一张画都会出自同一双手。上面的每一幅样图，连同这张对照表本身，都是这个仓库里的代码画出来的。
+每种风格都有自己独特的落笔方式：笔尖的收锋、水彩的晕染、粉笔在石板上的揉擦、剪纸边缘的撕裂感、孔版印刷滚筒的网点、一条雕刻线螺旋展开变成一轮月亮。同一个主题，在不同的风格里会呈现出完全不同的样子，就像出自 31 位不同插画师之手。每种风格还附有一段影片，按使用这种媒介的画家实际作画的顺序，逐笔展示画面如何诞生。为你的品牌选定一种风格，之后的每一张画都会出自同一双手。上面的每一幅样图，连同这张对照表本身，都是这个仓库里的代码画出来的。
 
 ## 你能做出什么
 
@@ -46,7 +46,11 @@
 | **品牌** | 一个会自己画出来的 Logo，一段片头动画，一套每次发帖都保持品牌调性的社交卡片模板。 |
 | **社交和聊天** | 无限循环的动图、GIF，以及适配信息流尺寸的透明动态贴纸。 |
 | **幻灯片和文档** | 一个程序生成一整套章节插画。换个种子，就能得到风格相同的姊妹图。 |
-| **故事** | 分镜和动态预览，一步步长成一部配有原创配乐的完整短片。 |
+| **故事** | 分镜和动态预览，一步步长成一部任意时长、配有原创配乐的完整影片。 |
+| **你自己的图片** | 带来一张画，就能用它的风格画新主题；带来一张照片，就能用 31 种画风中的任意一种重新创作，每一笔都由代码绘制。 |
+| **网页** | 会追随光标、响应点击和表单，或随着页面滚动自行绘制的互动插画。 |
+| **学习** | 用分步图和延时视频教你一幅画如何完成，还会指出该看什么、常见错误有哪些。 |
+| **角色** | 一个角色只需构建一次，在不同镜头、姿势和风格中始终保持一致。 |
 
 用大白话说出你的需求就行，比如 *“给我们的招聘页面画一张孔版印刷风格的灯塔，1600×900”*，或者 *“用粉笔黑板风格画一张解释我们定价方案的说明图”*，anidoodle 会自动把它路由到合适的工作流和风格配方，只有在你没说清楚的地方才会追问。
 
@@ -56,8 +60,8 @@
 
 - **故事**，让每件作品都有一个重点。一张静态图只讲一个想法、聚焦一个主体；一部短片只有一次转变、一个高潮，和一个反复出现的意象。→ [`storytelling.md`](references/storytelling.md)
 - **写实感**，来自把它说清楚。解剖结构、观察视角，以及你参考过的资料，都要交代明白，这样一只蝴蝶读起来才像是一个有身体、有翅脉的真实生物。→ [`realism-and-craft.md`](references/realism-and-craft.md)
-- **风格**，活在笔触里。九套完整配方，外加一份按场合挑风格的指南，以及自创风格的步骤。→ [`styles.md`](references/styles.md)
-- **音乐**，遵循一套配方。大调、拨弦，一句先提问后归家的旋律，温暖而笃定。→ [`music-recipe.md`](references/music-recipe.md)
+- **风格**，活在笔触里。31 套完整配方，外加一份按场合挑风格的指南，以及自创风格的步骤。→ [`styles.md`](references/styles.md)
+- **音乐**，先写成音符，再由代码合成：建模钢琴和十余种乐器、所有大小调、每个段落各自的情绪，以及能适配任意时长的主题旋律。→ [`music/README.md`](references/music/README.md)
 - **确定性**，是这套系统的承诺。纯函数加上带种子的随机数，任何人拿到源码都能重建出一模一样的作品。→ [`determinism-and-contract.md`](references/determinism-and-contract.md)
 - **方法**，让你保持速度。先用一张静态图验证效果，再一路做到底，把审批环节留给那些出错代价高的地方。→ [`working-method.md`](references/working-method.md)
 
@@ -88,16 +92,27 @@ https://github.com/user-attachments/assets/019d46d3-536a-4843-9f68-8e8f5f5c3401
 
 ## 开始使用
 
-anidoodle 是一个 agent skill：一个文件夹，顶层放着一个 `SKILL.md`。如果你用的是 Claude Code，把它克隆进你的 skills 文件夹：
+**Claude Code:**
 
 ```bash
-git clone https://github.com/alexgreensh/anidoodle ~/.claude/skills/anidoodle
+/plugin marketplace add alexgreensh/anidoodle
+/plugin install anidoodle@alexgreensh-anidoodle
 ```
+
+**Codex:**
+
+```bash
+codex plugin marketplace add alexgreensh/anidoodle
+```
+
+然后在 Codex 的 TUI 中输入 `/plugins`，安装 anidoodle。
+
+**其他智能体：** anidoodle 是标准的 skill 文件夹（`skills/anidoodle/SKILL.md`），可以复制到任何能读取 skill 的运行环境。
 
 然后直接说出你想要什么就行，比如 *“给我们的菜谱页面画一个铅笔加水彩风格的梨”*。如果你想亲自操作引擎：
 
 ```bash
-node ~/.claude/skills/anidoodle/engine/tools/scaffold.mjs ~/art --still hero --film intro
+node <anidoodle>/engine/tools/scaffold.mjs ~/art --still hero --film intro --format 9x16 --duration 60
 cd ~/art && npm install && npx playwright-core install chromium
 
 node tools/still.mjs  hero  --out out/hero.png --scale 2   # a finished illustration, print size
@@ -114,7 +129,7 @@ node tools/gate.mjs   hero                                 # determinism, contra
 
 ## 示例短片
 
-`example/` 目录里放着**机械鳞翅目**（Mechanical Lepidoptera）：1,410 帧，47 秒，一只机械蝴蝶自己画出自己的图纸，在水彩中苏醒过来，又把蓝图留在了草丛里。这一部作品，就是整个引擎的缩影：控制点是按照真实解剖结构手工摆放的，缓存键记录了每个像素依赖的每一个输入，配乐按照配方生成，从画成到活过来，是一气呵成的一个动作。九张风格样图和引擎放在一起，都在 `engine/src/canvas-core/` 里，每一张的顶部都写着自己的配方。随便打开一个，改一个数字，看看会发生什么变化。
+`example/` 目录里放着**机械鳞翅目**（Mechanical Lepidoptera）：1,410 帧，47 秒，一只机械蝴蝶自己画出自己的图纸，在水彩中苏醒过来，又把蓝图留在了草丛里。这一部作品，就是整个引擎的缩影：控制点是按照真实解剖结构手工摆放的，缓存键记录了每个像素依赖的每一个输入，配乐按照配方生成，从画成到活过来，是一气呵成的一个动作。风格样图和引擎放在一起，都在 `engine/src/canvas-core/` 里，每一张的顶部都写着自己的配方。随便打开一个，改一个数字，看看会发生什么变化。
 
 ## 诚实是设计出来的
 

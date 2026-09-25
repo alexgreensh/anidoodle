@@ -1,0 +1,26 @@
+{
+ "name": "quiet-scrapbook",
+ "title": "Quiet archival scrapbook",
+ "plate": "engine/src/canvas-core/adaptScrapbook.ts",
+ "nearest": "scrapbook (v1 wave; the loud sibling: foxed parchment, ransom titles, copperplate everywhere)",
+ "recipe": {
+  "mark": "flat pieces of coloured stock with a fine torn deckle; typewriter strikes (one weight, each strike its own ink density); thin steady technical-pen diagrams; ONE small vintage engraving as ornament; a red pen and a blue pencil used once or twice each",
+  "edge": "torn but tidy: an even fine deckle, never ragged; every piece throws the same soft shadow down-right (lamp upper left); ink lines clean and unhatched outside the engraving",
+  "order": "page; cards laid down big first; coloured label chips; the diagram inked on its card; typed labels; the engraving; red and blue annotations last",
+  "paper": "a pale warm sheet (#efe7d3), barely aged: soft mottle, slight darkening toward the edges; no foxing, tape or pegs",
+  "palette": { "page": "#efe7d3", "ink": "#35302d", "duckEgg": "#bcd3d6", "rose": "#e3a3a6", "sage": "#7fa99e", "cream": "#f4efe3", "card": "#e6e1d2", "redPen": "#c44a36", "bluePencil": "#4f86c6" },
+  "layout rule": "mostly empty page; pieces are islands with air round them; one diagram card is the focal piece"
+ },
+ "params": { "deckle": 3.2, "shadow": { "dx": 4, "dy": 6, "blur": 5, "alpha": 0.55 }, "typeCell": 0.86 },
+ "profile": { "file": "samples/adapt-teach/scrapbook/profile.json", "summary": "high key (mean L 0.86), contrast 0.23, 5 colours over 2%, low chroma 0.03 with one vermilion accent, line presence 1.8% (mostly type), pooled rims 0.42 (card shadows), no lattice. The statistical nearest was wren: the empty page dominates the numbers, which is why the plate was picked by eye" },
+ "provenance": {
+  "reference": "refs/ritwika-explainer/frames/f_10.png (1280x720), frame 10 of Ritwika's explainer film",
+  "sha256": "8d9f7315fb91a81b364235f77bd3653a794c97967cbf99a8a24fcfed4d26fb34",
+  "broughtBy": "Alex Greenshpun (owner)",
+  "date": "2026-09-25",
+  "embedded": false,
+  "copied": "nothing: its subject (a frozen-LLM encoder), diagram (bars in a box, a vector), quote card, padlock engraving, asterisk and progress dots are not used; the proof subject (why sourdough rises) and its layout are new"
+ },
+ "knownGaps": ["the typewriter is capitals only (drafting.ts has no lowercase); the reference types lowercase serif", "no brush-script hand yet (lettering.ts spells one authored word)"],
+ "proof": ["samples/adapt-teach/scrapbook/adaptScrapbook-still.png", "samples/adapt-teach/scrapbook/compare-scrapbook.png"]
+}

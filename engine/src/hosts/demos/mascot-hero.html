@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tinker &amp; Ink · a hero that watches back</title>
+<meta name="description" content="An anidoodle interactive demo: a hand-drawn mascot who follows your pointer and your keyboard focus.">
+<style>
+  :root { --paper: #fbf6ea; --paper-2: #f4ead6; --ink: #3d3437; --ink-soft: #6b5f62; --rose: #c9566b; --rose-soft: #f2899c; --butter: #f3d577; --sage: #6fa874; --line: rgba(61,52,55,.18); }
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body { margin: 0; color: var(--ink); background: var(--paper); font: 17px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  .serif { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; }
+  a { color: inherit; }
+  nav { max-width: 1160px; margin: 0 auto; padding: 22px 28px; display: flex; align-items: center; gap: 28px; }
+  .brand { font-weight: 700; font-size: 20px; letter-spacing: -.01em; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand i { width: 14px; height: 14px; border-radius: 50%; background: var(--butter); box-shadow: 0 0 0 2px var(--ink); display: inline-block; }
+  nav .links { display: flex; gap: 22px; margin-left: auto; font-size: 15px; color: var(--ink-soft); }
+  nav .links a { text-decoration: none; }
+  nav .links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .hero { max-width: 1160px; margin: 0 auto; padding: 24px 28px 40px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+  .eyebrow { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: 6px 12px; border: 1.5px dashed var(--line); border-radius: 999px; }
+  h1 { font-size: clamp(40px, 5.4vw, 68px); line-height: 1.02; letter-spacing: -.025em; margin: 18px 0 18px; font-weight: 600; }
+  h1 em { font-style: italic; color: var(--rose); }
+  .lede { font-size: 19px; color: var(--ink-soft); max-width: 34ch; margin: 0 0 30px; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .btn { font: 600 17px/1 ui-sans-serif, system-ui, sans-serif; padding: 16px 26px; border-radius: 999px; border: 2px solid var(--ink); cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+  .btn.primary { background: var(--ink); color: var(--paper); box-shadow: 4px 4px 0 var(--rose-soft); }
+  .btn.primary:hover, .btn.primary:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--rose-soft); }
+  .btn.primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rose-soft); }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn.ghost:hover, .btn.ghost:focus-visible { background: #fff8e3; }
+  .btn:focus-visible { outline: 3px solid var(--butter); outline-offset: 3px; }
+  .hint { margin-top: 26px; font-size: 14px; color: var(--ink-soft); display: flex; gap: 8px; align-items: center; }
+  .hint kbd { font: 600 12px/1 ui-monospace, monospace; padding: 3px 6px; border: 1.5px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: #fff; }
+  .stage { position: relative; }
+  .stage ani-doodle { display: block; max-width: 540px; margin-left: auto; border-radius: 6px; }
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 220%); visibility: hidden; background: var(--ink); color: var(--paper); padding: 14px 20px; border-radius: 14px; font-size: 15px; transition: transform .35s cubic-bezier(.2,.9,.3,1.2); box-shadow: 4px 4px 0 var(--butter); }
+  .toast.on { transform: translate(-50%, 0); visibility: visible; }
+  .features { max-width: 1160px; margin: 0 auto; padding: 10px 28px 70px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+  .card { border: 1.5px solid var(--line); border-radius: 18px; padding: 22px 22px 20px; background: linear-gradient(#fffdf6, #fbf6ea); transition: border-color .2s ease, transform .2s ease; }
+  .card:hover, .card:focus-visible { border-color: var(--ink); transform: translateY(-3px); outline: none; }
+  .card h3 { margin: 0 0 6px; font-size: 21px; }
+  .card p { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
+  .dot { width: 30px; height: 30px; border-radius: 50%; margin-bottom: 14px; border: 2px solid var(--ink); }
+  footer { max-width: 1160px; margin: 0 auto; padding: 24px 28px 40px; color: var(--ink-soft); font-size: 13.5px; border-top: 1.5px dashed var(--line); }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 10px; }
+    .stage { order: -1; }
+    .stage ani-doodle { margin: 0 auto; max-width: 420px; }
+    .features { grid-template-columns: 1fr; }
+    nav .links { display: none; }
+  }
+</style>
+</head>
+<body>
+  <nav>
+    <a class="brand serif" href="#"><i></i>Tinker &amp; Ink</a>
+    <div class="links"><a href="#">Work</a><a href="#">Studio</a><a href="#">Pricing</a><a href="#">Journal</a></div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Illustrated onboarding · made by hand</span>
+      <h1 class="serif">Give your product a <em>friend</em> who is paying attention.</h1>
+      <p class="lede">Characters drawn in pencil and watercolour, living on your page. They notice people. People notice them.</p>
+      <div class="ctas">
+        <button class="btn primary" data-anidoodle="start" id="start">Get started, it's free</button>
+        <button class="btn ghost" data-anidoodle="tour">Take the tour</button>
+      </div>
+      <p class="hint">He is watching your pointer. <kbd>Tab</kbd> works too, and so does poking him.</p>
+    </div>
+    <div class="stage">
+      <ani-doodle piece="mascot-hero"></ani-doodle>
+    </div>
+  </header>
+
+  <section class="features">
+    <div class="card" tabindex="0" data-anidoodle="f1"><div class="dot" style="background:#a9cdea"></div><h3 class="serif">Drawn, not generated</h3><p>Every mark is a pencil stroke in code: one source, the same pixels on every screen.</p></div>
+    <div class="card" tabindex="0" data-anidoodle="f2"><div class="dot" style="background:#f3d577"></div><h3 class="serif">Watches, politely</h3><p>Pointer, keyboard focus and touch, with a pause button and a calm mode for reduced motion.</p></div>
+    <div class="card" tabindex="0" data-anidoodle="f3"><div class="dot" style="background:#f2899c"></div><h3 class="serif">Weighs almost nothing</h3><p>No images, no fonts, no framework. One small module and a custom element.</p></div>
+  </section>
+
+  <footer>Tinker &amp; Ink is a made-up studio. The robot is Bit, from the anidoodle storybook plate, drawn entirely in code.</footer>
+
+  <div class="toast" role="status" aria-live="polite" id="toast">You're in. Bit is thrilled.</div>
+  <script>
+    document.getElementById("start").addEventListener("click", () => { const t = document.getElementById("toast"); t.classList.add("on"); clearTimeout(window.__toast); window.__toast = setTimeout(() => t.classList.remove("on"), 2400); });
+  </script>
+<!--anidoodle-->
+</body>
+</html>
