@@ -114,7 +114,7 @@ Ilustraciones interactivas para webs reales: una mascota que sigue el cursor y r
 ## Aprende a dibujar
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="Una lección de lápiz en ocho pasos para dibujar un gato sentado, desde las líneas de colocación y las tres masas hasta la construcción, los valores y los últimos detalles">
+  <img src="assets/readme/lesson.jpg" width="100%" alt="Cómo dibujar un búho en nueve pasos: de dos círculos a la estructura, el contorno, los ojos, las sombras y las plumas, hasta el resto del búho">
 </p>
 
 Pregunta cómo dibujar algo, o trae un dibujo, y anidoodle lo reconstruye como lección: una lámina paso a paso y un timelapse con subtítulos. Cada paso explica qué observar, cómo hacerlo y cuál es el error más común.
