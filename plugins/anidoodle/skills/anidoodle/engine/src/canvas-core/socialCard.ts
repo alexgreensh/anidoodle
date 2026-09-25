@@ -59,8 +59,8 @@ export const drawSocialCard = (ctx: Ctx, _frame: number, env: Env) => {
   letter(g, "HAND-DRAWN ART,", 62, 332, { cap: 38, color: IRON, seed: 3, w: 3.4 });
   letter(g, "WRITTEN AS CODE.", 62, 390, { cap: 38, color: RED, seed: 4, w: 3.4 });
   g.group("ink", () => g.pen(line([64, 458], [470, 452], 3), { w: 1.2, color: IRON, opacity: 0.55, wobble: 0.8, boil: 0, seed: 7 }));
-  letter(g, "ILLUSTRATIONS / LOOPS / STICKERS / FILMS", 64, 482, { cap: 15, color: IRON, seed: 5, w: 1.6, opacity: 0.9 });
-  letter(g, "NINE STYLES. EVERY MARK IS CODE.", 64, 514, { cap: 15, color: MUTED, seed: 6, w: 1.5, opacity: 0.9 });
+  letter(g, "ILLUSTRATIONS / FILMS / EXPLAINERS / WEB ART", 64, 482, { cap: 15, color: IRON, seed: 5, w: 1.6, opacity: 0.9 });
+  letter(g, "DOZENS OF STYLES. EVERY MARK IS CODE.", 64, 514, { cap: 15, color: MUTED, seed: 6, w: 1.5, opacity: 0.9 });
 
   // the prints, each drawn full size by its own module onto a sheet with a margin and a lettered
   // caption, and the whole sheet is then turned and set down on the desk
@@ -97,7 +97,7 @@ export const drawSocialCard = (ctx: Ctx, _frame: number, env: Env) => {
     g.pen([[662, 456], [676, 452], [676, 467]], { w: 1.6, color: IRON, opacity: 0.85, wobble: 0.3, boil: 0, seed: 72, retrace: false });
   });
   // what it is, for anyone who meets it outside GitHub
-  letter(g, "AN OPEN-SOURCE SKILL FOR CLAUDE CODE", 64, 592, { cap: 11, color: MUTED, seed: 8, w: 1.2, opacity: 0.9 });
+  letter(g, "A PLUGIN FOR CLAUDE CODE + CODEX", 64, 592, { cap: 11, color: MUTED, seed: 8, w: 1.2, opacity: 0.9 });
   g.group("ink", () => {
     const star = (cx: number, cy: number, k: number, seed: number) => { const pts: P[] = []; for (let i = 0; i <= 10; i++) { const t = (i / 10) * Math.PI * 2 - Math.PI / 2, rr = i % 2 ? k * 0.42 : k; pts.push([cx + Math.cos(t) * rr, cy + Math.sin(t) * rr]); } g.pen(pts, { w: 1.1, color: RED, opacity: 0.7, wobble: 0.4, boil: 0, seed }); };
     star(604, 64, 12, 81);
