@@ -1,6 +1,6 @@
 ---
 name: anidoodle
-description: Code-drawn stills, timelapses, films, explainers and interactive web art in 31 styles, with composed scores. Matches reference styles, keeps characters consistent, teaches drawing. No generated assets.
+description: Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 31 styles, with composed scores. Matches a reference style, keeps characters consistent, teaches drawing. Deterministic, no generated assets.
 metadata:
   created_by: Alex Greenshpun (10x Company)
   license: Apache-2.0
