@@ -23,6 +23,8 @@
 
 <p align="center">
   <a href="#31-estilos-entre-los-que-elegir">Estilos</a> ·
+  <a href="#cada-estilo-se-dibuja-solo">Películas del dibujo</a> ·
+  <a href="#música-compuesta-con-código">Música</a> ·
   <a href="#qué-puedes-crear">Qué puedes crear</a> ·
   <a href="#qué-trae-dentro">Qué trae dentro</a> ·
   <a href="#primero-dibuja-luego-se-mueve">Movimiento</a> ·
@@ -36,6 +38,86 @@
 </p>
 
 Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, el sangrado de una aguada, el rozado de la tiza sobre la pizarra, el borde rasgado del papel recortado, la trama de un tambor de risografía, una sola línea grabada que se enrosca hasta convertirse en luna. El motivo cambia de forma según la mano que lo dibuje, igual que le pasaría con treinta y un ilustradores distintos. Cada estilo incluye además una película en la que su imagen se dibuja trazo a trazo, siguiendo el orden de trabajo de un artista de ese medio. Elige uno para tu marca y cada imagen que venga después llegará de la misma mano. Cada lámina de arriba, y la propia hoja de contactos, está dibujada por código en este repositorio.
+
+<details>
+<summary><b>Los 31 estilos</b> y cómo se hace cada uno</summary>
+
+| Estilo | Cómo se hace |
+|---|---|
+| **Bolígrafo** | Un solo boli; las tramas cruzadas crean los tonos |
+| **Color fragmentado** | Toques separados de color sin mezclar, a la manera impresionista |
+| **Tiza sobre pizarra** | El lateral de la tiza frota y deja polvo |
+| **Carboncillo borrado** | Carboncillo dibujado, borrado y vuelto a dibujar, con sus fantasmas |
+| **Lápiz de color** | Rayado direccional sobre papel crema con textura |
+| **Cera** | Garabatos cerosos que dejan libres los surcos del papel |
+| **Collage de papel recortado** | Papel rasgado y cortado, sin líneas dibujadas |
+| **Plano cianotipo** | Dibujo técnico a plumilla sobre una hoja de cianotipia |
+| **Bordado** | Hilo cosido sobre lino tensado en un bastidor |
+| **Vectorial plano** | Formas geométricas nítidas con grano y sombras largas |
+| **Cuento popular ilustrado** | Un primer plano pintado se funde con líneas de lápiz sobre papel crema |
+| **Tinta y aguada** | Primero las aguadas, después una plumilla flexible |
+| **Isométrico** | Un corte isométrico 2:1 con planos de color plano |
+| **3D de pocos polígonos** | Triángulos de color plano dibujados con código |
+| **Cómic con rotulador** | Rellenos lisos y un único contorno grueso |
+| **Gouache de mediados de siglo** | Formas mates y opacas, bordes a pincel seco y trazo suelto |
+| **Trama de periódico** | Una trama negra y una tinta plana sobre papel de periódico |
+| **Óleo** | Pinceladas de cerda y empaste sobre un lienzo entonado |
+| **Artesanía en papel** | Capas de papel cortado y recortes pintados, animados a doses |
+| **Lápiz y acuarela** | Aguadas que nunca llenan del todo el contorno a lápiz |
+| **Pixel art** | Una paleta fija de 16 colores sobre una cuadrícula de baja resolución |
+| **Risografía** | Tambores de tinta sobreimpresos con ligeros desajustes |
+| **Animación rubber hose** | Tinta de dibujos animados de los años treinta, extremidades flexibles y grano de película |
+| **Esgrafiado** | Líneas blancas rascadas sobre una capa negra de arcilla |
+| **Grabado de una línea** | Una espiral ininterrumpida cuyo grosor crea los tonos |
+| **Punteado** | Puntos de pluma cuya densidad crea los tonos |
+| **Libro ilustrado** | Personajes a lápiz y acuarela |
+| **Sumi-e** | Un solo pincel cargado de tinta sobre papel absorbente |
+| **Bloques de juguete** | Bloques de plástico con tetones, montados capa a capa |
+| **Álbum de recortes vintage** | Grabados, títulos de letras recortadas y tarjetas pegadas sobre papel envejecido |
+| **Xilografía / ukiyo-e** | Una plancha maestra tallada y planchas de color sobre washi |
+
+</details>
+
+## Cada estilo se dibuja solo
+
+<p align="center">
+  <img src="assets/readme/drawing.gif" width="100%" alt="Cuatro imágenes se dibujan a la vez: un robot a lápiz de color en su mesa de trabajo, una xilografía de garzas en un puente bajo la lluvia, un gato de pixel art que salta hacia las luciérnagas y bambú sumi-e con un gorrión">
+</p>
+
+Cada estilo entrega la imagen terminada y, de la misma fuente, una película de cómo se hizo, siguiendo el orden de trabajo de un artista de ese medio. La acuarela empieza con lápiz y luego aplica las aguadas de claro a oscuro. La xilografía imprime primero la plancha maestra y después cada plancha de color. El pixel art bloquea formas lisas antes de sombrear grupos de píxeles. Nada aparece con un fundido: cada trazo crece, cada aguada se extiende desde donde tocó el pincel y el último fotograma coincide con la imagen fija, píxel por píxel. Es a la vez un timelapse, un proceso de creación y un diagrama explicativo.
+
+## Música compuesta con código
+
+Sin muestras ni grabaciones. Las notas se escriben como datos y cada sonido se sintetiza: un piano modelado, con cuerdas que laten, martillos que iluminan el timbre y un pedal que prolonga la resonancia, además de marimba, arpa, guitarra, celesta, campanas, cuerdas, chiptune y batería. Todas las tonalidades mayores y menores, un estado de ánimo para cada sección y un tema que se ajusta a cualquier duración.
+
+| Escucha | |
+|---|---|
+| [Un nocturno en la bemol](assets/audio/nocturne-45s.mp3) | 45 s de piano: crece, llega a la cima y vuelve al susurro |
+| [El piano interpretado](assets/audio/piano-8s.mp3) · [las mismas notas tocadas sin expresión](assets/audio/piano-flat-baseline-8s.mp3) | La diferencia está en la interpretación: voces, fraseo y pedal |
+| [Cinemático, asombro](assets/audio/sampler-cinematic-awe-8s.mp3) · [Lo-fi](assets/audio/sampler-lofi-nostalgic-8s.mp3) · [Marimba](assets/audio/sampler-marimba-curious-8s.mp3) · [Electrónica](assets/audio/sampler-drive-electronic-8s.mp3) | más estados de ánimo e instrumentos |
+| [El tema del nocturno en 15 segundos](assets/audio/fit-theme-15s.mp3) | El compositor elige la forma que cabe en ese tiempo |
+
+## Páginas web que se fijan en ti
+
+<p align="center">
+  <img src="assets/readme/interactive.gif" width="100%" alt="Un formulario de registro con un robot dibujado a mano que observa mientras escribes, se tapa los ojos en el campo de contraseña y celebra el registro completado">
+</p>
+
+Ilustraciones interactivas para webs reales: una mascota que sigue el cursor y reacciona a los botones, una imagen de cabecera que se dibuja al desplazarte, un compañero de formulario que se tapa los ojos ante el campo de contraseña. Basta un pequeño módulo ES y un elemento `<ani-doodle>`, sin framework, con opciones de movimiento reducido y uso por teclado. Cada fotograma queda determinado por las entradas que lo preceden.
+
+## Trae tu propia imagen
+
+- **Reproducir un estilo.** Enséñale una imagen que te guste y estudiará su trazo, sus bordes, su paleta y su papel para dibujar algo nuevo con ese estilo. Toma prestado el estilo, nunca la imagen.
+- **Recrear una foto.** Una foto se convierte en un esgrafiado, una xilografía o una sola línea grabada: se miden los tonos y la dirección del pelo o la tela, y cada marca visible se dibuja con código.
+- **Mantener un personaje.** Crea un personaje una vez y seguirá siendo el mismo en cada plano, pose y estilo, desde la xilografía hasta los bloques de juguete.
+
+## Aprende a dibujar
+
+<p align="center">
+  <img src="assets/readme/lesson.jpg" width="100%" alt="Una lección de lápiz en ocho pasos para dibujar un gato sentado, desde las líneas de colocación y las tres masas hasta la construcción, los valores y los últimos detalles">
+</p>
+
+Pregunta cómo dibujar algo, o trae un dibujo, y anidoodle lo reconstruye como lección: una lámina paso a paso y un timelapse con subtítulos. Cada paso explica qué observar, cómo hacerlo y cuál es el error más común.
 
 ## Qué puedes crear
 

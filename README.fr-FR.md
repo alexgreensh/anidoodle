@@ -23,6 +23,8 @@
 
 <p align="center">
   <a href="#31-styles-au-choix">Styles</a> ·
+  <a href="#chaque-style-se-dessine-sous-vos-yeux">Films de dessin</a> ·
+  <a href="#de-la-musique-composée-en-code">Musique</a> ·
   <a href="#ce-que-vous-pouvez-créer">Ce que vous pouvez créer</a> ·
   <a href="#ce-quil-embarque">Ce qu'il embarque</a> ·
   <a href="#ça-dessine-puis-ça-bouge">Mouvement</a> ·
@@ -36,6 +38,86 @@
 </p>
 
 Chaque style est une façon bien à lui de poser une trace : l'effilement d'une plume, le débordement d'un lavis, le grain de la craie sur l'ardoise, le bord déchiré du papier découpé, la trame d'un tambour de risographie, un seul trait gravé qui s'enroule pour devenir une lune. Le sujet change de forme selon la main qui le dessine, comme il le ferait pour trente et un illustrateurs différents. Chaque style s’accompagne aussi d’un film où son image se dessine trait après trait, dans l’ordre de travail d’un artiste qui emploie ce médium. Choisissez-en un pour votre marque, et toutes les images suivantes arriveront de la même main. Chaque planche ci-dessus, et la planche-contact elle-même, est dessinée par du code dans ce dépôt.
+
+<details>
+<summary><b>Les 31 styles</b> et leur façon de prendre forme</summary>
+
+| Style | Comment il est réalisé |
+|---|---|
+| **Stylo bille** | Un seul stylo ; les hachures superposées font les valeurs |
+| **Couleurs fragmentées** | Des touches de couleurs non mélangées, à la manière impressionniste |
+| **Craie sur ardoise** | Le côté de la craie frotte et laisse sa poussière |
+| **Fusain effacé** | Du fusain dessiné, effacé puis repris, avec ses fantômes |
+| **Crayon de couleur** | Des hachures orientées sur un papier crème à grain |
+| **Crayon de cire** | Des gribouillis cireux qui sautent les creux du papier |
+| **Collage de papier découpé** | Du papier déchiré et découpé, sans traits dessinés |
+| **Plan cyanotype** | Un dessin à la plume à tracer sur papier cyanotype |
+| **Broderie** | Du fil piqué dans du lin tendu sur un tambour |
+| **Vecteur à plat** | Des formes géométriques nettes, du grain et de longues ombres |
+| **Conte populaire illustré** | Un premier plan peint qui se fond dans le crayon sur papier crème |
+| **Encre et lavis** | Les lavis d'abord, puis une plume souple |
+| **Isométrique** | Une coupe isométrique 2:1 aux facettes colorées à plat |
+| **3D low poly** | Des triangles aux facettes colorées à plat, dessinés en code |
+| **BD au marqueur** | Des aplats et un seul contour épais |
+| **Gouache du milieu du siècle** | Des formes mates et opaques, des bords au pinceau sec, un trait libre |
+| **Trame sur papier journal** | Une trame noire et une couleur d'accompagnement sur papier journal |
+| **Peinture à l'huile** | Des coups de brosse et de la matière sur une toile teintée |
+| **Papier animé** | Des papiers découpés superposés et peints, animés sur deux images |
+| **Crayon et aquarelle** | Des lavis qui ne remplissent jamais tout à fait le trait de crayon |
+| **Pixel art** | Une palette fixe de 16 couleurs sur une grille basse résolution |
+| **Risographie** | Des tambours d'encre surimprimés, avec leurs légers décalages |
+| **Animation rubber hose** | De l'encre façon dessin animé des années 1930, des membres souples et du grain de pellicule |
+| **Carte à gratter** | Des lignes blanches grattées dans une couche d'argile noire |
+| **Gravure d'un seul trait** | Une spirale ininterrompue dont l'épaisseur crée les valeurs |
+| **Pointillisme à la plume** | Des points de plume dont la densité crée les valeurs |
+| **Livre d'images** | Des personnages au crayon et à l'aquarelle |
+| **Sumi-e** | Un seul pinceau chargé d'encre sur papier absorbant |
+| **Briques de jeu** | Des briques en plastique à tenons, montées couche par couche |
+| **Album de coupures vintage** | Gravures, titres en lettres découpées et cartes scotchées sur papier vieilli |
+| **Gravure sur bois / ukiyo-e** | Une planche de trait gravée et des planches de couleur sur washi |
+
+</details>
+
+## Chaque style se dessine sous vos yeux
+
+<p align="center">
+  <img src="assets/readme/drawing.gif" width="100%" alt="Quatre images se dessinent en même temps : un robot au crayon de couleur devant son établi, une estampe de hérons sur un pont sous la pluie, un chat en pixel art sautant vers des lucioles et des bambous au sumi-e avec un moineau">
+</p>
+
+Chaque style livre l'image achevée et, depuis la même source, un film de sa création, dans l'ordre où travaillerait un artiste de ce médium. L'aquarelle commence au crayon, puis pose les lavis du clair au foncé. La gravure sur bois imprime d'abord la planche de trait, puis chaque planche de couleur. Le pixel art pose les formes à plat avant d'ombrer les groupes de pixels. Rien n'apparaît en fondu : chaque trait grandit, chaque lavis s'étend depuis le point de contact du pinceau, et la dernière image du film correspond à l'image fixe, pixel pour pixel. C'est à la fois un accéléré, les coulisses de la création et un schéma explicatif.
+
+## De la musique composée en code
+
+Ni échantillons ni enregistrements. Les notes sont écrites comme des données et chaque son est synthétisé : un piano modélisé, avec ses cordes qui battent, ses marteaux qui éclaircissent le timbre et sa pédale qui prolonge la résonance, mais aussi marimba, harpe, guitare, célesta, cloches, cordes, chiptune et batterie. Toutes les tonalités majeures et mineures, une humeur par section et un thème qui s'adapte à n'importe quelle durée.
+
+| Écouter | |
+|---|---|
+| [Un nocturne en la bémol](assets/audio/nocturne-45s.mp3) | 45 s de piano : il monte, atteint un sommet, puis retombe dans le calme |
+| [Le piano, interprété](assets/audio/piano-8s.mp3) · [les mêmes notes, jouées sans expression](assets/audio/piano-flat-baseline-8s.mp3) | La différence tient au jeu : voix, phrasé, pédale |
+| [Cinématique, émerveillement](assets/audio/sampler-cinematic-awe-8s.mp3) · [Lo-fi](assets/audio/sampler-lofi-nostalgic-8s.mp3) · [Marimba](assets/audio/sampler-marimba-curious-8s.mp3) · [Électronique](assets/audio/sampler-drive-electronic-8s.mp3) | d'autres ambiances et instruments |
+| [Le thème du nocturne en 15 secondes](assets/audio/fit-theme-15s.mp3) | Le compositeur choisit la forme adaptée à la durée |
+
+## Des pages web qui vous remarquent
+
+<p align="center">
+  <img src="assets/readme/interactive.gif" width="100%" alt="Un formulaire d'inscription accompagné d'un robot dessiné à la main, qui suit la saisie, se cache les yeux au champ du mot de passe et se réjouit quand l'inscription réussit">
+</p>
+
+Des illustrations interactives pour de vrais sites : une mascotte qui suit le curseur et réagit aux boutons, une image d'en-tête qui se dessine au défilement de la page, un compagnon de formulaire qui se cache les yeux devant le champ du mot de passe. Un petit module ES et un élément `<ani-doodle>` suffisent, sans framework, avec prise en charge de la réduction des animations et du clavier. Chaque image est déterminée par les entrées qui l'ont précédée.
+
+## Apportez votre propre image
+
+- **Retrouver un style.** Montrez-lui une image que vous aimez : il en étudie le geste, les traits, les bords, la palette et le papier, puis dessine un autre sujet dans ce style. Il emprunte le style, jamais l'image.
+- **Recréer une photo.** Une photo devient une carte à gratter, une gravure sur bois ou un seul trait gravé. Les valeurs et le sens du poil ou du tissu sont mesurés ; chaque marque visible est dessinée en code.
+- **Garder un personnage.** Créez-le une fois ; il reste le même d'un plan, d'une pose et d'un style à l'autre, de la gravure sur bois aux briques de jeu.
+
+## Apprendre à dessiner
+
+<p align="center">
+  <img src="assets/readme/lesson.jpg" width="100%" alt="Une leçon de crayon en huit étapes pour dessiner un chat assis, des lignes de placement et des trois masses à la construction, aux valeurs et aux derniers détails">
+</p>
+
+Demandez comment dessiner quelque chose, ou apportez un de vos dessins, et anidoodle le reconstruit en leçon : une planche étape par étape et un accéléré légendé, avec, à chaque étape, ce qu'il faut observer, comment procéder et l'erreur courante.
 
 ## Ce que vous pouvez créer
 

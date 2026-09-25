@@ -23,6 +23,8 @@
 
 <p align="center">
   <a href="#31-styles-to-choose-from">Styles</a> ·
+  <a href="#every-style-draws-itself">Drawing films</a> ·
+  <a href="#music-composed-in-code">Music</a> ·
   <a href="#what-you-can-make">What you can make</a> ·
   <a href="#what-it-packs">What it packs</a> ·
   <a href="#it-draws-then-it-moves">Motion</a> ·
@@ -36,6 +38,86 @@
 </p>
 
 Each style is its own way of making a mark: the taper of a nib, the bleed of a wash, the scumble of chalk on slate, the torn edge of cut paper, the halftone of a risograph drum, one engraved line spiralling out to become a moon. The subject changes shape in each hand, the way it would for thirty-one different illustrators. Every style also ships a film of its picture being drawn, mark by mark, in the order an artist in that medium works. Pick one for your brand and every picture after it arrives in the same hand. Every plate above, and the contact sheet itself, is drawn by code in this repo.
+
+<details>
+<summary><b>All 31 styles</b>, and how each one is made</summary>
+
+| Style | How it's made |
+|---|---|
+| **Ballpoint** | One biro; tone from where hatching sits |
+| **Broken colour** | Separate dabs of unmixed colour, impressionist |
+| **Chalkboard** | Side-of-chalk scumble with dust |
+| **Charcoal erasure** | Charcoal drawn, erased and redrawn, ghosts kept |
+| **Coloured pencil** | Directional pencil hatching on toothy cream paper |
+| **Crayon** | Waxy scribble fills that skip the paper's valleys |
+| **Cut-paper collage** | Torn and cut paper, no drawn lines |
+| **Cyanotype blueprint** | Ruling-pen drafting on a cyanotype sheet |
+| **Embroidery** | Thread stitched through linen in a hoop |
+| **Flat vector** | Crisp geometric shapes with grain and long shadows |
+| **Folk-tale storybook** | Painted foreground dissolving into pencil line on cream paper |
+| **Ink & line-wash** | Washes first, then a flexible nib |
+| **Isometric** | A 2:1 isometric cutaway in flat-shaded planes |
+| **Low-poly 3D** | Flat-shaded triangles, drawn in code |
+| **Marker comic** | Flat cel fills and one heavy contour |
+| **Mid-century gouache** | Opaque matte shapes, dry-brush edges, loose line |
+| **Newsprint halftone** | One black screen plus a spot colour on newsprint |
+| **Painted oil** | Bristle strokes and impasto on a toned canvas |
+| **Paper-craft** | Layered cut paper and painted cut-outs, on twos |
+| **Pencil & watercolour** | Washes that never quite fill their pencil line |
+| **Pixel art** | A fixed 16-colour palette on a low-res grid |
+| **Risograph** | Ink drums overprinting through registration |
+| **Rubber-hose** | 1930s cartoon ink with bendy limbs and film grain |
+| **Scratchboard** | White lines scratched out of black clay |
+| **Single-line engraving** | One unbroken spiral whose width is the tone |
+| **Stipple** | Pen dots whose density is the tone |
+| **Storybook** | Pencil and watercolour for characters |
+| **Sumi-e** | One loaded brush on absorbent paper |
+| **Toy brick** | Studded plastic bricks, built layer by layer |
+| **Vintage scrapbook** | Engravings, cut-letter titles and taped cards on aged paper |
+| **Woodcut / ukiyo-e** | A carved keyblock and colour blocks on washi |
+
+</details>
+
+## Every style draws itself
+
+<p align="center">
+  <img src="assets/readme/drawing.gif" width="100%" alt="Four pictures drawing themselves at once: a coloured-pencil robot at a workbench, a woodblock print of herons on a bridge in the rain, a pixel-art cat leaping for fireflies, and sumi-e bamboo with a sparrow">
+</p>
+
+Every style ships the finished picture and, from the same source, a film of it being made in the order an artist in that medium works. Watercolour lays in pencil, then washes light to dark. A woodblock prints the keyblock, then each colour block. Pixel art blocks in flat shapes, then shades clusters. Nothing fades in: every stroke grows, every wash spreads from where the brush touched, and the film's last frame is the still, pixel for pixel. It is the timelapse, the making-of and the explainer diagram in one.
+
+## Music, composed in code
+
+No samples and no recordings. The notes are written as data, and every sound is synthesized: a modelled piano (strings that beat, hammers that brighten, a pedal that rings), marimba, harp, guitar, celesta, bells, strings, chiptune and drums. Every major and minor mode, a mood per section, and a theme that fits itself to any length.
+
+| Listen | |
+|---|---|
+| [A nocturne in A-flat](assets/audio/nocturne-45s.mp3) | 45 s, piano: it builds, peaks, then falls to a hush |
+| [The piano, played](assets/audio/piano-8s.mp3) · [the same notes, played flat](assets/audio/piano-flat-baseline-8s.mp3) | the difference is the performance: voicing, phrasing, pedal |
+| [Cinematic, awe](assets/audio/sampler-cinematic-awe-8s.mp3) · [Lo-fi](assets/audio/sampler-lofi-nostalgic-8s.mp3) · [Marimba](assets/audio/sampler-marimba-curious-8s.mp3) · [Electronic](assets/audio/sampler-drive-electronic-8s.mp3) | more moods and instruments |
+| [The nocturne's theme in 15 seconds](assets/audio/fit-theme-15s.mp3) | the composer picks the form that fits the length |
+
+## Web pages that notice you
+
+<p align="center">
+  <img src="assets/readme/interactive.gif" width="100%" alt="A sign-up form with a hand-drawn robot beside it that watches the typing, covers its eyes at the password field, and cheers on success">
+</p>
+
+Interactive illustrations for real sites: a mascot that follows the cursor and reacts to buttons, a hero that draws itself as the page scrolls, a form companion that covers its eyes at the password field. One small ES module and a `<ani-doodle>` element, no framework, with reduced-motion and keyboard paths. Each frame is still a fact, given the input that led to it.
+
+## Bring your own image
+
+- **Match a style.** Show it a picture you love and it studies the hand (the marks, the edges, the palette, the paper) and draws something new in it. It borrows the style, never the picture.
+- **Recreate a photo.** A photo becomes a scratchboard, a woodblock print or a single engraved line: the photo is measured for tone and fur or fabric direction, and every visible mark is drawn in code.
+- **Keep a character.** Build a character once and every shot, pose and style uses the same one, from woodcut to toy bricks.
+
+## Learn to draw
+
+<p align="center">
+  <img src="assets/readme/lesson.jpg" width="100%" alt="An eight-step pencil lesson for drawing a sitting cat, from placement lines and three masses to construction, values and final details">
+</p>
+
+Ask how to draw something, or bring a drawing, and anidoodle rebuilds it as a lesson: a step sheet and a captioned timelapse, each step with what to look for, how to do it, and the common mistake.
 
 ## What you can make
 
