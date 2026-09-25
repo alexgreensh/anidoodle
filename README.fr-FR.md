@@ -114,8 +114,10 @@ Des illustrations interactives pour de vrais sites : une mascotte qui suit le cu
 ## Apprendre à dessiner
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="Dessiner un hibou en neuf étapes : de deux cercles à la structure, au contour, aux yeux, aux ombres et aux plumes, jusqu'au reste du hibou">
+  <img src="assets/readme/lesson.jpg" width="56%" alt="Dessiner un hibou en neuf étapes : de deux cercles à la structure, au contour, aux yeux, aux ombres et aux plumes, jusqu'au reste du hibou">
+  <img src="assets/readme/lesson.gif" width="40%" alt="Le hibou se dessine étape par étape">
 </p>
+<p align="center"><a href="assets/readme/lesson.mp4">Voir la leçon complète sous-titrée (mp4, 95 s)</a></p>
 
 Demandez comment dessiner quelque chose, ou apportez un de vos dessins, et anidoodle le reconstruit en leçon : une planche étape par étape et un accéléré légendé, avec, à chaque étape, ce qu'il faut observer, comment procéder et l'erreur courante.
 

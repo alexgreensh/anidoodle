@@ -22,3 +22,6 @@ skills/anidoodle/engine/src/canvas-core/lessonClawd*.ts
 skills/anidoodle/engine/src/hosts/page-lessonClawd*.ts
 # agent worktrees
 .claude/
+# PRIVATE: local-only studio pieces
+skills/anidoodle/engine/src/canvas-core/clawd*.ts
+skills/anidoodle/engine/src/hosts/page-clawd*.ts

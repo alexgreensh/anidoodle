@@ -114,8 +114,10 @@
 ## 描き方を学ぶ
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="フクロウの描き方を9ステップで。2つの円から、構造、輪郭、目、陰影、羽根を経て、残りのフクロウまで">
+  <img src="assets/readme/lesson.jpg" width="56%" alt="フクロウの描き方を9ステップで。2つの円から、構造、輪郭、目、陰影、羽根を経て、残りのフクロウまで">
+  <img src="assets/readme/lesson.gif" width="40%" alt="フクロウが一段階ずつ描かれていくタイムラプス">
 </p>
+<p align="center"><a href="assets/readme/lesson.mp4">キャプション付きのレッスン全編を見る (mp4, 95秒)</a></p>
 
 描き方を尋ねるか、自分の絵を持ち込めば、anidoodleがレッスンに組み直す。手順シートと字幕付きタイムラプスで、各段階に観察する点、描き方、よくある間違いを添える。
 

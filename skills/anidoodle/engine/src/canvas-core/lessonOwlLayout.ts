@@ -9,20 +9,37 @@
 //   - the last panel, the payoff, shows the whole owl at full strength with no veil.
 // The film: a 1080 px wide art area with a deep caption band under it, captions ~3x the old size.
 import { Gfx, PENCIL, type Ctx, type Env } from "./core";
-import { letter } from "./drafting";
+import { letter, width } from "./drafting";
 import type { Film } from "./film";
 import { all, before, only, paperGrain, progressAt, renderArt, schedule, type Score, type Timing, type View } from "./drawingScore";
 import { lessonTiming, wrap } from "./lesson";
 
 export type OwlLook = { ink: string; body: string; accent: string; band: string; rule: string };
-const LOOK: OwlLook = { ink: "#1d191a", body: "#2e292a", accent: "#2f5fae", band: "#ebe4d4", rule: "#8a817c" };
-const pen = (ctx: Ctx, env: Env) => new Gfx(ctx, env, 0, { ...PENCIL, wobble: 0.35, rough: 0.45 });
+export const LOOK: OwlLook = { ink: "#1d191a", body: "#2e292a", accent: "#2f5fae", band: "#ebe4d4", rule: "#8a817c" };
+export const pen = (ctx: Ctx, env: Env) => new Gfx(ctx, env, 0, { ...PENCIL, wobble: 0.35, rough: 0.45 });
 
-type Line = { t: string; cap: number; col: string; w: number; gap: number; x?: number };
+export type Line = { t: string; cap: number; col: string; w: number; gap: number; x?: number };
 // write lines on, one after another; `p` is 0..1 over the whole block (a hand writes, nothing fades)
-const block = (g: Gfx, lines: Line[], x: number, y: number, p: number, seed: number) => {
+export const block = (g: Gfx, lines: Line[], x: number, y: number, p: number, seed: number) => {
   const cost = lines.map((l) => l.t.length), tot = cost.reduce((a, b) => a + b, 0) || 1; let acc = 0, yy = y;
   lines.forEach((l, i) => { const a = acc / tot, b = (acc + cost[i]) / tot, q = p >= 1 ? 1 : Math.max(0, Math.min(1, (p - a) / (b - a || 1))); acc += cost[i]; if (q > 0) letter(g, l.t, x + (l.x ?? 0), yy, { cap: l.cap, color: l.col, seed: seed + i * 7, w: l.w, progress: q, slant: 0.1, opacity: 1 }); yy += l.cap + l.gap; });
+};
+// FIT, never clip. Every text block is wrapped against the drafting hand's own measured advance
+// widths, then the whole block is checked against the box it must live in; only if it still does
+// not fit (too many lines, or one word wider than the box) does the lettering shrink, 4 % at a
+// time, down to 55 %. The test that forced this: "FEATHERS FOLLOW THE FORM" at 52 px caps ran off
+// a 1080 px frame at "FOR" because titles were written as one unwrapped line.
+export type Spec = { text: string; cap: number; col: string; w: number; gap: number; maxW: number; x?: number };
+export const fitLines = (specs: Spec[], maxH: number): { lines: Line[]; scale: number; height: number } => {
+  let best = { lines: [] as Line[], scale: 0.55, height: Infinity };
+  for (let s = 1; s >= 0.549; s -= 0.04) {
+    const lines: Line[] = []; let ok = true;
+    for (const sp of specs) { const cap = sp.cap * s, room = sp.maxW - 8; for (const t of wrap(sp.text, cap, room)) { if (width(t, cap) > room) ok = false; lines.push({ t, cap, col: sp.col, w: sp.w * Math.max(0.8, s), gap: sp.gap * s, x: sp.x }); } }
+    const height = lines.reduce((a, l, i) => a + l.cap + (i < lines.length - 1 ? l.gap : 0), 0);
+    best = { lines, scale: s, height };
+    if (ok && height <= maxH) return best;
+  }
+  return best;
 };
 const rule = (g: Gfx, x0: number, x1: number, y: number, seed: number, col: string) => g.pen([[x0, y], [(x0 + x1) / 2, y - 1.2], [x1, y + 0.6]], { w: 1.6, color: col, seed, opacity: 0.6, retrace: false, boil: 0, wobble: 0.3 });
 
@@ -31,7 +48,7 @@ export type OwlFilmOpts = { timing?: Partial<Timing>; outro?: string; subtitle?:
 export const owlFilm = (build: () => Score, o: OwlFilmOpts = {}) => {
   let S0: Score | null = null; const score = () => (S0 ??= build());
   const S = score(), W = 1080, art = Math.round((W * S.H) / S.W), bandH = 360, H = art + bandH;
-  const T = lessonTiming({ intro: 90, captionLead: 24, pause: 12, hold: 120, rate: 30, minStep: 120, maxStep: 330, ...o.timing });
+  const T = lessonTiming({ intro: 90, captionLead: 24, pause: 12, hold: 120, rate: 30, minStep: 75, maxStep: 330, ...o.timing });
   const P0 = schedule(S, T), total = P0.total, last = P0.steps[P0.steps.length - 1];
   const view = (env: Env): View => ({ x: 0, y: 0, w: Math.round(W * env.scale), h: Math.round(art * env.scale) });
   const band = (ctx: Ctx, env: Env, frame: number, final: boolean) => {
@@ -44,11 +61,12 @@ export const owlFilm = (build: () => Score, o: OwlFilmOpts = {}) => {
       return;
     }
     if (k < 0) { // the title card
-      block(g, [{ t: S.title.toUpperCase(), cap: 62, col: LOOK.ink, w: 6.8, gap: 30 }, ...wrap(o.subtitle ?? S.medium, 30, maxW).map((t) => ({ t, cap: 30, col: LOOK.accent, w: 3.3, gap: 16 }))], x, art + 70, Math.min(1, frame / Math.max(1, T.intro - 20)), 700);
+      block(g, [{ t: S.title.toUpperCase(), cap: 62, col: LOOK.ink, w: 6.8, gap: 30 }, ...wrap(o.subtitle ?? S.medium, 30, maxW).map((t) => ({ t, cap: 30, col: LOOK.accent, w: 3.3, gap: 16 }))], x, art + 70, Math.min(1, frame / Math.max(1, T.intro - 1)), 700);
       return;
     }
-    const st = S.steps[k], ps = P0.steps[k], p = Math.min(1, (frame - ps.start) / Math.max(24, (ps.markEnd - ps.start) * 0.4));
-    block(g, [{ t: `STEP ${k + 1} OF ${S.steps.length}`, cap: 26, col: LOOK.accent, w: 3.2, gap: 22 }, { t: st.title.toUpperCase(), cap: 52, col: LOOK.ink, w: 6, gap: 26 }, ...wrap(st.caption, 31, maxW).map((t) => ({ t, cap: 31, col: LOOK.body, w: 3.5, gap: 17 }))], x, art + 50, p, 100 + k * 50);
+    const st = S.steps[k], ps = P0.steps[k], p = Math.min(1, (frame - ps.start) / Math.max(24, (ps.markEnd - ps.start) * 0.7)); // written on across most of the step, finished in time to be read
+    const fitted = fitLines([{ text: `STEP ${k + 1} OF ${S.steps.length}`, cap: 26, col: LOOK.accent, w: 3.2, gap: 22, maxW }, { text: st.title, cap: 52, col: LOOK.ink, w: 6, gap: 22, maxW }, { text: st.caption, cap: 31, col: LOOK.body, w: 3.5, gap: 16, maxW }], bandH - 50 - 24);
+    block(g, fitted.lines, x, art + 50, p, 100 + k * 50);
   };
   const draw = (ctx: Ctx, frame: number, env: Env, final: boolean) => {
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = S.paper; ctx.fillRect(0, 0, W * env.scale, H * env.scale); ctx.restore();

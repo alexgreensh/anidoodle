@@ -229,7 +229,10 @@ export const owlScore = (): Score => {
   const radial = (cx: number, cy: number, a0: number, a1: number, rim: P[], seed: number) => { const out: Ink[] = [], r = rng(seed), reg = polyR(rim); for (let k = 0; k < 34; k++) { const a = a0 + ((a1 - a0) * (k + r() * 0.6)) / 34, c = Math.cos(a), s = Math.sin(a); let r1 = 42; while (r1 < 140 && reg.has(cx + c * (r1 + 4), cy + s * (r1 + 4))) r1 += 3; if (r1 < 52) continue; const r0 = 40 + r() * 6; out.push(S([[cx + c * r0, cy + s * r0], [cx + c * (r0 + r1) / 2 + s * 2, cy + s * (r0 + r1) / 2 - c * 2], [cx + c * (r1 - 3), cy + s * (r1 - 3)]], 2.1, 0.6)); } return out; };
   b.addAll("face.discL", "face", "line", "line", radial(eyeL.cx, eyeL.cy + 4, Math.PI * 0.35, Math.PI * 1.25, discL, 84));
   b.addAll("face.discR", "face", "line", "line", radial(eyeR.cx, eyeR.cy + 4, -Math.PI * 0.25, Math.PI * 0.65, discR, 85));
-  b.erase("circles.lift", "circles", "guides", eraserPath([0, 30, 1000, 1170], { seed: 86, bite: 70 }), { width: 80, ghost: 0.03 });
+  // lift the blue where it is: back and forth over the owl, then once along each branch line (never scrubbing bare paper)
+  b.erase("circles.lift", "circles", "guides", eraserPath([226, 36, 774, 1146], { seed: 86, bite: 50 }), { width: 90, ghost: 0.03 });
+  b.erase("branch.liftTop", "branch", "guides", [[10, bTop(10)], [505, bTop(505)], [1000, bTop(1000)]], { width: 34, ghost: 0.03 });
+  b.erase("branch.liftBot", "branch", "guides", [[1000, bBot(1000)], [505, bBot(505)], [10, bBot(10)]], { width: 34, ghost: 0.03 });
 
   // 6. value masses
   b.step("s6", "values", {

@@ -114,8 +114,10 @@
 ## 学着画画
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="九步画一只猫头鹰：从两个圆开始，经过结构、轮廓、眼睛、阴影和羽毛，直到画完剩下的猫头鹰">
+  <img src="assets/readme/lesson.jpg" width="56%" alt="九步画一只猫头鹰：从两个圆开始，经过结构、轮廓、眼睛、阴影和羽毛，直到画完剩下的猫头鹰">
+  <img src="assets/readme/lesson.gif" width="40%" alt="猫头鹰一步步画出来的延时动画">
 </p>
+<p align="center"><a href="assets/readme/lesson.mp4">观看带字幕的完整课程 (mp4, 95 秒)</a></p>
 
 问它怎么画一样东西，或者带来自己的画，anidoodle 就会把它重新拆成一堂课：分步图和带字幕的延时视频，每一步都说明该观察什么、怎样动笔，以及常见的错误。
 

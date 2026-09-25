@@ -114,8 +114,10 @@
 ## 그림 그리는 법 배우기
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="부엉이 그리는 법 9단계: 동그라미 두 개에서 시작해 구조, 윤곽, 눈, 그림자, 깃털을 거쳐 나머지 부엉이까지">
+  <img src="assets/readme/lesson.jpg" width="56%" alt="부엉이 그리는 법 9단계: 동그라미 두 개에서 시작해 구조, 윤곽, 눈, 그림자, 깃털을 거쳐 나머지 부엉이까지">
+  <img src="assets/readme/lesson.gif" width="40%" alt="부엉이가 단계별로 그려지는 타임랩스">
 </p>
+<p align="center"><a href="assets/readme/lesson.mp4">자막이 있는 전체 레슨 보기 (mp4, 95초)</a></p>
 
 무언가 그리는 법을 묻거나 직접 그린 그림을 가져오면, anidoodle이 수업으로 다시 구성해요. 단계별 시트와 자막이 달린 타임랩스에 각 단계에서 볼 것, 그리는 법, 흔한 실수를 담아요.
 

@@ -114,8 +114,10 @@ Ilustraciones interactivas para webs reales: una mascota que sigue el cursor y r
 ## Aprende a dibujar
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="Cómo dibujar un búho en nueve pasos: de dos círculos a la estructura, el contorno, los ojos, las sombras y las plumas, hasta el resto del búho">
+  <img src="assets/readme/lesson.jpg" width="56%" alt="Cómo dibujar un búho en nueve pasos: de dos círculos a la estructura, el contorno, los ojos, las sombras y las plumas, hasta el resto del búho">
+  <img src="assets/readme/lesson.gif" width="40%" alt="El búho dibujándose paso a paso">
 </p>
+<p align="center"><a href="assets/readme/lesson.mp4">Ver la lección completa con subtítulos (mp4, 95 s)</a></p>
 
 Pregunta cómo dibujar algo, o trae un dibujo, y anidoodle lo reconstruye como lección: una lámina paso a paso y un timelapse con subtítulos. Cada paso explica qué observar, cómo hacerlo y cuál es el error más común.
 

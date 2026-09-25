@@ -114,8 +114,10 @@ Interactive illustrations for real sites: a mascot that follows the cursor and r
 ## Learn to draw
 
 <p align="center">
-  <img src="assets/readme/lesson.jpg" width="100%" alt="How to draw an owl in nine steps: from two circles through construction, outline, eyes, shadows and feathers, to the rest of the owl">
+  <img src="assets/readme/lesson.jpg" width="56%" alt="How to draw an owl in nine steps: from two circles through construction, outline, eyes, shadows and feathers, to the rest of the owl">
+  <img src="assets/readme/lesson.gif" width="40%" alt="The owl drawing itself, step by step, with captions">
 </p>
+<p align="center"><a href="assets/readme/lesson.mp4">Watch the full lesson with captions (mp4, 95 s)</a></p>
 
 Ask how to draw something, or bring a drawing, and anidoodle rebuilds it as a lesson: a step sheet and a captioned timelapse, each step with what to look for, how to do it, and the common mistake.
 
