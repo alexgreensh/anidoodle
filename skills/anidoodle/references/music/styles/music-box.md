@@ -1,4 +1,4 @@
-# Style preset: music-box (the default)
+# Style preset: music-box (opt-in)
 
 > The original anidoodle music recipe, kept **verbatim** below as one style preset among the eleven
 > in `engine/src/canvas-core/music/tables.ts` (`STYLES.musicBox`). Its numbers are what the

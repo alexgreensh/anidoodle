@@ -6,7 +6,7 @@ what you make, so every choice is a number, every number is measured, and a huma
 before anything ships.
 
 Code: `engine/src/canvas-core/music/`. Tool: `engine/tools/music.mjs`. The old music-box recipe
-lives on, verbatim, as the default style preset: [`styles/music-box.md`](styles/music-box.md).
+lives on, verbatim, as an opt-in style preset: [`styles/music-box.md`](styles/music-box.md).
 
 ## The pipeline
 
@@ -211,7 +211,7 @@ piece to make a foley-only film. The existing `filmAudio(piece, seconds)` stays
 available for music-only films.
 
 Choose a score from the film's motion and emotion, not from the old music-box
-fixture by default. These named pieces are starting briefs in
+fixture by default. Keep the music-box preset available when a mechanical pluck is the intended sound. These named pieces are starting briefs in
 `music/pieces/modern.ts`, not an automatic score generator:
 
 | Piece | Harmonic / rhythmic idea | Texture |

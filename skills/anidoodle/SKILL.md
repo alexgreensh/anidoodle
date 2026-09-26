@@ -76,7 +76,7 @@ on the moving file.**
 longer films, a spine plus one line per chapter. If you cannot write it, stop. (2) **The grid**:
 at 120 bpm and 30 fps a beat is 15 frames; one cue table holds every frame number and a checker
 runs at load. (3) **Real reference** for anything that exists. (4) **ONE look still**, the hardest
-frame, critiqued in writing. ✋ **Approval.** (5) **ONE 8-second music sample.** ✋ **Approval.**
+frame, critiqued in writing. ✋ **Approval.** (5) **ONE 8-second sound sample (music and effects, if used).** ✋ **Approval.**
 (6) **Build the whole film**; mechanical checks run continuously. (7) **Review once** from the
 rendered file: a contact sheet per beat, each cut as a pair, the dead-air numbers. One ranked fix
 list, one rebuild. (8) ✋ **Final approval.** Say what you verified and what you cannot.
