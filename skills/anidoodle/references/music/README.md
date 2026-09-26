@@ -196,3 +196,34 @@ Meters prove we aren't obviously wrong. Only an ear says right.
   wrong, not the listener. Change the numbers, re-measure, re-listen.
 - **Honesty rule:** passing meters is not a timbre or emotion claim. If no human listened, the
   delivery says so.
+
+## Film sound design and contemporary score choices
+
+A film can call `filmSound(piece, { fps, frames, cues, ambience })` from
+`engine/src/canvas-core/music/sound-design.ts`. A `SoundCue` names a frame, an effect
+(`impact`, `whoosh`, `riser`, `click`, `flutter`, `ink`, `paper`), strength, optional
+length in frames, pan and seed. Whoosh/riser cues **end** on their named frame;
+impacts/clicks **begin** there. The renderer returns separate music, foley,
+transition and ambience stems; it ducks music under effects and masters the
+combined mix once. It does not load samples. Keep sound intentional: 3-5 main
+visual beats in a short piece, not a click on everything. Pass `null` for the
+piece to make a foley-only film. The existing `filmAudio(piece, seconds)` stays
+available for music-only films.
+
+Choose a score from the film's motion and emotion, not from the old music-box
+fixture by default. These named pieces are starting briefs in
+`music/pieces/modern.ts`, not an automatic score generator:
+
+| Piece | Harmonic / rhythmic idea | Texture |
+|---|---|---|
+| `lofiBeat` | F-major 9th-colour chords, phrase answer, 84 BPM half-time beat; keys and hats swing separately from the bass | FM e-piano, warm bass, soft rim, quiet optional crackle |
+| `synthPopHouse` | C-major hook and inversions, 124 BPM straight four-on-floor; two-bar build and lift | Detuned band-limited string synth, bass, dry kick and clap |
+| `brokenBeat` | D dorian chords and syncopated call/answer, 132 BPM displaced kick and shuffled hats | Short e-piano stabs, FM bell, voiced bass |
+| `ambientElectronic` | F lydian colour note and pedal, 88 BPM, four-bar open-to-arrival arc | Slow-attack synth strings, electric-piano motif, light bass |
+
+For every film, tailor the notes, cues and mix to the actual picture. The pieces
+are not proof of genre authenticity or sonic polish: audition picture and sound
+at matched loudness and report what a human heard. `tools/audio-e2e.mjs` renders
+two short film scores, tests frame/sample placement, deterministic output,
+combined LUFS/true peak and cut-boundary clicks. `colorArrives` and
+`inkTakesShape` are minimal visual test films, not polished showcase films.

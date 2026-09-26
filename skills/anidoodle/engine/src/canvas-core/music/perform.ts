@@ -40,13 +40,13 @@ export const perform = (p: Piece, tempo: number, o: PerformOpts): Performance =>
   const secRaw = (b: number) => { const f = (b - b0) / step, i = Math.floor(f), u = f - i; const a = tab[clamp(i, 0, tab.length - 1)], c = tab[clamp(i + 1, 0, tab.length - 1)]; return a + (c - a) * u; };
   const start = secRaw(-pick);
   const sec = (b: number) => secRaw(b) - start + lead;
-  const swing = plan.swing ?? 0.5;
-  const sw = (b: number) => { if (swing === 0.5) return b; const fl = Math.floor(b), fr = b - fl; return fl + (fr <= 0.5 ? fr * (swing / 0.5) : swing + (fr - 0.5) * ((1 - swing) / 0.5)); };
+  const sw = (b: number, swing = plan.swing ?? 0.5) => { if (swing === 0.5) return b; const fl = Math.floor(b), fr = b - fl; return fl + (fr <= 0.5 ? fr * (swing / 0.5) : swing + (fr - 0.5) * ((1 - swing) / 0.5)); };
 
   const RoleGain: Record<Role, number> = { melody: 1, inner: 0.55, bass: 0.68, accomp: 0.52, color: 0.7, drum: 1 }; // voicing: melody 6-10 dB over the rest
   let leadSum = 0, leadN = 0;
   const parts = p.parts.map((pt, pi) => {
     const hr = mkRng(p.seed * 131 + pi * 17 + 1), grid = pt.opts?.grid === true, isPiano = pt.inst === "piano";
+    const groove = typeof pt.opts?.swing === "number" ? clamp(pt.opts.swing, 0.5, 0.7) : plan.swing ?? 0.5;
     let tDev = 0, vDev = 0; // AR(1) states
     const notes = pt.notes.slice().sort((a, b) => a.t - b.t || a.p - b.p);
     // group simultaneous onsets (chords) for spread/roll
@@ -55,7 +55,7 @@ export const perform = (p: Piece, tempo: number, o: PerformOpts): Performance =>
     let lastT = -1e9, chordIdx = 0;
     notes.forEach((n, i) => {
       if (Math.abs(n.t - lastT) > 1e-6) { chordIdx = 0; lastT = n.t; if (o.expressive && !grid) { tDev = 0.85 * tDev + Math.sqrt(1 - 0.85 * 0.85) * gauss(hr) * 0.007; vDev = 0.7 * vDev + Math.sqrt(1 - 0.49) * gauss(hr) * 0.035; } } else chordIdx++;
-      let t = sec(sw(n.t)), end = sec(sw(n.t + n.d));
+      let t = sec(sw(n.t, groove)), end = sec(sw(n.t + n.d, groove));
       let v: number;
       if (!o.expressive) { v = o.flatVelocity ?? 0.6; }
       else {

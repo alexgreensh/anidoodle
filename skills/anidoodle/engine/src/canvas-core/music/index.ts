@@ -12,7 +12,10 @@ export * as instruments from "./instruments";
 import { nocturne, pianoPhrase8 } from "./pieces/nocturne";
 import { musicBoxJoy, minorPianoMelancholy, cinematicAwe, chiptunePlayful, lofiNostalgic } from "./pieces/samplers";
 import { marimbaCurious, harpTender, guitarWistful, celestaWonder, bellsHopeful, driveElectronic, folkCalm } from "./pieces/families";
+import { lofiBeat, synthPopHouse, brokenBeat, ambientElectronic } from "./pieces/modern";
 import { ghostFixture } from "./pieces/fixtures";
-export { nocturne, pianoPhrase8, musicBoxJoy, minorPianoMelancholy, cinematicAwe, chiptunePlayful, lofiNostalgic, marimbaCurious, harpTender, guitarWistful, celestaWonder, bellsHopeful, driveElectronic, folkCalm, ghostFixture };
+export { lofiBeat, synthPopHouse, brokenBeat, ambientElectronic, nocturne, pianoPhrase8, musicBoxJoy, minorPianoMelancholy, cinematicAwe, chiptunePlayful, lofiNostalgic, marimbaCurious, harpTender, guitarWistful, celestaWonder, bellsHopeful, driveElectronic, folkCalm, ghostFixture };
 /** Named pieces a film (or the tool) can ask for. ghostFixture is a test fixture, never a score. */
-export const PIECES = { nocturne, pianoPhrase8, musicBoxJoy, minorPianoMelancholy, cinematicAwe, chiptunePlayful, lofiNostalgic, marimbaCurious, harpTender, guitarWistful, celestaWonder, bellsHopeful, driveElectronic, folkCalm, ghostFixture };
+export const PIECES = { lofiBeat, synthPopHouse, brokenBeat, ambientElectronic, nocturne, pianoPhrase8, musicBoxJoy, minorPianoMelancholy, cinematicAwe, chiptunePlayful, lofiNostalgic, marimbaCurious, harpTender, guitarWistful, celestaWonder, bellsHopeful, driveElectronic, folkCalm, ghostFixture };
+
+export * from "./sound-design";
