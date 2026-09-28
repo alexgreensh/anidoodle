@@ -195,6 +195,17 @@ codex plugin marketplace add alexgreensh/anidoodle
 
 続いてCodexのTUIで`/plugins`を開き、anidoodleをインストールする。
 
+**Grok:**
+
+anidoodle は Alex Greenshpun のスキルです。ここにあるのは、Grok がそれを読む場所だけです。
+
+```bash
+grok plugin marketplace add alexgreensh/anidoodle
+grok plugin install anidoodle
+```
+
+インストールの前に Grok が確認を求めます。フォルダを直接読む場合は、`skills/anidoodle` を `~/.grok/skills/anidoodle` にコピーまたはリンクします。
+
 **その他のエージェント:** anidoodleは標準的なスキルフォルダ（`skills/anidoodle/SKILL.md`）なので、スキルを読み込める環境ならコピーして使える。
 
 あとは欲しいものを言葉で伝えるだけ。たとえば「レシピページ用に、鉛筆と水彩で洋梨を描いて」というように。エンジンを直接動かしたいときは:

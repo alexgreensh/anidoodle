@@ -195,6 +195,17 @@ codex plugin marketplace add alexgreensh/anidoodle
 
 Then in the Codex TUI: `/plugins` and install anidoodle.
 
+**Grok:**
+
+anidoodle is Alex Greenshpun's skill. This only tells Grok where to read it.
+
+```bash
+grok plugin marketplace add alexgreensh/anidoodle
+grok plugin install anidoodle
+```
+
+Grok asks you to confirm before it installs. To load the folder directly, copy or link `skills/anidoodle` to `~/.grok/skills/anidoodle`.
+
 **Any other agent:** anidoodle is a standard skill folder (`skills/anidoodle/SKILL.md`), so it can be copied into any harness that reads skills.
 
 Then ask for what you want: *"draw a pencil & watercolour pear for our recipes page"*. To drive the engine yourself:

@@ -195,6 +195,17 @@ codex plugin marketplace add alexgreensh/anidoodle
 
 Después, en la interfaz de Codex, abre `/plugins` e instala anidoodle.
 
+**Grok:**
+
+anidoodle es el skill de Alex Greenshpun. Esto solo le dice a Grok dónde leerlo.
+
+```bash
+grok plugin marketplace add alexgreensh/anidoodle
+grok plugin install anidoodle
+```
+
+Grok pide confirmación antes de instalar. Para cargar la carpeta directamente, copia o enlaza `skills/anidoodle` a `~/.grok/skills/anidoodle`.
+
 **Cualquier otro agente:** anidoodle es una carpeta de skill estándar (`skills/anidoodle/SKILL.md`), así que puedes copiarla a cualquier entorno que lea skills.
 
 Luego pide lo que quieras: *«dibuja una pera en lápiz y acuarela para nuestra página de recetas»*. Para manejar el motor tú mismo:
