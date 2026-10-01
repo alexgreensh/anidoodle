@@ -53,5 +53,5 @@ shown, crop into it at full size and check the interior, because that is where a
 - **Recreations from a photo**: trace each of the above from the photo and overlay-check it; tone
   alone never supplies interior lines.
 
-Each medium says it its own way (a carved keyblock line, a scratched cut, a pencil accent, a darker
+Each medium says it in its own way (a carved keyblock line, a scratched cut, a pencil accent, a darker
 brick), but none of them may leave it out.
