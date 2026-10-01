@@ -26,7 +26,7 @@ tones → lights with a smaller brush and fatter paint → impasto highlights �
 (stems, calyx, contact shadows). Background strokes never cross the objects (an even-odd clip), so
 each object keeps its own passes.
 
-**Size hierarchy.** A big flat (~130 px) lays the wall in few steep diagonal passes, with the toned ground left between them. Broad horizontals lay the table. A medium brush follows each form. A small brush does the accents only. Strokes feather in (`soft`), so no stroke starts as a square slab.
+**Size hierarchy.** A big flat (~130 px) lays the wall in a few steep diagonal passes, with the toned ground left between them. Broad horizontals lay the table. A medium brush follows each form. A small brush does the accents only. Strokes feather in (`soft`), so no stroke starts as a square slab.
 
 **Form and direction.** Strokes follow each form's own structure. The copper pot is painted in hoops
 round its belly: one eye-level ellipse ratio (0.17 at the rim, 0.205 at the foot), with the stroke curvature
