@@ -40,7 +40,7 @@ by `1/(D + z)` and moves with it: near planes swing wide, far ones barely stir, 
 element at a depth agrees with every other, because there is only one camera. Positive z
 recedes; a negative z crosses the lens (grass across the glass). Pass the plane's z to
 `begin(g, f, z)` or `toScreen(p, f, z)`. One dolly, one number, and the parallax is true for
-every element at once: do not hand-each-plane its own drift.
+every element at once: do not hand each plane its own drift.
 
 ## Shake
 
