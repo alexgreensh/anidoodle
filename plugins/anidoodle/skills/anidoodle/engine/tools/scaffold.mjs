@@ -51,7 +51,7 @@ const ownFilmFiles = () => {
   const SRC = join(ENGINE, "src");
   const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : p.endsWith(".ts") ? [p] : []; });
   const files = walk(SRC);
-  const res = (from, spec) => { const b = resolve(dirname(from), spec); for (const e of ["", ".ts", "/index.ts"]) if (existsSync(b + e) && statSync(b + e).isFile()) return b + e; return null; };
+  const res = (from, spec) => { const b = resolve(dirname(from), spec); for (const e of ["", ".ts", "/index.ts"]) { const c = resolve(b + e); if (existsSync(c) && statSync(c).isFile()) return c; } return null; }; // resolve(): on Windows "dir/index.ts" must become "dir\index.ts" to match the walked file list
   const imp = new Map(files.map((f) => [f, new Set([...readFileSync(f, "utf8").matchAll(/(?:from|import)\s*\(?\s*"(\.[^"]+)"/g)].map((m) => res(f, m[1])).filter(Boolean))]));
   const page = (f) => join(SRC, "hosts", `page-${f.slice(f.lastIndexOf(sep) + 1)}`);
   const out = new Set(OWN_FILMS.map((n) => join(SRC, "canvas-core", `${n}.ts`)));

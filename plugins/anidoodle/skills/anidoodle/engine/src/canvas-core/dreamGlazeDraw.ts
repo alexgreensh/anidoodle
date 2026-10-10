@@ -1,6 +1,7 @@
-import { type Ctx, type Env, type Layer } from "./core";
+import { type Ctx, type Env } from "./core";
 import { Film } from "./film";
-import { AX0, AY0, CAMH, COPIES, CT, DOT1, DOT2, F, H, MX, MY, OBJS, Q1, Q2, RIMW, S, SCROLL, ST, W, WIN, YH, Z0, backRim, built, cl, copyLayer, crown, drawDreamGlaze, halfW, hash2, lashLine, mouthLine, ridge, scrollW, signature, sm, smallThings, surface, type Built, type Curve } from "./dreamGlaze";
+import { AX0, AY0, CAMH, COPIES, CT, DOT1, DOT2, F, H, MX, MY, OBJS, Q1, Q2, RIMW, S, SCROLL, ST, W, WIN, YH, Z0, backRim, built, copyLayer, crown, drawDreamGlaze, halfW, lashLine, mouthLine, ridge, scrollW, signature, smallThings, type Built } from "./dreamGlaze";
+import { type Curve, type Plan, cl, hash2, laid, rows, sm, surface, wav, workPlan, workUp } from "./dreamGlazeKit";
 
 // THE SOFT SELF-PORTRAIT, PAINTED · the same picture, in the order its hand works.
 //
@@ -56,48 +57,21 @@ const drawing = (ctx: Ctx, s: number, f: number) => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
 
-// ---------------------------------------------------------------- a brush laying a ground in rows
-// The region painted so far: whole rows above, and the row in hand as far as the brush has got.
-// Rows run left to right, then right to left; their lower edge wavers as a hand's does.
-const wav = (x: number, row: number) => 6 * Math.sin(x * 0.011 + row * 1.7) + 3 * Math.sin(x * 0.037 + row);
-const rows = (ctx: Ctx, x0: number, y0: number, x1: number, y1: number, band: number, p: number) => {
-  const n = Math.ceil((y1 - y0) / band), q = cl(p) * n, k = Math.min(n, Math.floor(q)), fr = q - k;
-  ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip(); ctx.beginPath();
-  if (k > 0) { const yb = y0 + k * band; ctx.moveTo(x0, y0 - 20); ctx.lineTo(x1, y0 - 20); for (let x = x1; x >= x0 - 40; x -= 40) ctx.lineTo(x, k >= n ? y1 + 20 : yb + wav(x, k)); ctx.closePath(); }
-  if (k < n && fr > 0) { const yt = y0 + k * band - 12, yb = y0 + (k + 1) * band, ltr = k % 2 === 0, xf = ltr ? x0 + fr * (x1 - x0 + 60) : x1 - fr * (x1 - x0 + 60), xs = ltr ? x0 - 10 : x1 + 10, dir = ltr ? 1 : -1;
-    ctx.moveTo(xs, yt); ctx.lineTo(xf, yt); ctx.quadraticCurveTo(xf + dir * 26, (yt + yb) / 2, xf - dir * 6, yb + wav(xf, k + 1)); for (let x = xf - dir * 6; dir * (x - xs) > 0; x -= dir * 40) ctx.lineTo(x, yb + wav(x, k + 1)); ctx.lineTo(xs, yb + wav(xs, k + 1)); ctx.closePath(); }
-  ctx.clip();
-};
-const laid = (ctx: Ctx, s: number, src: Layer, f: number, cue: number[], region: number[], band: number, alpha: number) => { if (f <= cue[0]) return; ctx.save(); ctx.setTransform(s, 0, 0, s, 0, 0); rows(ctx, region[0], region[1], region[2], region[3], band, (f - cue[0]) / (cue[1] - cue[0])); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = alpha; ctx.drawImage(src.canvas, 0, 0); ctx.restore(); };
-
-// ---------------------------------------------------------------- the forms, dark to light
-// For every pixel a form owns: when the small brush reaches it (its place in the rows), and how
-// light it is. A form is first laid in its shadow tone; then the lights are worked up across it.
-type Plan = { idx: Uint32Array; ord: Float32Array; lum: Float32Array; who: Uint8Array; sIdx: Int32Array; img: ImageData; L: Layer };
+// ---------------------------------------------------------------- the forms, dark to light (the kit's gesture, with one addition)
 const BAND = [9, 9, 5, 5, 15, 12, 19, 100];
-const plan = (B: Built, env: Env): Plan => {
-  const key = `dreamGlazeDraw:plan@${env.scale}`; let P = env.cache.get(key) as Plan | undefined; if (P) return P;
-  const s = env.scale, { DW, DH, px, oid, SL } = B; let n = 0; for (let i = 0; i < DW * DH; i++) if (px[i * 4 + 3] > 0 && oid[i]) n++;
-  const idx = new Uint32Array(n), ord = new Float32Array(n), lum = new Float32Array(n), who = new Uint8Array(n), sIdx = new Int32Array(n); let m = 0;
-  for (let j = 0; j < DH; j++) for (let i = 0; i < DW; i++) { const g = j * DW + i, id = oid[g]; if (!(px[g * 4 + 3] > 0 && id)) continue; const x = (i + 0.5) / s, y = (j + 0.5) / s;
-    const box = id === 8 ? [0, 0, W, H] : OBJS[id - 1].box, band = BAND[id - 1], nr = Math.max(1, Math.ceil((box[3] - box[1]) / band)), yy = y - box[1] + 0.45 * wav(x * 3, id), row = cl(Math.floor(yy / band), 0, nr - 1), fx = cl((x - box[0]) / (box[2] - box[0]));
-    idx[m] = g; who[m] = id; ord[m] = id === 8 ? 0 : (row + (row % 2 ? 1 - fx : fx)) / nr; lum[m] = Math.max(px[g * 4], px[g * 4 + 1], px[g * 4 + 2]) / 255;
-    sIdx[m] = id === 5 && i >= SL.x0 && i < SL.x0 + SL.w && j >= SL.y0 && j < SL.y0 + SL.h ? (j - SL.y0) * SL.w + (i - SL.x0) : -1; m++; }
-  const L = env.canvas(DW, DH); P = { idx, ord, lum, who, sIdx, img: L.ctx.createImageData(DW, DH), L }; env.cache.set(key, P); return P;
+type Forms = { P: Plan; sIdx: Int32Array };
+const formPlan = (B: Built, env: Env): Forms => {
+  const key = `dreamGlazeDraw:forms@${env.scale}`; let Q = env.cache.get(key) as Forms | undefined; if (Q) return Q;
+  const P = workPlan(env, "dreamGlazeDraw:plan", B.DW, B.DH, B.px, (g) => B.oid[g], (id) => (id === 8 ? [0, 0, W, H] : OBJS[id - 1].box), (id) => BAND[id - 1]), { DW, SL } = B, sIdx = new Int32Array(P.idx.length);
+  // which pixels are the scroll's, and where in its own buffer
+  for (let m = 0; m < P.idx.length; m++) { const g = P.idx[m], i = g % DW, j = (g - i) / DW; sIdx[m] = P.who[m] === 5 && i >= SL.x0 && i < SL.x0 + SL.w && j >= SL.y0 && j < SL.y0 + SL.h ? (j - SL.y0) * SL.w + (i - SL.x0) : -1; }
+  Q = { P, sIdx }; env.cache.set(key, Q); return Q;
 };
-const SHADE = 0.4; // the shadow tone a form is laid in with, as a ceiling on its lightness
 const forms = (ctx: Ctx, B: Built, env: Env, f: number) => {
-  if (f <= CUE.form[0][0]) return; const P = plan(B, env), d = P.img.data, { px, bare, SL } = B;
-  const pu = CUE.form.map((c) => cl((f - c[0]) / (c[1] - c[0]))), pm = CUE.form.map((c) => cl((f - c[2]) / (c[3] - c[2])));
+  if (f <= CUE.form[0][0]) return; const { P, sIdx } = formPlan(B, env), { bare, SL } = B, q = [0, 0, 0];
   // the writing: line after line down the scroll, each one running out along its length
   const SLEN = SCROLL.s[SCROLL.n - 1], penAt = (j: number) => cl((f - (CUE.write[0] + (j + 5) * 7.4)) / 26) * (SLEN + 20);
-  for (let m = 0; m < P.idx.length; m++) { const g = P.idx[m] * 4, id = P.who[m] - 1, o = P.ord[m];
-    if (pu[id] < 1 && pu[id] * 1.0001 <= o) { d[g + 3] = 0; continue; }
-    let r = px[g], gg = px[g + 1], b = px[g + 2];
-    const k = P.sIdx[m]; if (k >= 0) { const line = cl(Math.round((SL.A2[k] - 5) / 19), -5, 5); if (SL.A1[k] > penAt(line)) { r = bare[k * 3]; gg = bare[k * 3 + 1]; b = bare[k * 3 + 2]; } }
-    if (pm[id] < 1) { const t = cl((pm[id] * 1.4 - o) / 0.4), cap = SHADE + (1 - SHADE) * t * t * (3 - 2 * t), l = Math.max(r, gg, b) / 255, q = l > cap ? cap / l : 1; r *= q; gg *= q; b *= q; }
-    d[g] = r; d[g + 1] = gg; d[g + 2] = b; d[g + 3] = px[g + 3]; }
-  P.L.ctx.putImageData(P.img, 0, 0); ctx.drawImage(P.L.canvas, 0, 0);
+  workUp(ctx, P, B.px, f, (id) => CUE.form[id - 1], (m) => { const k = sIdx[m]; if (k < 0) return null; const line = cl(Math.round((SL.A2[k] - 5) / 19), -5, 5); if (SL.A1[k] <= penAt(line)) return null; q[0] = bare[k * 3]; q[1] = bare[k * 3 + 1]; q[2] = bare[k * 3 + 2]; return q; });
 };
 
 export const drawDreamGlazeDraw = (ctx: Ctx, f: number, env: Env) => {
