@@ -1,6 +1,6 @@
 {
   "name": "anidoodle",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 32 styles, with scores composed in code.",
   "skills": "./skills/",
   "interface": {
