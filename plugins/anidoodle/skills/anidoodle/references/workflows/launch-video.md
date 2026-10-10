@@ -64,7 +64,7 @@ pieces are examples of the craft, never material for someone else's film.
   product's UI, the detail the shot is about, or busy texture. Check it in a review still at
   the smallest delivery size. In doubt, the word gets its own frame.
 - **3-7 words a frame, few frames.** Collapse word cards into one claim then proof ("JUST CODE."
-  then "31 STYLES"); fewer cards leave more time for the proof.
+  then "32 STYLES"); fewer cards leave more time for the proof.
 - **Hold each settled word 0.5 s or more**, longer for the claim.
 - **Judge DESIGN in review stills, not only collisions**: hierarchy, spacing, whether the frame
   would pass as a poster. A frame with nothing overlapping can still be ugly.

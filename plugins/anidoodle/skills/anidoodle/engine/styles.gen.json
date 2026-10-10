@@ -55,6 +55,17 @@
     "source": "scanned"
   },
   {
+    "id": "dreamGlaze",
+    "name": "Dream glaze",
+    "family": "paint",
+    "medium": "resin-thinned oil glazes laid with a very small soft brush on a smooth white ground: no visible stroke, every form turned pixel by pixel under one low sun, every edge hard",
+    "nearest": "paintedOil",
+    "hero": "a hollow mask of a calm face held up by question marks in an empty desert, its cheek running out into a scroll of handwriting",
+    "module": "engine/src/canvas-core/dreamGlaze.ts",
+    "drawFilm": "dreamGlazeDraw",
+    "source": "scanned"
+  },
+  {
     "id": "embroidery",
     "name": "Hand embroidery",
     "family": "textile",
