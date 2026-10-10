@@ -6,7 +6,7 @@ beech hoop with a brass screw clamp.
 
 **The marks.** A stitch is a length of twisted thread between two holes (`St`: a, b, width, colour).
 - Stem stitch (overlapping, slanted: a rope) for stems; two rows for a main stem.
-- Split stitch (each stitch coming up through the last) for the edges fills butt against.
+- Split stitch (each stitch coming up through the last) for the edges that the fills butt against.
 - Satin laid side by side ACROSS a form, direction following it: across a petal, round an abdomen. Spans past ~9 mm are split at the axis.
 - Fishbone: from a leaf's edge to its midrib, slanting to the tip, alternating sides.
 - Long-and-short: rows from an edge toward a target, the first row alternating long and short, the thread stepping from colour A to colour B.
