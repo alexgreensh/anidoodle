@@ -68,7 +68,7 @@ None of that was drawing. These habits cut it by an order of magnitude:
   is every 50th frame from 0 to 300. Add `--sheet out/sheet.jpg` for a contact sheet of them at
   `--sheet-scale` (default 0.4). `--out out/dir/` or `--out out/x-{frame}.png` names the PNGs.
 - **Plate cache.** Finished plate frames are kept in `engine/.cache/bakes/<browser version>-<binary>/`,
-  keyed by a hash of the plate's whole import closure, so a wall of 31 live plates stops
+  keyed by a hash of the plate's whole import closure, so a wall of 32 live plates stops
   re-baking (about 60 s) on every still, and an edited plate simply misses and is drawn again.
   It is never needed: delete `.cache/` any time. `--no-bake-cache` (or `ANIDOODLE_BAKE_CACHE=0`)
   draws every plate cold, which is what to do when you suspect the cache.

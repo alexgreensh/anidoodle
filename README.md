@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
 <p align="center"><strong>Hand-drawn art, written as code.</strong></p>
 
 <p align="center">
-  Illustrations, drawing timelapses, films, explainers and interactive web art in 31 styles.<br>
+  Illustrations, drawing timelapses, films, explainers and interactive web art in 32 styles.<br>
   Every mark is a function and every score is written, so the same source<br>
   redraws the same picture on every machine, at every size, for good.
 </p>
@@ -28,7 +28,7 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
 <p align="center"><b>English</b> · <a href="README.ja-JP.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko-KR.md">한국어</a> · <a href="README.fr-FR.md">Français</a> · <a href="README.es-ES.md">Español</a></p>
 
 <p align="center">
-  <a href="#31-styles-to-choose-from">Styles</a> ·
+  <a href="#32-styles-to-choose-from">Styles</a> ·
   <a href="#every-style-draws-itself">Drawing films</a> ·
   <a href="#music-composed-in-code">Music</a> ·
   <a href="#what-you-can-make">What you can make</a> ·
@@ -37,16 +37,16 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
   <a href="#get-started">Get started</a>
 </p>
 
-## 31 styles to choose from
+## 32 styles to choose from
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="31 illustrations, each in its own style, from pencil and watercolour, marker comic and risograph to pixel art, toy brick, woodcut, sumi-e, scratchboard, embroidery, painted oil and a folk-tale storybook">
+  <img src="assets/styles.jpg" width="100%" alt="32 illustrations, each in its own style, from pencil and watercolour, marker comic and risograph to pixel art, toy brick, woodcut, sumi-e, scratchboard, embroidery, painted oil and a folk-tale storybook">
 </p>
 
-Each style is its own way of making a mark: the taper of a nib, the bleed of a wash, the scumble of chalk on slate, the torn edge of cut paper, the halftone of a risograph drum, one engraved line spiralling out to become a moon. The subject changes shape in each hand, the way it would for thirty-one different illustrators. Every style also ships a film of its picture being drawn, mark by mark, in the order an artist in that medium works. Pick one for your brand and every picture after it arrives in the same hand. Every plate above, and the contact sheet itself, is drawn by code in this repo.
+Each style is its own way of making a mark: the taper of a nib, the bleed of a wash, the scumble of chalk on slate, the torn edge of cut paper, the halftone of a risograph drum, one engraved line spiralling out to become a moon. The subject changes shape in each hand, the way it would for 32 different illustrators. Every style also ships a film of its picture being drawn, mark by mark, in the order an artist in that medium works. Pick one for your brand and every picture after it arrives in the same hand. Every plate above, and the contact sheet itself, is drawn by code in this repo.
 
 <details>
-<summary><b>All 31 styles</b>, and how each one is made</summary>
+<summary><b>All 32 styles</b>, and how each one is made</summary>
 
 | Style | How it's made |
 |---|---|
@@ -58,6 +58,7 @@ Each style is its own way of making a mark: the taper of a nib, the bleed of a w
 | **Crayon** | Waxy scribble fills that skip the paper's valleys |
 | **Cut-paper collage** | Torn and cut paper, no drawn lines |
 | **Cyanotype blueprint** | Ruling-pen drafting on a cyanotype sheet |
+| **Dream glaze** | Thin resin-oil glazes, no visible stroke, every edge hard |
 | **Embroidery** | Thread stitched through linen in a hoop |
 | **Flat vector** | Crisp geometric shapes with grain and long shadows |
 | **Folk-tale storybook** | Painted foreground dissolving into pencil line on cream paper |
@@ -167,7 +168,7 @@ Ask how to draw something, or bring a drawing, and anidoodle rebuilds it as a le
 | **Social and chat** | Endless loops, GIFs and transparent animated stickers, sized for the feed. |
 | **Decks and docs** | A family of section illustrations from one program. A new seed gives a sister image in the same style. |
 | **Stories** | Storyboards and animatics that grow into a finished film of any length, with an original score. |
-| **Your own image** | Bring a picture and get its style on a new subject, or bring a photo and get it recreated in any of the 31 hands, every mark drawn in code. |
+| **Your own image** | Bring a picture and get its style on a new subject, or bring a photo and get it recreated in any of the 32 hands, every mark drawn in code. |
 | **Web pages** | Interactive illustrations that watch the cursor, react to clicks and forms, or draw themselves as the page scrolls. |
 | **Learning** | Drawing lessons: step sheets and timelapses that teach how a picture is built, with what to look for and the common mistakes. |
 | **Characters** | One character, built once and kept identical across shots, poses and styles. |
