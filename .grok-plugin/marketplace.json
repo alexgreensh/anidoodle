@@ -10,7 +10,7 @@
       "name": "anidoodle",
       "source": "./plugins/anidoodle",
       "description": "Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 32 styles, with scores composed in code.",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "author": {
         "name": "Alex Greenshpun",
         "url": "https://linkedin.com/in/alexgreensh"

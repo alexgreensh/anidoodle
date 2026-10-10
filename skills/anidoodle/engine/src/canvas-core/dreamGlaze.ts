@@ -1,6 +1,6 @@
-import { Gfx, PENCIL, rng, type Ctx, type Env } from "./core";
-import { weave } from "./paintedOilKit";
+import { rng, type Ctx, type Env } from "./core";
 import { Film } from "./film";
+import { G, OUT, ball, cl, curve, fbm, hash2, hex, lin, near, NR, paintForms, raise, ramp, sm, sunlight, surface, tube, type Bufs, type C3, type Obj } from "./dreamGlazeKit";
 
 // SOFT SELF-PORTRAIT HELD UP BY ITS QUESTIONS · resin-oil glazes, a very small brush.
 //
@@ -20,36 +20,21 @@ import { Film } from "./film";
 // window is cut in the forehead with a night sky and one spark inside. The right cheek runs out
 // into a soft scroll of handwriting. Two question marks hold it up; their stems stop short of
 // their dots. The same mask repeats to the horizon.
+// THE HAND itself is in dreamGlazeKit.ts and has no subject in it. Everything below is this one
+// picture: its face, its props and its painter. Build a new picture on the kit, never on this file.
 // NOT: `paintedOil` shows its bristle and loses its edges; this hand hides the brush and keeps
 // every edge. No composition, figure or prop from any existing painting is re-staged.
 
 export const W = 1600, H = 2000;
-export const cl = (v: number, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
-export const sm = (a: number, b: number, x: number) => { const t = cl((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-export const G = (du: number, dv: number, su: number, sv: number) => Math.exp(-(du * du) / (su * su) - (dv * dv) / (sv * sv));
 
-// ---------------------------------------------------------------- noise (pure arithmetic)
-export const hash2 = (ix: number, iy: number, seed: number) => { let h = Math.imul(ix, 374761393) ^ Math.imul(iy, 668265263) ^ Math.imul(seed + 1, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
-export const vnoise = (x: number, y: number, seed: number) => { const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy); const a = hash2(x0, y0, seed), b = hash2(x0 + 1, y0, seed), c = hash2(x0, y0 + 1, seed), d = hash2(x0 + 1, y0 + 1, seed); return a + (b - a) * sx + (c - a + (a - b - c + d) * sx) * sy; };
-export const fbm = (x: number, y: number, oct: number, seed: number) => { let s = 0, a = 0.5, n = 0; for (let o = 0; o < oct; o++) { s += vnoise(x, y, seed + o * 17) * a; n += a; a *= 0.5; x *= 2.03; y *= 2.03; } return s / n; };
 
-// ---------------------------------------------------------------- colour
-export type C3 = [number, number, number];
-export const hex = (h: string): C3 => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-export const lin = (h: string): C3 => hex(h).map((v) => Math.pow(v / 255, 2.2)) as C3;
-export const ramp = (stops: [number, C3][], t: number, out: C3) => { if (t <= stops[0][0]) { out[0] = stops[0][1][0]; out[1] = stops[0][1][1]; out[2] = stops[0][1][2]; return; } for (let i = 1; i < stops.length; i++) if (t <= stops[i][0]) { const [t0, a] = stops[i - 1], [t1, b] = stops[i], f = (t - t0) / (t1 - t0); out[0] = a[0] + (b[0] - a[0]) * f; out[1] = a[1] + (b[1] - a[1]) * f; out[2] = a[2] + (b[2] - a[2]) * f; return; } const l = stops[stops.length - 1][1]; out[0] = l[0]; out[1] = l[1]; out[2] = l[2]; };
 const SKY: [number, C3][] = [[0, hex("#0d2450")], [0.26, hex("#1f4f8c")], [0.5, hex("#4a8dba")], [0.7, hex("#8fc2bd")], [0.86, hex("#dcd9a4")], [0.95, hex("#f1d491")], [1, hex("#f4c486")]];
 export const GROUND: [number, C3][] = [[0, hex("#8f5f2c")], [0.3, hex("#b98646")], [0.62, hex("#d6b170")], [1, hex("#ecd7a4")]];
 
 // ---------------------------------------------------------------- the space
 // A pinhole camera 1.6 units above an endless plain. The horizon sits at 65 % of the height.
 export const YH = 1300, F = 1800, CAMH = 1.6, CX = 800;
-const n3 = (v: number[]) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
-export const LW = n3([-0.6, 0.42, -0.68]);            // to the sun, world: x right, y up, z into the picture
-export const LS = [LW[0], -LW[1], -LW[2]];            // the same, screen: x right, y down, z toward the eye
-const LXY = Math.hypot(LS[0], LS[1]), LDX = LS[0] / LXY, LDY = LS[1] / LXY, RISE = LS[2] / LXY;
-const HV = n3([LS[0], LS[1], LS[2] + 1]);      // half vector, for the wet highlight
-const SUN = [1.3, 1.1, 0.8], SKYL = [0.3, 0.44, 0.8], BNC = [0.85, 0.46, 0.18];
+export const { LW, LS, sunAt, light } = sunlight([-0.6, 0.42, -0.68]); // one low sun, front-left and a little above
 // the main group stands where its dots touch the plain
 export const AX0 = 678, AY0 = 1570, Z0 = (F * CAMH) / (AY0 - YH);
 // the same mask, further and further off: [depth, screen x of the dot]
@@ -96,25 +81,6 @@ export const RIMW = 0.4455;
 export const crown = (u: number) => -0.6 + (0.03 * Math.sin(u * 9 + 1) + 0.018 * Math.sin(u * 23 + 2) + 0.01 * Math.sin(u * 51)) * Math.max(0, 1 - Math.pow(u / RIMW, 6));
 
 // ---------------------------------------------------------------- curves: question marks and the scroll
-export type Curve = { x: Float32Array; y: Float32Array; r: Float32Array; s: Float32Array; k: Float32Array; n: number };
-const curve = (cp: number[][], per = 14): Curve => {
-  const xs: number[] = [], ys: number[] = [], rs: number[] = [], g = (i: number) => cp[Math.max(0, Math.min(cp.length - 1, i))];
-  for (let i = 0; i < cp.length - 1; i++) for (let j = 0; j < per; j++) { const t = j / per, p0 = g(i - 1), p1 = g(i), p2 = g(i + 1), p3 = g(i + 2), cr = (k: number) => 0.5 * (2 * p1[k] + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t * t + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t * t * t); xs.push(cr(0)); ys.push(cr(1)); rs.push(cr(2)); }
-  const e = cp[cp.length - 1]; xs.push(e[0]); ys.push(e[1]); rs.push(e[2]);
-  const n = xs.length, s = new Float32Array(n), k = new Float32Array(n);
-  for (let i = 1; i < n; i++) s[i] = s[i - 1] + Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]);
-  for (let i = 1; i < n - 1; i++) { const a1 = Math.atan2(ys[i] - ys[i - 1], xs[i] - xs[i - 1]), a2 = Math.atan2(ys[i + 1] - ys[i], xs[i + 1] - xs[i]); let d = a2 - a1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; k[i] = d / Math.max(1e-3, (s[i + 1] - s[i - 1]) / 2); }
-  return { x: Float32Array.from(xs), y: Float32Array.from(ys), r: Float32Array.from(rs), s, k, n };
-};
-// nearest point on a curve: distance, arc length, radius there, side (+ is right of travel), curvature
-const NR = { d: 0, s: 0, r: 0, side: 0, k: 0 };
-const near = (c: Curve, px: number, py: number) => {
-  let best = 1e18, bi = 0, bt = 0;
-  for (let i = 0; i < c.n - 1; i++) { const ax = c.x[i], ay = c.y[i], dx = c.x[i + 1] - ax, dy = c.y[i + 1] - ay, l2 = dx * dx + dy * dy; let t = l2 > 0 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0; t = t < 0 ? 0 : t > 1 ? 1 : t; const ex = px - ax - dx * t, ey = py - ay - dy * t, d2 = ex * ex + ey * ey; if (d2 < best) { best = d2; bi = i; bt = t; } }
-  const dx = c.x[bi + 1] - c.x[bi], dy = c.y[bi + 1] - c.y[bi];
-  NR.d = Math.sqrt(best); NR.s = c.s[bi] + (c.s[bi + 1] - c.s[bi]) * bt; NR.r = c.r[bi] + (c.r[bi + 1] - c.r[bi]) * bt; NR.k = c.k[bi] + (c.k[bi + 1] - c.k[bi]) * bt;
-  NR.side = dx * (py - c.y[bi]) - dy * (px - c.x[bi]) >= 0 ? 1 : -1;
-};
 // [x, y, radius]: a hook that cradles, a stem that stops short, a dot on the ground
 export const Q1 = curve([[578, 1226, 8], [588, 1184, 13], [634, 1154, 19], [698, 1150, 22], [750, 1184, 22], [760, 1244, 20], [724, 1300, 17], [688, 1346, 14], [678, 1400, 12], [678, 1456, 9]]);
 export const Q2 = curve([[1128, 1082, 7], [1138, 1036, 12], [1184, 1002, 17], [1240, 1002, 19], [1272, 1042, 19], [1268, 1102, 17], [1236, 1152, 15], [1212, 1204, 13], [1208, 1300, 11], [1208, 1446, 8]]);
@@ -126,10 +92,7 @@ const SLEN = SCROLL.s[SCROLL.n - 1];
 // ---------------------------------------------------------------- objects, back to front
 // Each returns: edge distance in px (+ inside), height toward the eye in px, two coordinates the
 // painter needs, and which material it is.
-export type Obj = { box: [number, number, number, number]; at: (x: number, y: number, o: Float32Array) => void };
 export const M_FLESH = 1, M_NIGHT = 2, M_WALL = 3, M_WOOD = 4, M_SCROLL = 5;
-const tube = (c: Curve, pad: number): Obj => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < c.n; i++) { x0 = Math.min(x0, c.x[i] - c.r[i]); x1 = Math.max(x1, c.x[i] + c.r[i]); y0 = Math.min(y0, c.y[i] - c.r[i]); y1 = Math.max(y1, c.y[i] + c.r[i]); } return { box: [x0 - pad, y0 - pad, x1 + pad, y1 + pad], at: (x, y, o) => { near(c, x, y); const r = NR.r, d = NR.d; o[0] = r - d; o[1] = d < r ? Math.sqrt(r * r - d * d) : 0; o[2] = NR.s; o[3] = d * NR.side; o[4] = M_WOOD; } }; };
-const ball = (b: number[]): Obj => ({ box: [b[0] - b[2] - 3, b[1] - b[2] - 3, b[0] + b[2] + 3, b[1] + b[2] + 3], at: (x, y, o) => { const d = Math.hypot(x - b[0], y - b[1]), r = b[2]; o[0] = r - d; o[1] = d < r ? Math.sqrt(r * r - d * d) : 0; o[2] = x * 0.6; o[3] = y - b[1]; o[4] = M_WOOD; } });
 export const scrollW = (s: number, r: number) => { const e = SLEN - s; return e < 40 ? r * Math.sqrt(Math.max(0, 1 - Math.pow(1 - e / 40, 2))) : r; };
 const scroll: Obj = { box: [680, 560, 1440, 1460], at: (x, y, o) => {
   near(SCROLL, x, y); const w = scrollW(NR.s, NR.r), d = NR.d, q = Math.max(0, 1 - (d / Math.max(1, w)) * (d / Math.max(1, w)));
@@ -159,7 +122,7 @@ const inside: Obj = { box: [MX - 0.56 * S, MY - 0.76 * S, MX + 0.56 * S, MY - 0.
   const X = (x - MX) / S, Y = (y - MY) / S, u = X * CT + Y * ST, v = -X * ST + Y * CT, cu = Math.sqrt(Math.max(0, 1 - (u / RIMW) * (u / RIMW)));
   o[0] = Math.min((v - backRim(u)) * S, (RIMW - Math.abs(u)) * S, (crown(u) + 0.02 - v) * S); o[1] = MBASE - 30 - 60 * cu; o[2] = u; o[3] = v; o[4] = M_INSIDE;
 } };
-export const OBJS: Obj[] = [tube(Q2, 3), tube(Q1, 3), ball(DOT2), ball(DOT1), scroll, inside, mask];
+export const OBJS: Obj[] = [tube(Q2, 3, M_WOOD), tube(Q1, 3, M_WOOD), ball(DOT2, M_WOOD), ball(DOT1, M_WOOD), scroll, inside, mask];
 
 // ---------------------------------------------------------------- the painter
 const FLESH = lin("#ecd0ac"), LIP = lin("#c9836c"), PAPERC = lin("#efe2c4"), INK = lin("#3a2414"), WOOD = lin("#6b3c1c"), WOODD = lin("#3a1e0e");
@@ -181,17 +144,7 @@ export const script = (s: number, d: number, w: number) => {
 const RAYS = (() => { const r = rng(41), n = 12, out: number[][] = []; for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + (r() - 0.5) * 0.22, l = 0.62 + r() * 0.38; out.push([Math.cos(a), Math.sin(a), l]); } return out; })();
 export const spark = (x: number, y: number) => { let best = 1e9; const rr = Math.hypot(x, y); for (const [cx, sy, l] of RAYS) { const t = cl(x * cx + y * sy, 0.1, l), d = Math.hypot(x - cx * t, y - sy * t) - (0.05 + 0.055 * (t / l)); if (d < best) best = d; } return Math.min(best, rr - 0.16); };
 
-export type Bufs = { DW: number; DH: number; s: number; Hg: Float32Array; Ag: Float32Array; Hb: Float32Array };
-export const hAt = (b: Bufs, x: number, y: number) => { const ix = (x * b.s) | 0, iy = (y * b.s) | 0; return ix < 0 || iy < 0 || ix >= b.DW || iy >= b.DH ? -1e9 : b.Hg[iy * b.DW + ix]; };
-// is the sun hidden from this point by anything nearer the eye? walk toward it across the heights
-export const sunAt = (b: Bufs, x: number, y: number, h: number) => { let occ = 0; for (let k = 1; k <= 70; k++) { const d = k * 2.6, hs = hAt(b, x + LDX * d, y + LDY * d); if (hs > -1e8) { const o = (hs - (h + RISE * d + 2)) / (d * 0.5 + 7); if (o > occ) { occ = o; if (occ >= 1) break; } } } return 1 - cl(occ); };
-export const OUT: C3 = [0, 0, 0];
 let NOINK = false;
-export const light = (al: C3, nx: number, ny: number, nz: number, sh: number, ao: number, spec: number, gloss: number) => {
-  const dif = Math.max(0, nx * LS[0] + ny * LS[1] + nz * LS[2]) * sh, skyk = (0.5 - 0.5 * ny) * ao, bnc = (0.5 + 0.5 * ny) * ao;
-  const sp = spec * Math.pow(Math.max(0, nx * HV[0] + ny * HV[1] + nz * HV[2]), gloss) * sh;
-  for (let i = 0; i < 3; i++) OUT[i] = al[i] * (SUN[i] * dif + SKYL[i] * 0.36 * skyk + BNC[i] * 0.34 * bnc) + sp * SUN[i];
-};
 export const paint = (b: Bufs, mat: number, x: number, y: number, h: number, nx: number, ny: number, nz: number, a1: number, a2: number, e: number) => {
   if (mat === M_NIGHT) {
     const wu = (a1 - (WIN.u0 + WIN.u1) / 2) / ((WIN.u1 - WIN.u0) / 2), wv = (a2 - (WIN.v0 + WIN.v1) / 2) / ((WIN.v1 - WIN.v0) / 2), X = wu * 1.42, Y = wv;
@@ -246,31 +199,9 @@ const STONES = [[236, 1694, 26], [1016, 1772, 30], [1338, 1672, 17], [524, 1626,
 
 // ---------------------------------------------------------------- the picture
 export const build = (env: Env) => {
-  const s = env.scale, DW = Math.round(W * s), DH = Math.round(H * s);
-  const b: Bufs = { DW, DH, s, Hg: new Float32Array(DW * DH).fill(-1e9), Ag: new Float32Array(DW * DH), Hb: new Float32Array(DW * DH) };
-  const o = new Float32Array(5), GAM = new Uint8ClampedArray(4097); for (let i = 0; i <= 4096; i++) GAM[i] = Math.round(255 * Math.pow(i / 4096, 1 / 2.2));
-  const tone = (v: number) => GAM[Math.round(4096 * (1 - Math.exp(-1.35 * Math.max(0, v))))];
-
-  // 1. every object's height and edge, kept per object, and the highest height at every pixel
-  const local = OBJS.map((ob) => { const x0 = Math.max(0, Math.floor(ob.box[0] * s)), y0 = Math.max(0, Math.floor(ob.box[1] * s)), x1 = Math.min(DW, Math.ceil(ob.box[2] * s)), y1 = Math.min(DH, Math.ceil(ob.box[3] * s)), w = x1 - x0, h = y1 - y0; const E = new Float32Array(w * h), Hh = new Float32Array(w * h), A1 = new Float32Array(w * h), A2 = new Float32Array(w * h), Mt = new Uint8Array(w * h);
-    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { ob.at((x0 + i + 0.5) / s, (y0 + j + 0.5) / s, o); const k = j * w + i; E[k] = o[0]; Hh[k] = o[1]; A1[k] = o[2]; A2[k] = o[3]; Mt[k] = o[4]; if (o[0] > 0) { const g = (y0 + j) * DW + x0 + i; if (o[1] > b.Hg[g]) b.Hg[g] = o[1]; const a = cl(o[0] * s + 0.5); if (a > b.Ag[g]) b.Ag[g] = a; } }
-    return { x0, y0, w, h, E, Hh, A1, A2, Mt }; });
-
-  // the hollows: where a point sits below the average height round it, less sky reaches it
-  { const R = Math.round(11 * s), tmp = new Float32Array(DW * DH), n = 2 * R + 1;
-    for (let j = 0; j < DH; j++) { let acc = 0; const row = j * DW; for (let i = -R; i < DW; i++) { const a = i + R < DW ? Math.max(0, b.Hg[row + i + R]) : 0, d = i - R - 1 >= 0 ? Math.max(0, b.Hg[row + i - R - 1]) : 0; acc += a - d; if (i >= 0) tmp[row + i] = acc / n; } }
-    for (let i = 0; i < DW; i++) { let acc = 0; for (let j = -R; j < DH; j++) { const a = j + R < DH ? tmp[(j + R) * DW + i] : 0, d = j - R - 1 >= 0 ? tmp[(j - R - 1) * DW + i] : 0; acc += a - d; if (j >= 0) b.Hb[j * DW + i] = acc / n; } } }
-  // 2. paint each object, back to front, into one layer
-  const objL = env.canvas(DW, DH), img = objL.ctx.createImageData(DW, DH), px = img.data, oid = new Uint8Array(DW * DH), SL = local[4], bare = new Uint8ClampedArray(SL.w * SL.h * 3);
-  for (let li = 0; li < local.length; li++) { const L = local[li]; for (let j = 1; j < L.h - 1; j++) for (let i = 1; i < L.w - 1; i++) { const k = j * L.w + i, e = L.E[k]; if (e * s < -0.5) continue; const a = cl(e * s + 0.5), h = L.Hh[k];
-    const m = L.Mt[k], ml = L.Mt[k - 1] === m, mr = L.Mt[k + 1] === m, mu = L.Mt[k - L.w] === m, md = L.Mt[k + L.w] === m;
-    let nx = -s * (ml && mr ? (L.Hh[k + 1] - L.Hh[k - 1]) / 2 : mr ? L.Hh[k + 1] - h : ml ? h - L.Hh[k - 1] : 0), ny = -s * (mu && md ? (L.Hh[k + L.w] - L.Hh[k - L.w]) / 2 : md ? L.Hh[k + L.w] - h : mu ? h - L.Hh[k - L.w] : 0), nz = 1; const nl = Math.hypot(nx, ny, nz); nx /= nl; ny /= nl; nz /= nl;
-    paint(b, L.Mt[k], (L.x0 + i + 0.5) / s, (L.y0 + j + 0.5) / s, h, nx, ny, nz, L.A1[k], L.A2[k], e);
-    const g = ((L.y0 + j) * DW + L.x0 + i) * 4, r = tone(OUT[0]), gg = tone(OUT[1]), bb = tone(OUT[2]), a0 = px[g + 3] / 255, ao = a + a0 * (1 - a);
-    if (a > 0.02) oid[g >> 2] = L.Mt[k] === M_NIGHT ? 8 : li + 1;
-    if (L.Mt[k] === M_SCROLL) { NOINK = true; paint(b, L.Mt[k], (L.x0 + i + 0.5) / s, (L.y0 + j + 0.5) / s, h, nx, ny, nz, L.A1[k], L.A2[k], e); NOINK = false; bare[k * 3] = tone(OUT[0]); bare[k * 3 + 1] = tone(OUT[1]); bare[k * 3 + 2] = tone(OUT[2]); }
-    px[g] = (r * a + px[g] * a0 * (1 - a)) / ao; px[g + 1] = (gg * a + px[g + 1] * a0 * (1 - a)) / ao; px[g + 2] = (bb * a + px[g + 2] * a0 * (1 - a)) / ao; px[g + 3] = ao * 255; } }
-  objL.ctx.putImageData(img, 0, 0);
+  // 1 and 2. raise the forms and paint them (dreamGlazeKit). The scroll is read twice: once with its writing, once bare, for the film.
+  const R = raise(env, W, H, OBJS), { s, DW, DH, b, local } = R, SL = local[4], bare = new Uint8ClampedArray(SL.w * SL.h * 3);
+  const { objL, px, oid } = paintForms(env, R, paint, { idOf: (li, m) => (m === M_NIGHT ? 8 : li + 1), each: (_li, L, k, x, y, h, nx, ny, nz, e, tone) => { if (L.Mt[k] === M_SCROLL) { NOINK = true; paint(b, L.Mt[k], x, y, h, nx, ny, nz, L.A1[k], L.A2[k], e); NOINK = false; bare[k * 3] = tone(OUT[0]); bare[k * 3 + 1] = tone(OUT[1]); bare[k * 3 + 2] = tone(OUT[2]); } } });
 
   // 3. sky, far rocks and the plain, with every cast shadow
   const bgL = env.canvas(DW, DH), bimg = bgL.ctx.createImageData(DW, DH), bp = bimg.data, c: C3 = [0, 0, 0], hz: C3 = [0, 0, 0];
@@ -347,9 +278,6 @@ export const signature = (ctx: Ctx, env: Env, prog = 1, dx = 0, dy = 0) => { con
   ctx.setTransform(s, 0, 0, s, dx * s, dy * s); ctx.strokeStyle = "rgba(214,160,74,0.9)"; ctx.lineWidth = 1.5; ctx.lineCap = "round"; ctx.lineJoin = "round";
   for (const st of SIG) { if (left <= 0) break; const n = Math.min(st.length - 1, left), whole = Math.floor(n), fr = n - whole; ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]); for (let i = 1; i <= whole; i++) ctx.lineTo(st[i][0], st[i][1]); if (fr > 0) ctx.lineTo(st[whole][0] + (st[whole + 1][0] - st[whole][0]) * fr, st[whole][1] + (st[whole + 1][1] - st[whole][1]) * fr); ctx.stroke(); left -= st.length - 1; }
   ctx.setTransform(1, 0, 0, 1, 0, 0); };
-// the surface: a fine linen under thin paint, and the corners a little sunk, as old varnish does
-export const surface = (ctx: Ctx, env: Env, W = 1600, H = 2000) => { const s = env.scale, g = new Gfx(ctx, env, 0, PENCIL); weave(g, 0.04); g.paper("paper", 0.05);
-  ctx.setTransform(s, 0, 0, s, 0, 0); ctx.globalCompositeOperation = "multiply"; const vg = ctx.createRadialGradient(W * 0.46, H * 0.44, H * 0.34, W * 0.5, H * 0.5, H * 0.76); vg.addColorStop(0, "rgba(255,255,255,1)"); vg.addColorStop(1, "rgba(150,128,112,1)"); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = "source-over"; ctx.setTransform(1, 0, 0, 1, 0, 0); };
 
 export const drawDreamGlaze = (ctx: Ctx, _frame: number, env: Env) => {
   const B = built(env);
