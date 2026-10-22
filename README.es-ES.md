@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
 <p align="center"><strong>Arte dibujado a mano, escrito en código.</strong></p>
 
 <p align="center">
-  Ilustraciones, timelapses de dibujo, películas, vídeos explicativos y arte web interactivo en 32 estilos.<br>
+  Ilustraciones, timelapses de dibujo, películas, vídeos explicativos y arte web interactivo en 33 estilos.<br>
   Cada trazo es una función y cada nota es aritmética, así que la misma fuente<br>
   redibuja la misma imagen en cualquier máquina, a cualquier tamaño, para siempre.
 </p>
@@ -28,7 +28,7 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
 <p align="center"><a href="README.md">English</a> · <a href="README.ja-JP.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko-KR.md">한국어</a> · <a href="README.fr-FR.md">Français</a> · <b>Español</b></p>
 
 <p align="center">
-  <a href="#32-estilos-entre-los-que-elegir">Estilos</a> ·
+  <a href="#33-estilos-entre-los-que-elegir">Estilos</a> ·
   <a href="#cada-estilo-se-dibuja-solo">Películas del dibujo</a> ·
   <a href="#música-compuesta-con-código">Música</a> ·
   <a href="#qué-puedes-crear">Qué puedes crear</a> ·
@@ -37,16 +37,16 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
   <a href="#empieza-aquí">Empieza aquí</a>
 </p>
 
-## 32 estilos entre los que elegir
+## 33 estilos entre los que elegir
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="32 ilustraciones, cada una con su estilo, desde lápiz y acuarela, cómic con rotulador y risografía hasta pixel art, bloques de juguete, xilografía, sumi-e, esgrafiado, bordado, óleo y libros de cuentos populares">
+  <img src="assets/styles.jpg" width="100%" alt="33 ilustraciones, cada una con su estilo, desde lápiz y acuarela, cómic con rotulador y risografía hasta pixel art, bloques de juguete, xilografía, sumi-e, esgrafiado, bordado, óleo y libros de cuentos populares">
 </p>
 
-Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, el sangrado de una aguada, el rozado de la tiza sobre la pizarra, el borde rasgado del papel recortado, la trama de un tambor de risografía, una sola línea grabada que se enrosca hasta convertirse en luna. El motivo cambia de forma según la mano que lo dibuje, igual que le pasaría con 32 ilustradores distintos. Cada estilo incluye además una película en la que su imagen se dibuja trazo a trazo, siguiendo el orden de trabajo de un artista de ese medio. Elige uno para tu marca y cada imagen que venga después llegará de la misma mano. Cada lámina de arriba, y la propia hoja de contactos, está dibujada por código en este repositorio.
+Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, el sangrado de una aguada, el rozado de la tiza sobre la pizarra, el borde rasgado del papel recortado, la trama de un tambor de risografía, una sola línea grabada que se enrosca hasta convertirse en luna. El motivo cambia de forma según la mano que lo dibuje, igual que le pasaría con 33 ilustradores distintos. Cada estilo incluye además una película en la que su imagen se dibuja trazo a trazo, siguiendo el orden de trabajo de un artista de ese medio. Elige uno para tu marca y cada imagen que venga después llegará de la misma mano. Cada lámina de arriba, y la propia hoja de contactos, está dibujada por código en este repositorio.
 
 <details>
-<summary><b>Los 32 estilos</b> y cómo se hace cada uno</summary>
+<summary><b>Los 33 estilos</b> y cómo se hace cada uno</summary>
 
 | Estilo | Cómo se hace |
 |---|---|
@@ -72,6 +72,7 @@ Cada estilo es su propia forma de dejar una marca: el afilado de una plumilla, e
 | **Artesanía en papel** | Capas de papel cortado y recortes pintados, animados a doses |
 | **Lápiz y acuarela** | Aguadas que nunca llenan del todo el contorno a lápiz |
 | **Pixel art** | Una paleta fija de 16 colores sobre una cuadrícula de baja resolución |
+| **Tarjeta pop-up** | Una tarjeta plegada: papel recortado que se alza sobre pliegues en valle |
 | **Risografía** | Tambores de tinta sobreimpresos con ligeros desajustes |
 | **Animación rubber hose** | Tinta de dibujos animados de los años treinta, extremidades flexibles y grano de película |
 | **Esgrafiado** | Líneas blancas rascadas sobre una capa negra de arcilla |
@@ -161,7 +162,7 @@ Pregunta cómo dibujar algo, o trae un dibujo, y anidoodle lo reconstruye como l
 | **Redes y chat** | Loops sin fin, GIFs y stickers animados transparentes, con el tamaño justo para el feed. |
 | **Presentaciones y documentos** | Una familia de ilustraciones de sección desde un solo programa. Una nueva semilla da una imagen hermana en el mismo estilo. |
 | **Historias** | Storyboards y animatics que crecen hasta convertirse en una película terminada de cualquier duración, con banda sonora original. |
-| **Tu propia imagen** | Trae un dibujo para aplicar su estilo a otro motivo, o una foto para recrearla en cualquiera de las 32 formas de dibujar, con cada trazo hecho en código. |
+| **Tu propia imagen** | Trae un dibujo para aplicar su estilo a otro motivo, o una foto para recrearla en cualquiera de las 33 formas de dibujar, con cada trazo hecho en código. |
 | **Páginas web** | Ilustraciones interactivas que siguen el cursor, reaccionan a clics y formularios, o se dibujan al desplazarte por la página. Arte de portada y spots junto a tu titular, en el color y la marca de tu página, en claro u oscuro. |
 | **Aprendizaje** | Lecciones de dibujo con láminas paso a paso y timelapses que enseñan cómo se construye una imagen, qué observar y qué errores evitar. |
 | **Personajes** | Un personaje creado una sola vez que se mantiene idéntico entre planos, poses y estilos. |

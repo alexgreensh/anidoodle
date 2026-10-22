@@ -12,8 +12,8 @@
     {
       "name": "anidoodle",
       "source": "./",
-      "description": "Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 32 styles, with scores composed in code.",
-      "version": "0.9.4",
+      "description": "Code-drawn stills, drawing timelapses, films, explainers and interactive web animations in 33 styles, with scores composed in code.",
+      "version": "0.10.0",
       "author": {
         "name": "Alex Greenshpun",
         "url": "https://linkedin.com/in/alexgreensh"

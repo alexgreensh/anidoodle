@@ -242,6 +242,17 @@
     "source": "legacy"
   },
   {
+    "id": "popUp",
+    "name": "Pop-up card",
+    "family": "paper engineering",
+    "medium": "one folded sheet of cream card: scissor-cut printed papers hinged on valley folds, a white cut core, faces toned by their angle to the sun, shadows that track the folds",
+    "nearest": "paperCraft",
+    "hero": "A cream card on a kraft table opens flat; hills, a bouquet and a butterfly rise from the fold and stand",
+    "module": "engine/src/canvas-core/popUp.ts",
+    "drawFilm": "popUp",
+    "source": "scanned"
+  },
+  {
     "id": "ranunculus",
     "name": "Pencil & watercolour",
     "family": "watercolour",

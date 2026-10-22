@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
 <p align="center"><strong>De l'art dessiné à la main, écrit en code.</strong></p>
 
 <p align="center">
-  Illustrations, accélérés de dessin, films, vidéos explicatives et art web interactif dans 32 styles.<br>
+  Illustrations, accélérés de dessin, films, vidéos explicatives et art web interactif dans 33 styles.<br>
   Chaque trait est une fonction et chaque note un calcul, si bien que la même source<br>
   redessine la même image sur toute machine, à toute taille, pour de bon.
 </p>
@@ -28,7 +28,7 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
 <p align="center"><a href="README.md">English</a> · <a href="README.ja-JP.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko-KR.md">한국어</a> · <b>Français</b> · <a href="README.es-ES.md">Español</a></p>
 
 <p align="center">
-  <a href="#32-styles-au-choix">Styles</a> ·
+  <a href="#33-styles-au-choix">Styles</a> ·
   <a href="#chaque-style-se-dessine-sous-vos-yeux">Films de dessin</a> ·
   <a href="#de-la-musique-composée-en-code">Musique</a> ·
   <a href="#ce-que-vous-pouvez-créer">Ce que vous pouvez créer</a> ·
@@ -37,16 +37,16 @@ https://github.com/user-attachments/assets/1cf7f75c-b040-4c00-bf0c-cf1885f8b8da
   <a href="#démarrer">Démarrer</a>
 </p>
 
-## 32 styles au choix
+## 33 styles au choix
 
 <p align="center">
-  <img src="assets/styles.jpg" width="100%" alt="32 illustrations, chacune dans son style, du crayon et de l’aquarelle, de la BD au marqueur et de la risographie au pixel art, aux briques de jeu, à la gravure sur bois, au sumi-e, à la carte à gratter, à la broderie, à la peinture à l’huile et au livre de contes populaires">
+  <img src="assets/styles.jpg" width="100%" alt="33 illustrations, chacune dans son style, du crayon et de l’aquarelle, de la BD au marqueur et de la risographie au pixel art, aux briques de jeu, à la gravure sur bois, au sumi-e, à la carte à gratter, à la broderie, à la peinture à l’huile et au livre de contes populaires">
 </p>
 
-Chaque style est une façon bien à lui de poser une trace : l'effilement d'une plume, le débordement d'un lavis, le grain de la craie sur l'ardoise, le bord déchiré du papier découpé, la trame d'un tambour de risographie, un seul trait gravé qui s'enroule pour devenir une lune. Le sujet change de forme selon la main qui le dessine, comme il le ferait pour 32 illustrateurs différents. Chaque style s’accompagne aussi d’un film où son image se dessine trait après trait, dans l’ordre de travail d’un artiste qui emploie ce médium. Choisissez-en un pour votre marque, et toutes les images suivantes arriveront de la même main. Chaque planche ci-dessus, et la planche-contact elle-même, est dessinée par du code dans ce dépôt.
+Chaque style est une façon bien à lui de poser une trace : l'effilement d'une plume, le débordement d'un lavis, le grain de la craie sur l'ardoise, le bord déchiré du papier découpé, la trame d'un tambour de risographie, un seul trait gravé qui s'enroule pour devenir une lune. Le sujet change de forme selon la main qui le dessine, comme il le ferait pour 33 illustrateurs différents. Chaque style s’accompagne aussi d’un film où son image se dessine trait après trait, dans l’ordre de travail d’un artiste qui emploie ce médium. Choisissez-en un pour votre marque, et toutes les images suivantes arriveront de la même main. Chaque planche ci-dessus, et la planche-contact elle-même, est dessinée par du code dans ce dépôt.
 
 <details>
-<summary><b>Les 32 styles</b> et leur façon de prendre forme</summary>
+<summary><b>Les 33 styles</b> et leur façon de prendre forme</summary>
 
 | Style | Comment il est réalisé |
 |---|---|
@@ -72,6 +72,7 @@ Chaque style est une façon bien à lui de poser une trace : l'effilement d'une 
 | **Papier animé** | Des papiers découpés superposés et peints, animés sur deux images |
 | **Crayon et aquarelle** | Des lavis qui ne remplissent jamais tout à fait le trait de crayon |
 | **Pixel art** | Une palette fixe de 16 couleurs sur une grille basse résolution |
+| **Carte pop-up** | Une carte pliée : du papier découpé qui se dresse sur des plis en vallée |
 | **Risographie** | Des tambours d'encre surimprimés, avec leurs légers décalages |
 | **Animation rubber hose** | De l'encre façon dessin animé des années 1930, des membres souples et du grain de pellicule |
 | **Carte à gratter** | Des lignes blanches grattées dans une couche d'argile noire |
@@ -161,7 +162,7 @@ Demandez comment dessiner quelque chose, ou apportez un de vos dessins, et anido
 | **Réseaux sociaux et messagerie** | Des boucles infinies, des GIF et des stickers animés transparents, aux bonnes dimensions pour le fil d'actualité. |
 | **Présentations et documents** | Une famille d'illustrations de section issues d'un seul programme. Une nouvelle graine donne une image sœur dans le même style. |
 | **Récits** | Des storyboards et des animatics qui grandissent jusqu’à devenir un film achevé, de n’importe quelle durée, avec une bande originale. |
-| **Votre propre image** | Apportez un dessin et reprenez son style pour un nouveau sujet, ou apportez une photo et recréez-la dans l’une des 32 manières, chaque trait tracé par le code. |
+| **Votre propre image** | Apportez un dessin et reprenez son style pour un nouveau sujet, ou apportez une photo et recréez-la dans l’une des 33 manières, chaque trait tracé par le code. |
 | **Pages web** | Des illustrations interactives qui suivent le curseur, réagissent aux clics et aux formulaires, ou se dessinent au fil du défilement. Des visuels d'en-tête et des spots à côté de votre titre, aux couleurs de votre page et de votre marque, en clair ou en sombre. |
 | **Apprentissage** | Des leçons de dessin en étapes et en accéléré, pour comprendre la construction d’une image, les points à observer et les erreurs courantes. |
 | **Personnages** | Un personnage créé une fois, qui reste identique d’un plan, d’une pose et d’un style à l’autre. |
