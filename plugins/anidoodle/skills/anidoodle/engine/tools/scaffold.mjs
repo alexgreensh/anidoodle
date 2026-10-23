@@ -72,7 +72,7 @@ for (const f of ["package.json", "package-lock.json", "tsconfig.json"]) if (exis
 
 if (opt.example) {
   const ex = join(SKILL, "example", "src");
-  if (!existsSync(ex)) die(`--example asked for, but ${ex} is not there`);
+  if (!existsSync(ex)) die(`--example: the worked film is not in this install (the directory copy leaves it out to stay small). Clone https://github.com/alexgreensh/anidoodle and run its skills/anidoodle/engine/tools/scaffold.mjs with --example.`);
   cpSync(ex, join(target, "src"), { recursive: true });
 }
 

@@ -2,10 +2,11 @@
 // (the same resolver the films use) and runs it in node. No browser, no framework, exit 1 on any
 // failure.   node tools/test.mjs [name ...]
 import { build } from "esbuild";
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { overlay } from "./overlay.mjs";
 
 const only = process.argv.slice(2);
+if (!existsSync("test")) { console.error("test: the unit suites are not in this install (the directory copy leaves them out to stay small). Clone https://github.com/alexgreensh/anidoodle to run them."); process.exit(2); }
 const files = readdirSync("test").filter((f) => f.endsWith(".test.ts")).sort().filter((f) => !only.length || only.includes(f.replace(/\.test\.ts$/, "")));
 if (!files.length) { console.error(`test: nothing to run${only.length ? ` for ${only.join(", ")}` : ""}`); process.exit(2); }
 let pass = 0, fail = 0;

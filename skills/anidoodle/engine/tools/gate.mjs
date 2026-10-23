@@ -183,6 +183,7 @@ const run = async () => {
 };
 const selfTest = async () => {
   let wrong = 0;
+  if (!existsSync("test/fixtures")) { console.error("gate --self-test: the fixtures are not in this install (the directory copy leaves them out). Clone https://github.com/alexgreensh/anidoodle to run it."); process.exit(2); }
   for (const file of readdirSync("test/fixtures").filter((f) => f.endsWith(".mjs")).sort()) {
     const fixture = (await import(`../test/fixtures/${file}`)).default;
     const { meta, render, expected } = fixture;
