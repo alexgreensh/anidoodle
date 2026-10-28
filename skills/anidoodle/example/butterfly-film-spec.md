@@ -1,5 +1,7 @@
 # MECHANICAL LEPIDOPTERA: film spec, Revision 4 (BUILT, then ALIVE)
 
+**Contents:** 0. The story (the client) · 1. The grid (binding) · 2. Craft bar (binding) · 3. Contract (unchanged) · 4. Camera model (binding) · 5. MOVEMENT 2, ALIVE (1260 frames). The client's six beats, on the grid. · 6. The world · 7. The signature (the client) · 8. Score (pure JS, same shape as score.ts) · 9. Engine work · 10. Gates (stills first, I review each; under the no-collision protocol I review COPIES and return numbered fix lists through the client) · 11. Open for the client (none blocks the build)
+
 Roles: an art director authors and reviews this spec, a builder implements it, a client approves.
 Project: this skill's `example/` (a worked reference to study, not a template).
 Read before building, in this order: this file, whole; `../references/determinism-and-contract.md` for the rules every frame obeys; then the modules beside this spec in `src/canvas-core/butterfly/` (geom, kit, parts, plate, surface, linkage, act1cues, and the finale world in act4*). Render the approved destination still yourself before you change anything that reaches it.
