@@ -44,7 +44,7 @@ or in 3D (one medium per film), what **shape** (1x1, 9x16, 16x9, 4x5 or any W x 
 | A score or soundtrack | `references/music/README.md` |
 | Narration, a voice-over, word timing or subtitles | `references/workflows/narration.md` |
 
-- Music: pick a style vocabulary and mood, sketch the tension arc and motif, compose your own harmony, motif and form (references/music/compose.md, craft in references/music/theory/), revise until node tools/music.mjs craft shows only findings you chose, then check must PASS before a human listens. Styles give sound, never notes.
+- Music: pick a style vocabulary (`references/music/styles/vocabularies.md`; deep dives `references/music/styles/music-box.md`, `references/music/styles/lofi-electronic.md`) and mood, sketch the tension arc and motif, compose your own harmony, motif and form (references/music/compose.md, craft in references/music/theory/), revise until node tools/music.mjs craft shows only findings you chose, then check must PASS before a human listens. Styles give sound, never notes.
 - Sound effects: references/music/sound-design.md. 14 layered, seeded effects cued by film frame (filmSfx); the score ducks, and every cue must be within 6 dB of it. Effects only on real direction changes, one riser + one impact per film.
 - Launch films: `launchTemplate.ts` renders a product's launch from data (prompts, plates or its own UI, a score composed for it, words, install lines) in every shape from one timeline; `launch.mjs new|ship`. Habits that save tokens: `references/working-method.md`.
 
