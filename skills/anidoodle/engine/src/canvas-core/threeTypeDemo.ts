@@ -6,7 +6,7 @@
 import type { Ctx, Env } from "./core";
 import type { Film } from "./film";
 import * as THREE from "three";
-import { draw3d, memo } from "../three-core/stage";
+import { draw3d, memo, probe3d } from "../three-core/stage";
 import { ease, lerp, seg, spring, tween } from "../three-core/time";
 import { defaultFont, text3d, textPlane, type Letter } from "../three-core/type3d";
 import { contactShadow, grain, matte, outline, satin, studio, toon, vignette } from "../three-core/look";
@@ -68,7 +68,7 @@ const sceneA = (ctx: Ctx, env: Env, f: number) => {
   letters.forEach((l, i) => drop(l, f, -6 + i * 3.2, i, shadows[i]));
   const t = tween(f, 0, 96, ease.outCubic);
   cam.position.set(lerp(-0.7, 0.5, t), lerp(2.9, 2.2, t), lerp(12.6, 11.2, t)); cam.lookAt(0, -0.05, 0);
-  draw3d(ctx, env, scene, cam, { clear: "#efe3d2" });
+  draw3d(ctx, env, scene, cam, { clear: "#efe3d2" }); if (f >= 48) probe3d(ctx, env, letters[0].parent!, cam, "anidoodle"); /* the letters drop in from above the frame on purpose; the word must read whole once it has landed */
 };
 
 // ---------------------------------------------------------------- scene B: "now in 3D", toon and ink
@@ -101,7 +101,7 @@ const sceneB = (ctx: Ctx, env: Env, f: number) => {
   word.rotation.y = lerp(-0.22, 0.16, tween(f, 0, 96, ease.inOutSine));
   const t = tween(f, 0, 96, ease.inOutSine);
   cam.position.set(lerp(0.8, -0.4, t), lerp(2.8, 2.1, t), lerp(12.2, 11.0, t)); cam.lookAt(0, -0.1, 0);
-  draw3d(ctx, env, scene, cam, { clear: "#2d3f8f" });
+  draw3d(ctx, env, scene, cam, { clear: "#2d3f8f" }); probe3d(ctx, env, word, cam, "now in 3D");
 };
 
 // ---------------------------------------------------------------- scene C: the end card
@@ -129,7 +129,7 @@ const sceneC = (ctx: Ctx, env: Env, f: number) => {
   (made.material as THREE.MeshBasicMaterial).opacity = pm; made.position.y = 1.3 + (1 - pm) * 0.12;
   const t = tween(f, 0, 48, ease.outCubic);
   cam.position.set(0, lerp(0.7, 0.55, t), lerp(9.2, 8.6, t)); cam.lookAt(0, 0.2, 0);
-  draw3d(ctx, env, scene, cam, { clear: "#efe3d2" });
+  draw3d(ctx, env, scene, cam, { clear: "#efe3d2" }); probe3d(ctx, env, letters[0].parent!, cam, "anidoodle");
 };
 
 // ---------------------------------------------------------------- finish and shots

@@ -13,6 +13,7 @@
 // esbuild then drops the parts a film never uses (the file loaders that could fetch, among them).
 import * as THREE from "three";
 import type { Ctx, Env } from "../canvas-core/core";
+import { probeRect } from "../canvas-core/core";
 
 // Hosts see this string in the page bundle and start Chrome with WebGL on (adapters/playwright.mjs).
 export const WEBGL_MARKER = "__ANIDOODLE_WEBGL__";
@@ -91,4 +92,29 @@ export const draw3d = (ctx: Ctx, env: Env, scene: THREE.Scene, camera: THREE.Cam
 export const rand = (seed: number) => {
   let a = seed >>> 0;
   return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+};
+
+/**
+ * Report a 3D object's on-screen box to the frame probe, so framecheck.mjs catches 3D type or a
+ * hero object cut by the frame edge (the 2D drawing code reports its boxes the same way). Call it
+ * after positioning the camera, for anything the viewer must see whole. No cost unless framecheck
+ * is running. The box is the projected corners of the object's world bounding box.
+ */
+const _box = new THREE.Box3(), _v = new THREE.Vector3();
+export const probe3d = (ctx: Ctx, env: Env, object: THREE.Object3D, camera: THREE.Camera, label: string, kind: "text" | "box" = "text") => {
+  if (!(globalThis as { __ANIDOODLE_PROBE__?: unknown }).__ANIDOODLE_PROBE__) return;
+  if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) { const c = camera as THREE.PerspectiveCamera; c.aspect = env.W / env.H; c.updateProjectionMatrix(); }
+  object.updateWorldMatrix(true, true); camera.updateMatrixWorld();
+  _box.setFromObject(object); if (_box.isEmpty()) return;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (let i = 0; i < 8; i++) {
+    _v.set(i & 1 ? _box.max.x : _box.min.x, i & 2 ? _box.max.y : _box.min.y, i & 4 ? _box.max.z : _box.min.z).project(camera);
+    if (_v.z > 1) continue; // behind the camera: not on screen
+    const x = ((_v.x + 1) / 2) * env.W, y = ((1 - _v.y) / 2) * env.H;
+    x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+  }
+  if (!Number.isFinite(x0)) return;
+  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.globalAlpha = 1;
+  probeRect(ctx, env, x0, y0, x1 - x0, y1 - y0, label, kind);
+  ctx.restore();
 };
