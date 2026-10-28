@@ -1,6 +1,6 @@
 # 3D films and 3D motion graphics
 
-**Contents:** 3D or 2D: one medium per film · A 3D shot · The contract in 3D · The kit, by job · The craft bar in 3D · The checks, and what each catches · Rendering
+**Contents:** 3D or 2D: one medium per film · Benchmark before the look still · A 3D shot · The contract in 3D · The kit, by job · The craft bar in 3D · The checks, and what each catches · Rendering
 
 A 3D shot is an ordinary shot. three.js renders into WebGL, `draw3d` copies the pixels onto the
 frame's 2D canvas, and every tool (still, render, gate, framecheck, captions, emit, the score)
@@ -19,6 +19,28 @@ film. The last 3D film rejected four mixed looks before the one that worked: cod
 reference pixels, a drawn world with a 3D puppet composited on top, a painted backdrop behind 3D.
 Each read as two films glued together. Build a hybrid only when the person asks for one. Finish
 layers drawn over the 3D frame (subtitles, grain, vignette, a plated title) are not a second medium.
+
+## Benchmark before the look still
+
+The kit makes it easy to put a lit, bevelled object on screen, and that is the trap: a capsule
+robot, a box house and lollipop trees under default materials render cleanly, pass every check,
+and still read as a beginner's three.js scene. It happened on this kit's first flagship still
+(graded 7 by its builder, rejected on sight). Clean is the floor. The bar is designed 3D, and you
+cannot hold a bar you have not looked at.
+
+So before the look still, build a reference board:
+
+1. **Find 6 to 12 real references** of excellent stylized 3D close to the brief: award-winning
+   WebGL work, stylized 3D studios, stylized games and films (a paper world that comes alive
+   points at Tearaway; a miniature town at Townscaper). Open them and look; do not work from memory.
+2. **Write what makes each one work**: shape language and proportions (characters designed as
+   shapes with a silhouette, never a stack of capsules), bevel softness, material recipe, light,
+   palette, depth and atmosphere, lens and framing, how dense the small detail is.
+3. **Pick ONE benchmark** and say which techniques you take from it. References are rebuilt in
+   code; their pixels never ship.
+4. **Critique the still side by side with the benchmark**, by a fresh critic
+   (`references/workflows/review.md`), and grade against the benchmark, never against "it works".
+   A still that would look out of place next to its benchmark is not done.
 
 ## A 3D shot
 
