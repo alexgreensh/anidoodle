@@ -15,7 +15,7 @@
 //   ink:        outline(mesh, width, color, o)                -> inverted hull, animatable width
 //   ground:     contactShadow(size, softness, o)              -> a soft shadow plane, no shadow map
 //   shadows:    softShadows(light, o)                         -> acne-free cast shadows when wanted
-//   post (2D):  grain(ctx, env, frame, amount)  vignette(ctx, env, amount)   after draw3d
+//   post (2D):  grain(ctx, env, frame, amount, seed, cell)  vignette(ctx, env, amount)   after draw3d
 import * as THREE from "three";
 import type { Ctx, Env, Layer } from "../canvas-core/core";
 import { rand } from "./stage";
@@ -240,19 +240,22 @@ export const grainTile = (seed: number, frame: number, size = 256): Uint8Clamped
 };
 /**
  * Film grain over the whole frame, new every frame, seeded by the frame (so frame 40 drawn first
- * or last is the same). amount 0-1: 0.06-0.1 is felt, not seen. Call after draw3d and any 2D
+ * or last is the same). amount 0-1: 0.03-0.06 is felt, not seen. Call after draw3d and any 2D
  * layers; overlay blending keeps mid-tones and leaves pure black and white alone.
+ * cell: logical pixels per grain value (default 2). The tile is stretched with smoothing, so each
+ * grain is a soft clump rather than a one-pixel speck: it still reads as film at 1x, and the encoder
+ * no longer spends its bits on per-pixel noise (an 8 s 1080p film went from 69 MB to well under 25).
  */
-export const grain = (ctx: Ctx, env: Env, frame: number, amount = 0.08, seed = 7) => {
+export const grain = (ctx: Ctx, env: Env, frame: number, amount = 0.035, seed = 7, cell = 2) => {
   if (amount <= 0) return;
-  const T = 256, key = `three:grain:${T}`;
+  const T = 256, key = `three:grain:${T}`, k = Math.max(1, cell);
   let layer = env.cache.get(key) as Layer | undefined;
   if (!layer) { layer = env.canvas(T, T); env.cache.set(key, layer); }
   const img = layer.ctx.createImageData(T, T); img.data.set(grainTile(seed, frame, T)); layer.ctx.putImageData(img, 0, 0);
   const pat = ctx.createPattern(layer.canvas as CanvasImageSource, "repeat"); if (!pat) return;
-  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0);
+  ctx.save(); ctx.setTransform(env.scale * k, 0, 0, env.scale * k, 0, 0);
   ctx.globalCompositeOperation = "overlay"; ctx.globalAlpha = Math.min(1, amount * 3); ctx.imageSmoothingEnabled = true;
-  ctx.fillStyle = pat; ctx.fillRect(0, 0, env.W, env.H);
+  ctx.fillStyle = pat; ctx.fillRect(0, 0, env.W / k, env.H / k);
   ctx.restore();
 };
 /** darken the corners toward a tinted dark (not black: lesson 8, black crush). amount 0-1, 0.3 is gentle */

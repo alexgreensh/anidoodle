@@ -133,7 +133,7 @@ const sceneC = (ctx: Ctx, env: Env, f: number) => {
 };
 
 // ---------------------------------------------------------------- finish and shots
-const finish = (ctx: Ctx, env: Env, f: number, dark = false) => { vignette(ctx, env, dark ? 0.32 : 0.22, dark ? "#0b0f2a" : "#3a2420"); grain(ctx, env, f, 0.05); };
+const finish = (ctx: Ctx, env: Env, f: number, dark = false) => { vignette(ctx, env, dark ? 0.32 : 0.22, dark ? "#0b0f2a" : "#3a2420"); grain(ctx, env, f); };
 const shotA = (ctx: Ctx, f: number, env: Env) => { sceneA(ctx, env, f); finish(ctx, env, f); };
 const shotWipe = (ctx: Ctx, f: number, env: Env) => {
   const F = WIPE[0] + f;
