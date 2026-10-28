@@ -76,9 +76,16 @@ const finishTake = (raw, out) => {
 
 /** Every line's take, from the cache or the provider. Returns [{ line, file, hash, cached }]. */
 export const makeTakes = async (s, { force = false, log = console.log } = {}) => {
-  const P = PROVIDERS[s.provider], av = P.available();
-  if (!av.ok) die(`provider '${s.provider}' is not available here: ${av.why}`);
-  if (P.cloud) log(`narrate: ${s.provider} is a cloud voice: each line's text is sent to ${P.about.match(/goes to (\w+)/)?.[1] ?? "its company"}`);
+  // the provider (and its key) is needed only for a take that is not cached yet: checking, timing and
+  // baking cached cloud takes never needs the key and never calls the company
+  const P = PROVIDERS[s.provider];
+  let ready = false;
+  const need = () => {
+    if (ready) return; ready = true;
+    const av = P.available(); if (!av.ok) die(`provider '${s.provider}' is not available here: ${av.why}`);
+    if (P.cloud) log(`narrate: ${s.provider} is a cloud voice: each line's text is sent to ${P.about.match(/goes to (\w+)/)?.[1] ?? "its company"}`);
+  };
+  if (s.provider === "files") need();
   mkdirSync(CACHE, { recursive: true });
   const out = [];
   for (const ln of s.lines) {
@@ -88,6 +95,7 @@ export const makeTakes = async (s, { force = false, log = console.log } = {}) =>
     const hash = sha(takeKey({ provider: s.provider, voice, text: ln.text, post: POST }) + (src ? sha(readFileSync(src)) : ""));
     const file = join(CACHE, `${hash}.wav`), cached = existsSync(file) && !force;
     if (!cached) {
+      need();
       const raw = join(CACHE, `${hash}.raw`);
       const got = src ?? await P.synth({ text: ln.text, voice, raw, lineId: ln.id, scriptDir: s.dir });
       finishTake(got, file);
