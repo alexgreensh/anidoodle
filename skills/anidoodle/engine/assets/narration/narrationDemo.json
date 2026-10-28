@@ -1,0 +1,13 @@
+{
+  "fps": 24,
+  "provider": "say",
+  "voice": { "name": "Samantha", "rate": 170 },
+  "lead": 12,
+  "tail": 30,
+  "pause": 0.4,
+  "lines": [
+    { "id": "open", "text": "Every film starts as a few plain words." },
+    { "id": "code", "text": "This one draws itself in code, at twenty four frames a second.", "display": "This one draws itself in code, at 24 frames a second." },
+    { "id": "duck", "text": "The music steps back while I speak, then comes home." }
+  ]
+}
