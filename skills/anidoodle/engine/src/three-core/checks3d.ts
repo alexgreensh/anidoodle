@@ -315,7 +315,9 @@ export const screenSizeOk = (object: Obj, camera: THREE.Camera, env: { W: number
 // at the start of every draw (resetChecks) and at the end of every run, so no frame sees another's.
 type Reg = { rigs: { name: string; obj: Obj; rig?: Rig }[]; grips: { holder: Rig | Obj; hand: Limb | Obj; prop: Obj; o: GripOpts }[]; labels: Label[]; sizes: { obj: Obj; minPx: number }[]; paths: { path: PathSpec; props: PropBox[] }[] };
 let REG: Reg = { rigs: [], grips: [], labels: [], sizes: [], paths: [] };
-const G = globalThis as { __ANIDOODLE_CHECK3D__?: (frame: number, findings: Finding[]) => void };
+/** What a host learns besides the findings: each registered grip's point on screen (logical px), for crop boards and for sampling contact windows. */
+export type CheckInfo = { grips: { name: string; x: number; y: number }[] };
+const G = globalThis as { __ANIDOODLE_CHECK3D__?: (frame: number, findings: Finding[], info: CheckInfo) => void };
 /** True while a host or a test is collecting 3D findings. Draws skip the checks otherwise: no cost. */
 export const checking = () => typeof G.__ANIDOODLE_CHECK3D__ === "function";
 export const resetChecks = () => { REG = { rigs: [], grips: [], labels: [], sizes: [], paths: [] }; };
@@ -346,8 +348,9 @@ export const runChecks = (frame: number, camera: THREE.Camera, env: { W: number;
   for (const l of REG.labels) F.push(...labelVisible(l, camera, REG.rigs.map((r) => r.obj), frame).findings);
   for (const s of REG.sizes) F.push(...screenSizeOk(s.obj, camera, env, s.minPx, frame).findings);
   for (const p of REG.paths) F.push(...pathClear({ ...p.path, from: frame, to: frame }, p.props).findings.map((x) => ({ ...x, frame })));
+  const info: CheckInfo = { grips: REG.grips.map((g) => { const q = gripFrame(g.hand).point.project(camera); return { name: `${objOf(g.holder).name || "holder"}/${g.prop.name || "prop"}`, x: ((q.x + 1) / 2) * env.W, y: ((1 - q.y) / 2) * env.H }; }) };
   resetChecks();
-  if (checking()) G.__ANIDOODLE_CHECK3D__!(frame, F);
+  if (checking()) G.__ANIDOODLE_CHECK3D__!(frame, F, info);
   return result(F);
 };
 /** Collect the findings of everything `run` draws (a test, a host's check pass). */

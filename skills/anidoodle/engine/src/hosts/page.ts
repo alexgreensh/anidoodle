@@ -156,6 +156,16 @@ export const mountFilm = (film: Film) => {
     } finally { protos.forEach((p, i) => (p.fillText = orig[i] as never)); delete g.__ANIDOODLE_PROBE__; }
     return out;
   };
+  // 3D CHECKS (tools/gate.mjs, still.mjs --grips). Turns three-core/checks3d.ts on, draws each frame asked
+  // and returns what every frame's runChecks found, plus where its grips sit on screen (logical px).
+  // A frame whose film never calls runChecks returns no record. Off by default: no hook, no cost.
+  type Check3D = { frame: number; findings: { frame: number; kind: string; where: string; detail: string }[]; grips: { name: string; x: number; y: number }[] };
+  const checks3d = (frames: number[]) => {
+    const out: Check3D[] = [], g = globalThis as { __ANIDOODLE_CHECK3D__?: (frame: number, findings: Check3D["findings"], info?: { grips: Check3D["grips"] }) => void };
+    g.__ANIDOODLE_CHECK3D__ = (frame, findings, info) => { out.push({ frame, findings, grips: info?.grips ?? [] }); };
+    try { for (const f of frames) seek(f); } finally { delete g.__ANIDOODLE_CHECK3D__; }
+    return out;
+  };
   const audio = (sr: number) => { if (!filmSound) return null; const [L, R] = filmSound(sr); if (L.length !== R.length) throw new Error("audio channels have different lengths"); const pcm = new Float32Array(L.length * 2); for (let i = 0; i < L.length; i++) { pcm[i * 2] = L[i]; pcm[i * 2 + 1] = R[i]; } return { sampleRate: sr, frames: L.length, float32: b64(new Uint8Array(pcm.buffer)) }; };
   const warm = () => film.shots.forEach((s) => { seek(s.start); seek(s.start + ((s.end - s.start) >> 1)); }); // first + middle frame of every shot: builds tiles, pre-allocates the layer pool
   // POSTER. Platforms show frame 0 as the thumbnail, so a delivery may open on a chosen frame (the
@@ -177,7 +187,7 @@ export const mountFilm = (film: Film) => {
     if (u > 0 && posterOf) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = Math.min(1, u); ctx.globalCompositeOperation = "source-over"; if (u >= 1) ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(posterOf.img, 0, 0); ctx.restore(); }
     current = n; return r;
   };
-  window.FILM = { probe, meta: { ...film.meta, hasAudio: typeof film.audio === "function", shots: film.shots.map(({ id, start, end }) => ({ id, start, end })) }, ready, mount, seek, hash, audio, warm, blur, poster, bakes: { load: bakes.load, take: bakes.take, hashes: bakes.hashes, stats: () => bakes.stats }, png: () => canvas.toDataURL("image/png").slice(22), frame: () => current };
+  window.FILM = { probe, checks3d, meta: { ...film.meta, hasAudio: typeof film.audio === "function", shots: film.shots.map(({ id, start, end }) => ({ id, start, end })) }, ready, mount, seek, hash, audio, warm, blur, poster, bakes: { load: bakes.load, take: bakes.take, hashes: bakes.hashes, stats: () => bakes.stats }, png: () => canvas.toDataURL("image/png").slice(22), frame: () => current };
 
   // ---- the player: click or space to play, arrows to step, ?frame=N to open on a frame
   ready.then(() => {

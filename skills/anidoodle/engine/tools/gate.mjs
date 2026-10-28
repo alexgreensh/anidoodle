@@ -7,6 +7,8 @@
 //                  different orders. Byte-identical, or PSNR above 45 dB.
 //   2 CONTRACT     a static scan of every module the film draws through.
 //   3 DEAD AIR     no identical consecutive frames, no half-second window under 0.5 % changed per 1/30 s.
+//   5 3D CHECKS    3D films only: three-core/checks3d.ts on sampled frames plus every frame of a
+//                  grip's contact window. Any finding (a prop through a hand, rigs clipping) fails.
 //
 // The gate NEVER writes to out/. It renders into .tmp/gate/ and it only ever READS the MP4 it is
 // pointed at, so running it can never damage a finished film.
@@ -17,6 +19,9 @@ import { resolve } from "node:path";
 import { readdirSync } from "node:fs";
 import { defaultOutput, requireFilm } from "./names.mjs";
 import { changedArea } from "./motion.mjs";
+import { pathToFileURL } from "node:url";
+import { glArgs } from "./adapters/playwright.mjs";
+import { detect } from "./detect.mjs";
 
 const VAL = new Set(["adapter", "mp4", "samples", "scale", "workers"]);
 const pos = [], opt = {};
@@ -92,6 +97,36 @@ const deadAir = async (mp4, meta) => {
   say(merged.length === 0, `no ${windowSize}-frame window under ${meta.kind === "drawing" ? "0.02" : "0.5"}% changed`, merged.map(([a, b]) => `${a}-${b}`).join(", ") || "none");
   const mvt = changed.slice(1).sort((a, b) => a - b);
   console.log(`        ${n} frames measured; median ${((mvt[mvt.length >> 1] ?? 0) * 100).toFixed(2)}%  min ${((mvt[0] ?? 0) * 100).toFixed(2)}%`);
+};
+
+// ---------------------------------------------------------------- 5. 3D checks, inside the page
+// The film's own draws run three-core/checks3d.ts (runChecks) when a collector listens; the page
+// returns every finding (hosts/page.ts FILM.checks3d). The pass mounts at a quarter scale: the checks
+// read geometry and the camera, never pixels, so the frame size changes nothing they see and the
+// WebGL draw costs a sixteenth. Lessons 37 and 48: a green gate with a prop through a hand is a failed gate.
+const CHECK_SCALE = 0.25, CHECK_SAMPLES = 48;
+const checks3d = async (pagePath, meta) => {
+  head(5, "3D CHECKS  grips held, nothing through anything (three-core/checks3d)");
+  if (!readFileSync(pagePath, "utf8").includes("__ANIDOODLE_WEBGL__")) { note("a 2D film", "3D checks not applicable"); return; }
+  const env = detect(), N = meta.durationFrames;
+  const browser = await env.pw.lib.chromium.launch({ executablePath: env.browser.executablePath, args: ["--disable-background-timer-throttling", ...glArgs(pagePath)] });
+  try {
+    const page = await (await browser.newContext({ viewport: { width: 640, height: 640 } })).newPage(), errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await page.goto(pathToFileURL(pagePath).href + "?adapter=gate-3d");
+    await page.evaluate(async (s) => { await window.FILM.ready; window.FILM.mount(s); }, CHECK_SCALE);
+    const ask = async (frames) => { const out = []; for (let i = 0; i < frames.length; i += 24) out.push(...(await page.evaluate((fs) => window.FILM.checks3d(fs), frames.slice(i, i + 24)))); return out; };
+    // pass 1: every Nth frame. pass 2: every frame between two samples where either one holds a grip
+    // (a contact window), because a hand can pass through a handle for three frames between samples
+    const step = Math.max(1, Math.ceil(N / CHECK_SAMPLES)), sampled = [...new Set([...Array.from({ length: Math.ceil(N / step) }, (_, i) => i * step), N - 1])];
+    const recs = await ask(sampled), byFrame = new Map(recs.map((r) => [r.frame, r]));
+    const fill = []; for (let i = 0; i + 1 < sampled.length; i++) { const a = byFrame.get(sampled[i]), b = byFrame.get(sampled[i + 1]); if (a?.grips.length || b?.grips.length) for (let f = sampled[i] + 1; f < sampled[i + 1]; f++) fill.push(f); }
+    recs.push(...(await ask(fill)));
+    if (errors.length) { say(false, "the 3D check pass drew without errors", errors.slice(0, 3).join("; ")); return; }
+    const findings = recs.flatMap((r) => r.findings), withGrip = recs.filter((r) => r.grips.length).length;
+    if (!recs.length) { note(`no frame registers anything to check (${sampled.length} sampled)`, "a 3D film with characters or held props should register them: three-core/checks3d.ts"); return; }
+    say(findings.length === 0, `${recs.length} frames checked (${sampled.length} sampled + ${fill.length} in grip windows), ${withGrip} with a grip`, findings.length ? `${findings.length} finding(s): ` + findings.slice(0, 6).map((x) => `${x.frame} ${x.kind} ${x.where}: ${x.detail}`).join(" | ") : "no finding");
+  } finally { await browser.close(); }
 };
 
 // ---------------------------------------------------------------- 1. determinism, two ways round
@@ -176,6 +211,7 @@ const run = async () => {
     console.log(`        ${art.path}  (${(art.bytes / 1024).toFixed(0)} KB, ${art.kind})`);
     art.checks.forEach((c) => say(c.ok, c.label, c.detail));
   }
+  await checks3d(resolve(`dist/${film}.html`), meta);
 
   console.log(`\n${"=".repeat(58)}`);
   console.log(fails ? `GATE: FAIL   ${fails} of ${checks} checks failed` : `GATE: PASS   ${checks}/${checks} checks, ${nFiles} modules scanned`);

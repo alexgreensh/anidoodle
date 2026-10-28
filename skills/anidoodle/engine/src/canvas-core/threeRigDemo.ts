@@ -230,17 +230,23 @@ export const rigDemoFrame = (env: Env, f: number, variant: Variant = "clean") =>
   return { ...B, hand };
 };
 // the camera keeps Nib a little left of centre while walking, then settles on the reach and pushes in
-const camTarget = (f: number) => v3(lerp(rootAt(f, "clean").x + 0.3, 0.2, tween(f, 64, 118)), lerp(0.72, 0.8, tween(f, 90, 160)), lerp(0.05, -0.02, tween(f, 64, 118)));
-const cameraAt = (f: number, _b?: Built) => { const t = camTarget(f), k = ease.inOutCubic(seg(f, 30, 170)); return t.add(v3(lerp(1.45, 1.35, k), lerp(0.5, 0.4, k), lerp(3.3, 3.0, k))); };
+const camTarget = (f: number) => v3(lerp(rootAt(f, "clean").x + 0.3, 0.2, tween(f, 64, 118)), lerp(0.72, 0.68, tween(f, 70, 110)) + 0.04 * tween(f, 120, 170), lerp(0.05, -0.02, tween(f, 64, 118)));
+// a side-on three-quarter for the walk, an arc round toward Nib's front for the reach (so its face reads
+// while it looks at the lantern on its far side), then a push in for the look and the wave
+const CAM_A = v3(1.45, 0.5, 3.3), CAM_B = v3(3.1, 0.6, 2.3), CAM_C = v3(2.85, 0.5, 2.45);
+const cameraAt = (f: number, _b?: Built) => { const t = camTarget(f), a = ease.inOutSine(seg(f, 46, 134)), b = ease.inOutCubic(seg(f, 128, 176)); return t.add(CAM_A.clone().lerp(CAM_B, a).lerp(CAM_C, b)); };
 
 // ---------------------------------------------------------------- the film
-const shot = (ctx: Ctx, f: number, env: Env) => {
-  const s = rigDemoFrame(env, f);
+const shotFor = (variant: Variant) => (ctx: Ctx, f: number, env: Env) => {
+  const s = rigDemoFrame(env, f, variant);
   if (checking()) runChecks(f, s.cam, env); else resetChecks();
   draw3d(ctx, env, s.scene, s.cam, { clear: "#e9e1d4", shadows: true });
 };
-export const threeRigDemo: Film = {
-  meta: { title: "three rig demo", W, H, fps: FPS, bpm: 120, durationFrames: N, kind: "story", poster: 150 },
+const filmOf = (title: string, variant: Variant): Film => ({
+  meta: { title, W, H, fps: FPS, bpm: 120, durationFrames: N, kind: "story", poster: 150 },
   assets: { images: {} },
-  shots: [{ id: "nib", start: 0, end: N, draw: shot }],
-};
+  shots: [{ id: "nib", start: 0, end: N, draw: shotFor(variant) }],
+});
+export const threeRigDemo = filmOf("three rig demo", "clean");
+/** TEST FIXTURE, not a film: the demo with the lantern shifted through Nib's jaws. The gate's 3D CHECKS must FAIL it. */
+export const fixtureRigBrokenGrip = filmOf("fixture: broken grip", "offset");

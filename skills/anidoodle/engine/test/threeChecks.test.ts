@@ -3,7 +3,7 @@
 // (lesson 44). Then the demo film: all 192 frames clean, and two broken variants that must fail.
 //   node tools/test.mjs threeChecks
 import * as THREE from "three";
-import { grip, handle, limb, makeRig, part, pose, type Rig } from "../src/three-core/rig";
+import { grip, gripFrame, handle, limb, makeRig, part, pose, type Rig } from "../src/three-core/rig";
 import { checkGrip, checking, collectChecks, labelVisible, pathClear, placeLabel, faceCamera, proximity, registerGrip, registerRig, runChecks, screenSizeOk, selfClear, type Finding } from "../src/three-core/checks3d";
 import { rigDemoFrame } from "../src/canvas-core/threeRigDemo";
 
@@ -173,6 +173,13 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
     const got = collectChecks(() => { registerRig("h", h); registerRig("lantern", p); registerGrip(h, h.limbs["arms.right"], p); runChecks(42, cam, ENV); });
     ok(got.length > 0 && got.every((x) => x.frame === 42) && got.some((x) => x.kind === "grip-gap"), `collectChecks receives the frame's findings (${got.length}, all on frame 42)`);
     ok(!checking() && runChecks(43, cam, ENV).ok, "the registry is cleared after a run: the next frame starts empty");
+    // what a host gets besides findings: each grip's point on screen (the gate samples contact windows with it, still --grips crops it)
+    holding(h, p, v3(-0.45, 1.35, 0.45));
+    const G = globalThis as { __ANIDOODLE_CHECK3D__?: unknown }; let info: { grips: { name: string; x: number; y: number }[] } | undefined;
+    G.__ANIDOODLE_CHECK3D__ = (_f: number, _fs: Finding[], i: typeof info) => { info = i; };
+    try { registerGrip(h, h.limbs["arms.right"], p); runChecks(44, cam, ENV); } finally { delete G.__ANIDOODLE_CHECK3D__; }
+    const want = gripFrame(h.limbs["arms.right"]).point.project(cam), g0 = info?.grips[0];
+    ok(!!g0 && g0.name === "h/lantern" && Math.abs(g0.x - ((want.x + 1) / 2) * ENV.W) < 1e-6 && Math.abs(g0.y - ((1 - want.y) / 2) * ENV.H) < 1e-6 && g0.x > 0 && g0.x < ENV.W, `the collector also gets each grip's point on screen (${g0?.name} at ${g0?.x.toFixed(0)}, ${g0?.y.toFixed(0)})`);
   }
 
   // ---- the demo film: every frame clean; two broken variants that must fail
