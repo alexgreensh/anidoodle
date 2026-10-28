@@ -25,9 +25,13 @@ export const resolveOverlay = (spec, dir) => {
   return null;
 };
 
+// THREE. A film imports "three" by its bare name and gets the vendored, hash-pinned build
+// (vendor/three/PROVENANCE.md): no npm package, no network, the same bytes on every machine.
+export const THREE_MODULE = join(ENGINE, "vendor/three/three.module.js");
 export const overlay = {
   name: "anidoodle-overlay",
   setup(b) {
+    b.onResolve({ filter: /^three$/ }, () => ({ path: THREE_MODULE }));
     b.onResolve({ filter: /^\.\.?\// }, (a) => {
       const f = resolveOverlay(a.path, a.resolveDir);
       return f ? { path: f } : undefined;

@@ -46,7 +46,8 @@ const surfaceFor = (cpu: boolean) => (w: number, h: number): Layer => {
   return { canvas: c, ctx: c.getContext("2d", cpu ? { willReadFrequently: true } : undefined) as unknown as Ctx } as Layer;
 };
 let surface = surfaceFor(false);
-const newEnv = (piece: Piece, scale: number): Env => ({ W: piece.meta.W, H: piece.meta.H, scale, cache: new Map(), canvas: surface });
+const glSurface = (w: number, h: number) => typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h });
+const newEnv = (piece: Piece, scale: number): Env => ({ W: piece.meta.W, H: piece.meta.H, scale, cache: new Map(), canvas: surface, webgl: glSurface });
 const q = (v: number, step: number) => Math.round(v / step) * step;
 const fnv = (d: Uint8ClampedArray) => { let h = 0x811c9dc5; for (let i = 0; i < d.length; i++) { h ^= d[i]; h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(16).padStart(8, "0"); };
 const pct = (a: number[], p: number) => { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };

@@ -2,13 +2,25 @@
 // canvas pixels. Frame accuracy comes from the pull model (frame N is a pure function of N),
 // not from anything Playwright does.
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { bakeCacheOn, loadBakes, saveBakes } from "../bake-cache.mjs";
 
 export const name = "playwright";
+// WEBGL. Only a page whose bundle carries three-core's marker gets a GL backend, so 2D films keep
+// exactly the browser they always had. Default: SwiftShader, a CPU renderer that draws the same
+// pixels on any machine (slow, ~1-3 s a 1080p frame). ANIDOODLE_GL=gpu uses the machine's GPU
+// (Metal on a Mac, about 10x faster), but its hashes only hold on that machine and driver.
+export const glArgs = (pagePath) => {
+  let three = false; try { three = readFileSync(pagePath, "utf8").includes("__ANIDOODLE_WEBGL__"); } catch { /* not a file: no GL */ }
+  if (!three) return [];
+  const gpu = process.env.ANIDOODLE_GL === "gpu";
+  return gpu ? ["--use-angle=" + (process.platform === "darwin" ? "metal" : "default"), "--ignore-gpu-blocklist", "--enable-gpu-rasterization"]
+    : ["--use-angle=swiftshader", "--use-gl=angle", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"];
+};
 // bakeCache (default on): finished plate frames come from and go to .cache/bakes (see bake-cache.mjs)
 export const open = async ({ pw, browser: found }, pagePath, { scale = 1, workers = 1, bakeCache } = {}) => {
-  const browser = await pw.lib.chromium.launch({ executablePath: found.executablePath, args: ["--disable-background-timer-throttling"] });
+  const browser = await pw.lib.chromium.launch({ executablePath: found.executablePath, args: ["--disable-background-timer-throttling", ...glArgs(pagePath)] });
   // the bake folder is keyed by the browser BINARY, not just its version: Chrome for Testing and
   // chrome-headless-shell report the same version and rasterise differently, so one must never
   // replay the other's plate frames

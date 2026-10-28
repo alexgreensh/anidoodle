@@ -42,7 +42,9 @@ export const mountFilm = (film: Film) => {
   const opts = film.meta.raster === "cpu" ? { willReadFrequently: true } : undefined;   // see Film.meta.raster
   const surface = (w: number, h: number): Layer => { const c = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h }); return { canvas: c, ctx: c.getContext("2d", opts) as unknown as Ctx } as Layer; };
   const bakes = bakeStore(surface);
-  const mount = (scale = 1) => { canvas.width = Math.round(film.meta.W * scale); canvas.height = Math.round(film.meta.H * scale); ctx = canvas.getContext("2d", opts) as CanvasRenderingContext2D; env = { W: film.meta.W, H: film.meta.H, scale, cache: new Map(), canvas: surface, image: (n) => images.get(n), bake: bakes.bake, root: true }; return film.meta; };
+  // 3D shots draw through WebGL (three-core/stage.ts). OffscreenCanvas when the browser has it, a detached <canvas> otherwise.
+  const glSurface = (w: number, h: number) => typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h });
+  const mount = (scale = 1) => { canvas.width = Math.round(film.meta.W * scale); canvas.height = Math.round(film.meta.H * scale); ctx = canvas.getContext("2d", opts) as CanvasRenderingContext2D; env = { W: film.meta.W, H: film.meta.H, scale, cache: new Map(), canvas: surface, webgl: glSurface, image: (n) => images.get(n), bake: bakes.bake, root: true }; return film.meta; };
   // contract rule 4: every asset is loaded AND decoded before frame 0, or the film refuses to start
   const ready = (async () => {
     const problems = validate(film); if (problems.length) throw new Error("timeline: " + problems.join("; "));

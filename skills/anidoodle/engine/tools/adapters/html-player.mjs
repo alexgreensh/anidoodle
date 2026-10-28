@@ -32,7 +32,8 @@ export const pageChecks = (html, declared = []) => {
   const has = (re) => { const m = rest.match(re); return m ? m.length : 0; };
   let names = null; try { names = assets ? Object.keys(JSON.parse(assets[1])) : null; } catch { names = null; }
   return [
-    { ok: has(/https?:\/\//g) === 0, label: "no http(s) reference of any kind", detail: `${has(/https?:\/\//g)} found` },
+    // an XML namespace name (three.js creates its canvas with createElementNS) is an identifier, never fetched
+    { ok: has(/https?:\/\/(?!www\.w3\.org\/(1999\/xhtml|2000\/svg)")/g) === 0, label: "no http(s) reference of any kind", detail: `${has(/https?:\/\/(?!www\.w3\.org\/(1999\/xhtml|2000\/svg)")/g)} found (XML namespace names excepted)` },
     { ok: has(/<(img|audio|video|source|link|iframe)\b/gi) === 0, label: "no external element (img, audio, video, link)", detail: `${has(/<(img|audio|video|source|link|iframe)\b/gi)} found` },
     { ok: has(/@font-face/gi) === 0, label: "no web font", detail: `${has(/@font-face/gi)} found` },
     { ok: has(/data:[a-z]+\/[a-z0-9.+-]+;base64/gi) === 0, label: "no embedded binary outside the asset manifest", detail: `${has(/data:[a-z]+\/[a-z0-9.+-]+;base64/gi)} found` },

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler", "jsx": "react-jsx",
     "strict": true, "noEmit": true, "skipLibCheck": true, "esModuleInterop": true, "lib": ["DOM", "ES2022"],
-    "rootDirs": ["src", "../example/src"]
+    "rootDirs": ["src", "../example/src"],
+    "paths": { "three": ["./vendor/three/types/Three.d.ts"] }
   },
   "include": ["src", "test", "../example/src"]
 }
