@@ -1,5 +1,7 @@
 # The launch kit: build your product's launch film
 
+**Contents:** Start from the template (16 s, one file) · The parts, for a film of your own shape · Worked example
+
 The pieces anidoodle's own launch film is made of, in `engine/src/canvas-core/`, usable for any
 product. The rules they serve are in `launch-video.md`.
 

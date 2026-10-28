@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Needs numpy (offline research tool, not used by renders): pip install numpy
 """Offline "measured physics" fitter for the keys voices (piano, mallets, organ).
 
     python3 tools/keys-fit.py <VCSL root> [--json out.json]

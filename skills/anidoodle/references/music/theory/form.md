@@ -1,5 +1,7 @@
 # Form, arrangement, orchestration, counterpoint
 
+**Contents:** 1. Song forms (and the engine's section kinds) · 2. Film cue structure (scoring to picture) · 3. Builds and releases · 4. Orchestration: registers and frequency slots · 5. Counterpoint basics (a second line that helps)
+
 ## 1. Song forms (and the engine's section kinds)
 
 | Form | Shape | Engine kinds |

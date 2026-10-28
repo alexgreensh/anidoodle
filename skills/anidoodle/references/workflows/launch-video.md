@@ -1,5 +1,7 @@
 # Launch and product videos
 
+**Contents:** Inputs the person brings · Ground it in the real product first · Made for this product, every frame and every note · The story · Type · Motion · The motif · Two registers · Brand and the end card · Sound · Delivery · The process
+
 A launch video makes one promise about a product and shows it being kept. It is a short film
 with a job: in the first seconds the viewer knows what the thing is, by the end they know where
 to get it. Every rule below was paid for on anidoodle's own 77 s launch film (four cuts) and

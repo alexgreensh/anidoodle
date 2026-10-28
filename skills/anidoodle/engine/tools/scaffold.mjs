@@ -69,6 +69,8 @@ mkdirSync(target, { recursive: true });
 cpSync(join(ENGINE, "src"), join(target, "src"), { recursive: true, filter: (f) => !skip.has(f) });
 cpSync(join(ENGINE, "tools"), join(target, "tools"), { recursive: true });
 for (const f of ["package.json", "package-lock.json", "tsconfig.json"]) if (existsSync(join(ENGINE, f))) cpSync(join(ENGINE, f), join(target, f));
+// three.js for 3D shots: the vendored, hash-pinned build and its types (vendor/three/PROVENANCE.md)
+if (existsSync(join(ENGINE, "vendor"))) cpSync(join(ENGINE, "vendor"), join(target, "vendor"), { recursive: true });
 
 if (opt.example) {
   const ex = join(SKILL, "example", "src");

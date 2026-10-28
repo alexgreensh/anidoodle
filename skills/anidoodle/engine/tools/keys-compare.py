@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Needs numpy (offline research tool, not used by renders): pip install numpy
 """Spectral A/B of rendered piano notes vs the CC0 VCSL Steinway B (offline, numpy only).
 
     python3 tools/keys-compare.py <VCSL root> <probe dir>   (probe dir holds old-<note>_vl<k>.wav / v2-<note>_vl<k>.wav)

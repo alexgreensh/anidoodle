@@ -1,5 +1,7 @@
 # Music: composed as data, performed, measured, then heard once
 
+**Contents:** The pipeline · Recorded instruments: the optional sound pack · Any length, never hard-coded · Styles (21) and moods (21) · Keys and modes (13) · How to write a score · The guards (guards.ts): sad is allowed, formless is not · The 8-second human listen
+
 Every score in anidoodle is written as data and every voice is the engine's own: you write the
 notes, the engine performs them. You cannot hear what you make, so every choice is a number, every
 number is measured, and a human hears 8 seconds before anything ships.

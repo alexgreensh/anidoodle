@@ -64,7 +64,7 @@ const walk = (dir, out = []) => { for (const e of execFileSync("find", [dir, "-n
 const contractScan = () => {
   head(2, "CONTRACT  the art core cannot reach a clock, the network or a file");
   // the worked example is part of the same tree at build time (tools/overlay.mjs): scan it too
-  const files = [...walk("src/canvas-core"), ...(existsSync("../example/src/canvas-core") ? walk("../example/src/canvas-core") : []), `src/hosts/page-${film}.ts`].filter((f) => existsSync(f));
+  const files = [...walk("src/canvas-core"), ...(existsSync("src/three-core") ? walk("src/three-core") : []), ...(existsSync("../example/src/canvas-core") ? walk("../example/src/canvas-core") : []), `src/hosts/page-${film}.ts`].filter((f) => existsSync(f));
   const hits = [];
   for (const f of files) { const src = stripComments(readFileSync(f, "utf8")); FORBIDDEN.forEach(([re, label]) => { const m = src.match(new RegExp(re.source, "g")); if (m) hits.push(`${f}: ${label} x${m.length}`); }); }
   say(hits.length === 0, `no forbidden call in ${files.length} art-core modules`, hits.length ? hits.slice(0, 6).join(" | ") : "Math.random, Date, performance.now, ctx.filter, network, image/font loads: none");

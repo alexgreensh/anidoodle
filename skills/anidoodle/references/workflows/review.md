@@ -1,5 +1,7 @@
 # The review: a fresh critic, three rounds at most
 
+**Contents:** The loop · What the critic does · The four readings · Severity · The check before fixing · The scorecard · The gate · The fix ledger
+
 The builder never judges its own work. A builder who has watched the film forty times sees what
 they meant, forgives the hand they know is hard, and grades the effort. So every review is done by
 a **fresh critic**: a new subagent (or a new session) that has seen none of the building.

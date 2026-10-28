@@ -1,5 +1,7 @@
 # Formats: what you are making, and how each one ships
 
+**Contents:** Stills: hero art, spots, covers, cards, diagrams · Motion without a story: loops, stickers, logos, ambient art · Films: the story ones · Delivering
+
 Everything is a `Film`: meta, shots that tile `[0, duration)`, and optionally a score. A still
 is a film one frame long, so every tool works on every format. Scaffold the kind you need:
 

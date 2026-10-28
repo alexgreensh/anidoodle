@@ -1,5 +1,7 @@
 # The camera: one dolly and one lens, keyed on the frame grid
 
+**Contents:** The move · Depth planes (parallax) · Lens and dolly · Time: speed ramps, slow motion, freeze frames · Shake · Line weight at close range · The two drawing paths
+
 `engine/src/canvas-core/camera.ts` is the camera. A film either draws in world coordinates
 inside `begin()`/`end()` (the transform path: dirty boxes stay right because the camera rides
 the `Gfx` transform stack), or asks `toScreen()` where a world point lands and draws there (the

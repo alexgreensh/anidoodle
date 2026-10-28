@@ -10,6 +10,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { glArgs } from "./playwright.mjs";
 import { buildPage } from "../build-page.mjs";
 import { detect } from "../detect.mjs";
 import { loadBakes, saveBakes } from "../bake-cache.mjs";
@@ -52,7 +53,7 @@ export const open = async (film, opts = {}) => {
   const built = await buildPage({ entry: `src/hosts/page-${film}.ts`, out, title: film });
   const html = readFileSync(out, "utf8");
 
-  const browser = await p.env.pw.lib.chromium.launch({ executablePath: p.env.browser.executablePath, args: ["--disable-background-timer-throttling"] });
+  const browser = await p.env.pw.lib.chromium.launch({ executablePath: p.env.browser.executablePath, args: ["--disable-background-timer-throttling", ...glArgs(out)] });
   const context = await browser.newContext({ viewport: { width: 640, height: 640 }, deviceScaleFactor: 1 });
   const pages = [], bv = browser.version();
   for (let i = 0; i < workers; i++) {

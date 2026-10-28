@@ -1,5 +1,7 @@
 # Motion grammar: six ways to get from one picture to the next
 
+**Contents:** 1. Foreground as transition · 2. Persistent actor · 3. Selection to expansion · 4. Registered decomposition · 5. Continuous canvas · 6. Exploded layers · Three ready-made seams · Cuts that carry motion · Dealing a hand · Names people use · Names we refuse · Callouts and the label handoff · Choosing
+
 A film that shows one good thing, then another unrelated good thing, reads as a slideshow however
 well each is animated. These six mechanisms are ways to make the next picture come OUT of the
 current one. They are a grammar to compose from, never presets: pick the one the story is already

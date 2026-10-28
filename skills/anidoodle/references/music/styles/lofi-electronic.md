@@ -1,5 +1,7 @@
 # Style: lo-fi electronic (chill, upbeat, clean)
 
+**Contents:** The sound · Grooves · Harmony language (write your own progression) · Melody rules (write your own motif) · Arrangement grammar · Mixing: balance by stem RMS, then master
+
 > A vocabulary, not a song. The data is `VOCAB.lofiElectronic` in `engine/src/canvas-core/music/vocab.ts`
 > (print it: `node tools/music.mjs vocab lofiElectronic`). You compose the notes with
 > [../compose.md](../compose.md). Our launch film was scored in this style (`launchLofi3`). That

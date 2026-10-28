@@ -1,5 +1,7 @@
 # Interactive web animation
 
+**Contents:** The contract: a frame is a fact, given its input log · Making one · What the replay gate proves · Measured (headless Chromium 1140, this Mac, 1280x800 at DPR 2, September 2026) · Limits
+
 Hand-drawn pieces that live on a web page and answer the person using it. They follow the pointer,
 react to hovered and focused buttons, draw themselves as you scroll, and read along with a form.
 None of this is a video or an embedded player: the piece is part of the page's UI.

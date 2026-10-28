@@ -1,5 +1,7 @@
 # Sound design: the effects kit, placed by frame, heard over the score
 
+**Contents:** What makes an effect sound designed, not generated · The kit · Placing effects in a film · Sound across a cut (J-cut and L-cut) · Levels and the audibility rule · Taste: when to use effects · The finished mix · Checking the finished film's sound · Tools and checks
+
 Every anidoodle sound effect is **built in code, from nothing**: no samples, no recordings, ever.
 (The music's acoustic instruments can play recordings from the optional sound pack; effects never
 do.) Every effect is deterministic: the same cue and seed give identical samples.
