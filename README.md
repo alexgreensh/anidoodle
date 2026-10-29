@@ -138,7 +138,7 @@ The film at the top of this page was made with anidoodle, and the kit it was mad
 - **Sound from the picture:** every key, press and landing gets its own effect, placed where it happens on screen, over a score composed for the film.
 - **Ready to post:** `launch.mjs ship <name>` renders every shape with its poster frame and captions (.srt and .vtt), checks audio-to-video sync and peak level on the file you deliver, and fails any frame whose edge cuts off text.
 
-It wears your product's look: your fonts, your colours, your chat window's shape, or a brand file imported straight from Figma. Start from drawn ink or a clean UI-first canvas, at 30 or 60 fps, with motion blur matched to each frame's speed. One `ship` command checks the finished film the way a picky editor would: text held long enough to read, no slide-deck cuts, no blurred exits, sound mastered for the feed, and every claim on screen sourced.
+It wears your product's look: your fonts, your colours, your chat window's shape, or a brand file imported straight from Figma. Start from drawn ink or a clean UI-first canvas, at 30 or 60 fps, with motion blur matched to each frame's speed. And before you see the finished film, anidoodle checks it on its own the way a picky editor would: text held long enough to read, no slide-deck cuts, no blurred exits, sound mastered for the feed, and every claim on screen sourced.
 
 The rules come from four cuts of our own launch and from the craft of the best ones out there: say what it is within five seconds, never put words over the art, cut on the downbeat, make the first frame the thumbnail. → [`launch-video.md`](skills/anidoodle/references/workflows/launch-video.md) · [the kit](skills/anidoodle/references/workflows/launch-video-kit.md)
 
