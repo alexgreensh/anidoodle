@@ -80,7 +80,7 @@ export const dolly = (curve: THREE.Curve<THREE.Vector3>, f0: number, f1: number,
   let target: V3;
   // "ahead": look along the travel direction, `lead` units out (the tangent, so it never stalls at the end)
   if (o.target === undefined || o.target === "ahead") target = arr(curve.getPointAt(t).add(curve.getTangentAt(t).multiplyScalar(o.lead ?? 3)));
-  else if (Array.isArray(o.target)) target = [...o.target];
+  else if (Array.isArray(o.target)) target = [o.target[0], o.target[1], o.target[2]];
   else target = arr(o.target.getPointAt(t));
   return { pos, target, fov: o.fov ?? 35, roll: 0 };
   };
@@ -195,7 +195,7 @@ export const matchLens = (s: CamState, fov: number): CamState => {
 };
 /** where a world point lands on the film, in film pixels [x, y] (call place() first); z > 1 means behind the camera */
 export const screenPx = (cam: THREE.PerspectiveCamera, world: V3 | THREE.Vector3, env: Size): [number, number, number] => {
-  const q = (Array.isArray(world) ? v(world) : world.clone()).project(cam);
+  const q = (Array.isArray(world) ? v(world as V3) : world.clone()).project(cam);
   return [((q.x + 1) / 2) * env.W, ((1 - q.y) / 2) * env.H, q.z];
 };
 /** distance from the camera to a world point along its view axis (what screenSize wants) */

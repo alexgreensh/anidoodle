@@ -53,6 +53,14 @@ while IFS= read -r f; do
   mkdir -p "${STAGE}/$(dirname "$f")"; cp -p "$f" "${STAGE}/$f"; count=$((count + 1))
 done < <(git ls-files skills/ | grep -v -E "${EXCLUDE}")
 
+# without three.js's type files the plugin's tsconfig types "three" loosely (three-untyped.d.ts), so callbacks
+# into three.js cannot infer their parameter types there: the staged tsconfig drops that one strict rule.
+node -e '
+  const fs = require("fs"), f = process.argv[1], j = JSON.parse(fs.readFileSync(f, "utf8"));
+  j.compilerOptions.paths.three = ["./vendor/three/three-untyped.d.ts"]; j.compilerOptions.noImplicitAny = false;
+  fs.writeFileSync(f, JSON.stringify(j, null, 2) + "\n");
+' "${STAGE}/skills/anidoodle/engine/tsconfig.json"
+
 # a host page that is exactly the standard one (import the film, mountFilm) is left out: the tools build that
 # page in memory when a film has none (engine/tools/names.mjs standardHost), pixel-identical. Custom pages stay.
 dropped=0

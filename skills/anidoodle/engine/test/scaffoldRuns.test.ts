@@ -13,5 +13,6 @@ export function run(ok: (cond: boolean, label: string) => void) {
     ok(r.status === 0, `RED: the scaffold exits 0 (got ${r.status}: ${(r.stderr || "").split("\n").find((l: string) => /Error/.test(l)) ?? ""})`);
     ok(existsSync(join(target, "src/canvas-core/intro.ts")), "the new film is there");
     ok(!existsSync(join(target, "src/canvas-core/launch3.ts")), "NEGATIVE: anidoodle's own launch film is left out");
+    ok(existsSync(join(target, "assets/fonts/Lora-Bold.ttf")) && existsSync(join(target, "assets/brand/lantern/brand.json")), "the fonts and brand files films import by path come along");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 }
