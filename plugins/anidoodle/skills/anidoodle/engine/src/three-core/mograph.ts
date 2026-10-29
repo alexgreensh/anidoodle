@@ -224,7 +224,7 @@ export const lagged = (g: THREE.Object3D | THREE.Object3D[], f: number, start: n
 export const grid = (g: THREE.Object3D | THREE.Object3D[], f: number, start: number, stagger: number, verb: Verb, o: { from?: "center" | "edge" | V3 } = {}) => {
   const cs = kids(g), c = new THREE.Vector3();
   if (Array.isArray(o.from)) c.set(...o.from); else { cs.forEach((x) => c.add(rest(x).position)); c.divideScalar(Math.max(1, cs.length)); }
-  const d = cs.map((x) => Math.round(rest(x).position.distanceTo(c) * 1000) / 1000), rings = [...new Set(d)].sort((a, b) => a - b);
+  const d = cs.map((x) => Math.round(rest(x).position.distanceTo(c) * 1000) / 1000), rings = [...new Set<number>(d)].sort((a, b) => a - b);
   cs.forEach((x, i) => { const ring = rings.indexOf(d[i]); verb(x, f, start + stagger * (o.from === "edge" ? rings.length - 1 - ring : ring), i); });
 };
 /**

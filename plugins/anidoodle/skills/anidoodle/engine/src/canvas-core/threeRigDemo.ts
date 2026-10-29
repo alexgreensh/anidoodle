@@ -91,7 +91,7 @@ const build = () => {
   const wood = std("#c9935c", { roughness: 0.8 }), woodDark = std("#9a6a3e", { roughness: 0.85 });
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.34, 0.4), wood); box.position.y = 0.17; crate.add(box);
   for (const y of [0.012, 0.115, 0.225, 0.328]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.408, 0.022, 0.408), woodDark); b.position.y = y; crate.add(b); }
-  crate.traverse((o) => { o.castShadow = o.receiveShadow = true; o.userData.part ??= "crate"; });
+  crate.traverse((o: THREE.Object3D) => { o.castShadow = o.receiveShadow = true; o.userData.part ??= "crate"; });
   scene.add(crate);
 
   const lantern = new THREE.Group(); lantern.name = "lantern";

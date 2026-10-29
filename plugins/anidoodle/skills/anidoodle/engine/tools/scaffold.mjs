@@ -100,7 +100,7 @@ export const ${film}: Film = {
 `);
   writeFileSync(host, `import { ${film} } from "../canvas-core/${film}";\nimport { mountFilm } from "./page";\nmountFilm(${film});\n`);
   const eng = rel(ENGINE);
-  if (!existsSync(join(target, "tsconfig.json"))) writeFileSync(join(target, "tsconfig.json"), JSON.stringify({ compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, noEmit: true, skipLibCheck: true, lib: ["DOM", "ES2022"], rootDirs: ["src", `${eng}/src`], paths: { three: [`${eng}/vendor/three/types/Three.d.ts`, `${eng}/vendor/three/three-untyped.d.ts`] } }, include: ["src"] }, null, 2) + "\n");
+  if (!existsSync(join(target, "tsconfig.json"))) writeFileSync(join(target, "tsconfig.json"), JSON.stringify({ compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, ...(existsSync(join(ENGINE, "vendor/three/types")) ? {} : { noImplicitAny: false }), noEmit: true, skipLibCheck: true, lib: ["DOM", "ES2022"], rootDirs: ["src", `${eng}/src`], paths: { three: [`${eng}/vendor/three/types/Three.d.ts`, `${eng}/vendor/three/three-untyped.d.ts`] } }, include: ["src"] }, null, 2) + "\n");
   // npm runs a script through a shell (sh, or cmd.exe on Windows): the tool path is quoted so a folder
   // with a space stays one word. Single quotes on sh (nothing inside expands), double quotes on cmd.exe.
   const quote = (p) => (process.platform === "win32" ? `"${p}"` : `'${p.replace(/'/g, `'\\''`)}'`);
@@ -121,6 +121,8 @@ for (const f of ["package.json", "package-lock.json", "tsconfig.json"]) if (exis
 // three.js for 3D shots: the vendored, hash-pinned build and its types where the install has them; the
 // plugin install has neither, and npm install brings the same pinned release (package.json, overlay.mjs)
 if (existsSync(join(ENGINE, "vendor"))) cpSync(join(ENGINE, "vendor"), join(target, "vendor"), { recursive: true });
+// fonts, brand files and narration scripts the engine's films import by path (../../assets/...)
+if (existsSync(join(ENGINE, "assets"))) cpSync(join(ENGINE, "assets"), join(target, "assets"), { recursive: true, filter: (f) => !f.includes(`${sep}assets${sep}refs`) });
 
 if (opt.example) {
   const ex = join(SKILL, "example", "src");

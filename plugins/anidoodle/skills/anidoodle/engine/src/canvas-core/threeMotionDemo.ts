@@ -33,7 +33,7 @@ const slab = (w: number, d: number, depth: number, r: number, bevel = 0.06) => {
   const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 6 });
   return g;
 };
-const shadowy = (m: THREE.Object3D) => { m.traverse((c) => { c.castShadow = true; c.receiveShadow = true; }); return m; };
+const shadowy = (m: THREE.Object3D) => { m.traverse((c: THREE.Object3D) => { c.castShadow = true; c.receiveShadow = true; }); return m; };
 
 const build = () => {
   const scene = new THREE.Scene();
@@ -145,7 +145,7 @@ const draw = (ctx: Ctx, f: number, env: Env) => {
     if (f < CUT.write) registerSize(s.tiles, 40);
     else if (f < CUT.morph) {
       registerSize(s.pillars, 40);
-      if (f >= w0) registerPath({ at: (ff) => s.swoop.getPointAt(ease.inOutSine(seg(ff, w0, w1))).clone().setY(s.swoop.getPointAt(ease.inOutSine(seg(ff, w0, w1))).y - 0.24), from: f, to: f, radius: 0.24, height: 0.48, name: "bead" }, s.pillars.children.map((c, i) => ({ name: `pillar ${i + 1}`, box: c })));
+      if (f >= w0) registerPath({ at: (ff) => s.swoop.getPointAt(ease.inOutSine(seg(ff, w0, w1))).clone().setY(s.swoop.getPointAt(ease.inOutSine(seg(ff, w0, w1))).y - 0.24), from: f, to: f, radius: 0.24, height: 0.48, name: "bead" }, s.pillars.children.map((c: THREE.Object3D, i: number) => ({ name: `pillar ${i + 1}`, box: c })));
     } else if (f < WHIP) registerSize(s.ringTube, 40);
     else if (f >= CUT.explode) registerSize(s.blockWrap, 40);
     runChecks(f, s.cam, env);

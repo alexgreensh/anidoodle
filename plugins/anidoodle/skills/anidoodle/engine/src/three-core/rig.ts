@@ -118,8 +118,8 @@ export const makeRig = (name: string, opts: { hipHeight?: number } = {}): Rig =>
 
 /** Add a mesh under `parent` with a part name the checks will print ("visor", "arms.left.hand"). */
 export const part = <T extends THREE.Object3D>(rig: Rig, parent: THREE.Object3D, name: string, obj: T): T => {
-  obj.traverse((o) => { if ((o as THREE.Mesh).isMesh) { o.userData.part ??= name; o.castShadow = true; o.receiveShadow = true; } });
-  obj.name ||= name;
+  (obj as THREE.Object3D).traverse((o: THREE.Object3D) => { if ((o as THREE.Mesh).isMesh) { o.userData.part ??= name; o.castShadow = true; o.receiveShadow = true; } });
+  (obj as THREE.Object3D).name ||= name;
   parent.add(obj);
   void rig;
   return obj;
