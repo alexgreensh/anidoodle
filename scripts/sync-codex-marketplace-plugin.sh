@@ -45,7 +45,8 @@ cd "${REPO_ROOT}"
 # use them (npm test, gate --self-test, scaffold --example) say where to get them when they are absent.
 # three.js (1.3 MB, over the directory's 256 KiB file hold) and its 500 type files are left out too: the
 # plugin gets the same pinned release from npm install, checked against the same sha256 (tools/overlay.mjs).
-EXCLUDE='^skills/anidoodle/engine/test/|^skills/anidoodle/example/|/canvas-core/(launch|launch2|launch3|launchClip|launchCode|typeOptions|typeStyles)\.ts$|/hosts/page-(launch|launch2|launch3|launchClip|typeOptions|typeStyles)\.ts$|/engine/assets/refs/|/engine/tools/gallery\.mjs$|^skills/anidoodle/assets/styles\.jpg$|/engine/package-lock\.json$|/music/blind/|/canvas-core/cheetah[A-Za-z]*\.ts$|/music/pieces/cheetah[A-Za-z]*\.ts$|/hosts/page-cheetah[A-Za-z]*\.ts$|/test/cheetahRig\.test\.ts$|/test/craft\.test\.ts$|/engine/vendor/three/three\.module\.js$|/engine/vendor/three/types/'
+# The check fixtures (fixture*.ts, the films the ship and motion end-to-end runs use) stay with those runs.
+EXCLUDE='^skills/anidoodle/engine/test/|^skills/anidoodle/example/|/canvas-core/(launch|launch2|launch3|launchClip|launchCode|typeOptions|typeStyles)\.ts$|/hosts/page-(launch|launch2|launch3|launchClip|typeOptions|typeStyles)\.ts$|/engine/assets/refs/|/engine/tools/gallery\.mjs$|^skills/anidoodle/assets/styles\.jpg$|/engine/package-lock\.json$|/music/blind/|/canvas-core/cheetah[A-Za-z]*\.ts$|/music/pieces/cheetah[A-Za-z]*\.ts$|/hosts/page-cheetah[A-Za-z]*\.ts$|/test/cheetahRig\.test\.ts$|/test/craft\.test\.ts$|/engine/vendor/three/three\.module\.js$|/engine/vendor/three/types/|/canvas-core/fixture[A-Z][A-Za-z]*\.ts$|/hosts/page-fixture[A-Z][A-Za-z]*\.ts$|/engine/tools/(ship|motion)-e2e\.mjs$'
 count=0
 while IFS= read -r f; do
   mkdir -p "${STAGE}/$(dirname "$f")"; cp -p "$f" "${STAGE}/$f"; count=$((count + 1))
