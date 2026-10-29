@@ -1,0 +1,61 @@
+{
+  "about": "anidoodle's own review record for launchClip, written by a fresh critic (an agent), not a person's review. launchClip is a frozen cut of the published launch film: every finding is kept here so it is seen, and closed as wontfix because the film is not re-cut.",
+  "findings": [
+    {
+      "id": "c1-1",
+      "p": "P1",
+      "status": "wontfix",
+      "note": "0.00-1.10 s (f1-33): the first second does nothing. The text is already typed and the cursor is already on Generate, and only the caret blinks. That is 27% of a 4 s test spent idle, so the hook arrives late. Fix: start about 0.3 s before the press, or hold the full sentence no longer than 0.3 s before the click.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    },
+    {
+      "id": "c1-2",
+      "p": "P1",
+      "status": "wontfix",
+      "note": "~1.03-1.10 s (f31-35): the press itself barely reads. The Generate button never visibly moves down (no scale or shade change), and the drop is already sitting on top of the button before the click, so it reads as a dot that was there, not ink the click squeezes out. Fix: a 2-3 frame press-down on the button (scale ~0.94, darker), with the drop swelling out of it only after the click.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    },
+    {
+      "id": "c1-3",
+      "p": "P1",
+      "status": "wontfix",
+      "note": "1.6-2.2 s (f49-66): the bloom is a heavy, solid black wobbly ring (donut) about 25 px thick at 1080p. It is the darkest, biggest shape in a pale UI and reads as a hole or stain more than ink blooming open. While the card squares off (f57-66) the ring gets clipped by the card's rectangle, leaving four black triangles in the corners that shrink away. That reads as a mask artifact, not ink. Fix: bloom as a soft spreading wash that thins as it grows and fades into the card edge, or round the clip to match the ring so no hard black corners show.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    },
+    {
+      "id": "c1-4",
+      "p": "P1",
+      "status": "wontfix",
+      "note": "2.2-4.0 s (f66-120, last frame): the style promised is 'marker comic' but the koi is thin, pale blue pencil construction lines. The last frame shows a faint sketch with two flat orange blobs and a half-laid cream fill: no bold marker outline, no comic ink. The test ends on what looks like a draft that is still loading, so it does not pay off the request it ends beside. Fix: bring in a bold dark marker outline pass by about 3.0 s so the final frame holds a recognisable marker-comic koi (outline plus the main orange patches) for the last ~0.4 s.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    },
+    {
+      "id": "c1-5",
+      "p": "P2",
+      "status": "wontfix",
+      "note": "1.30-1.60 s (f40-48): the drop's trail is a soft grey gradient smear, like a CSS motion blur, not ink. It also flies down-left to empty space, away from the thread bubble at top right. Fix: draw the trail as tapering ink droplets or a brush flick, and arc it so it reads as landing in the reply slot below the user bubble.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    },
+    {
+      "id": "c1-6",
+      "p": "P2",
+      "status": "wontfix",
+      "note": "2.70-2.95 s (f81-88): the header, the 'marker comic' label, the input, the button and the cursor all fade out together, while the window grows slightly (a camera push). The brief says the small print fades IN, but on screen it fades OUT. That leaves an empty top band, and the input disappears mid-fade, so the window reads as unfinished. Fix: decide the direction on purpose. If the goal is to end on card plus request, keep the push and crop the frame to them, so no empty chrome band remains.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    },
+    {
+      "id": "c1-7",
+      "p": "P2",
+      "status": "wontfix",
+      "note": "Whole clip: the 'turning' in the request never happens. The koi stays still, so nothing in the drawing moves except strokes and fills arriving. Fix: a slight body curve or tail flick in the last 0.5 s would make the answer match the request.",
+      "by": "fresh critic r1 (an agent)",
+      "why": "Not re-cut: launchClip is a frozen cut of the published launch film, its look already approved."
+    }
+  ]
+}

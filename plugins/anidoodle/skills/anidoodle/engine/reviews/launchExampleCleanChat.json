@@ -1,0 +1,97 @@
+{
+  "about": "anidoodle's own review record for launchExampleCleanChat, the worked example of the clean look with a chat ask. Written by a fresh critic (an agent), not a person's review. A film made from the template gets its own record (references/workflows/review.md).",
+  "verdict": "fix: no P0 or P1 open (cc1-3 iris and cc2-1 16:9 thread are fixed); after round 3 these P2s remain: grey tiny type (cc1-4), orphan end card pill on 16:9 (cc1-5), handover frames (cc1-6), near silent hook, measured only (cc1-7), 9:16 layout and small answer card (cc2-2, cc2-3), new small 16:9 answer card (cc3-1) and iris ring corner fragments (cc3-2) (fresh critic r3, an agent)",
+  "findings": [
+    {
+      "id": "cc1-1",
+      "p": "P1",
+      "status": "fixed",
+      "note": "The composer does not travel as one object. 16:9, 1.1 to 2.2 s (10 fps strip): it slides down at full size (it even grows a little from 1.3 to 1.7 s). Its vertical travel is almost done by 1.8 s (about 20 px left of 1080), and then it shrinks to about 55 % width from 1.8 to 2.1 s, nearly in place. That reads as a second move after the landing. 9:16 does the same at 1.8 to 2.4 s, ending as a narrow box with the question broken over three small lines. Scale should run on the same curve as the travel and finish with it. Checked r2: 16:9 at 0.8 to 2.6 s (10 fps strip) and 9:16 at the same span: the composer slides from mid window to the bottom between about 1.3 and 1.9 s at one constant size and stays that size after it lands; no shrink while moving or after. The question keeps two or three large lines on 9:16. Fixed on both shapes.",
+      "by": "fresh critic r1, an agent; checked fixed by fresh critic r2, an agent"
+    },
+    {
+      "id": "cc1-2",
+      "p": "P1",
+      "status": "fixed",
+      "note": "The inbox reorder glitches instead of sliding. 16:9, 11.5 to 11.8 s (8 fps strip): at 11.5 s the 'Team lunch' row is half see-through on top of the slot below it. At 11.6 s only 'Cloud hosting' is left, with one empty ghost row and a blank lower half in the panel. At 11.75 s a faded 'Design tool' row overlaps 'Team lunch'. That breaks the opaque rule, and on a normal viewing the rows look like they vanish and collide. Same beat on 9:16 at about 11.5 s. Rows should keep full opacity and visibly swap places. Checked r2: 16:9 and 9:16 at 10.4 to 12.8 s (8 fps strips) and a full frame at 12.5 s: there is no reorder any more; the three rows stay fully opaque in place, no ghost row, no overlap, and they tick to matched in turn at about 11.6 to 11.8 s. Fixed on both shapes.",
+      "by": "fresh critic r1, an agent; checked fixed by fresh critic r2, an agent"
+    },
+    {
+      "id": "cc1-3",
+      "p": "P1",
+      "status": "fixed",
+      "note": "The answer's iris does not read, and it is the payoff. 16:9, 2.6 to 3.6 s: the blue drop flying from Ask to the chart spot reads well, but it vanishes and the iris that follows is a cream disc opening on a cream card on a white window (at 3.1 s it is a faint 40 px circle you can barely see). At speed it looks like the chart fading in, not an iris opening. Same on 9:16 at 3.0 to 3.5 s. Give the iris edge contrast (an ink or blue rim, or open it onto the canvas colour) so the circle shape is seen. Still stands r2, half fixed: the iris is now a pale blue disc instead of cream. On 16:9 (full frame 3.55 s, strip 3.3 to 4.0 s) it is a 245 px disc and the circle shape reads in a still, though it has no rim and is low contrast (pale blue on a pale pink card on white). On 9:16 (full frame 3.5 s) the whole chart card is only about 265 px wide, the disc is about 85 px and very faint on a near white card, so at speed it still reads as a fade, not an iris. Needs an edge (ink or accent rim) and, on 9:16, a bigger answer card (see cc2-3). Checked r3: 16:9 strip 3.0 to 4.1 s (10 fps) and 9:16 the same span: the drop lands at about 3.4 s, then a thin solid accent blue ring opens from about 40 px to past the card edge by 3.9 s, with the chart showing inside it. The circle is clearly an iris at speed on both shapes, not a fade. Small leftover logged as cc3-2.",
+      "by": "fresh critic r1, an agent; checked fixed by fresh critic r3, an agent"
+    },
+    {
+      "id": "cc1-4",
+      "p": "P2",
+      "status": "open",
+      "note": "Tiny grey text that does not earn its place. A corner 'Tally' stamp, about 10 px tall on 1080, sits bottom right in every shot from 0 to about 15 s on both shapes. You cannot read it at a phone glance, and it repeats the wordmark. The window header subtitle 'your books, answered' (0 to 5 s) and the grey 'matched' chips on the secondary rows (11.7 to 15 s) are also small grey type. The person has rejected grey and tiny text before. Still stands r2: the corner 'Tally' stamp (grey, about 18 px on 1080) is still bottom right from 0 to about 16 s on both shapes; the grey 'your books, answered' subtitle (0 to 5 s) and grey 'matched' chips on the two secondary rows (11.7 to 16 s, full frame 12.5 s) are unchanged. Still stands r3: full frames 0.5 s and 2.8 s: grey corner \"Tally\" stamp (about 20 px) still bottom right on both shapes, grey \"your books, answered\" subtitle unchanged; grey \"matched\" chips on the two lower inbox rows from about 11.7 s unchanged.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "cc1-5",
+      "p": "P2",
+      "status": "open",
+      "note": "End card hierarchy, 16:9 from 15.5 s: the 'tally.example' pill floats on its own at x 1193 to 1591, 190 px past the end of the tagline, and lines up with no edge of the block above. It reads as an orphan, and the solid blue pill is the second-loudest thing on the card, louder than the tagline. The tagline also sits tight on the npm line (about 40 px) but far from the wordmark (about 90 px), so the two lower lines read as one clump. On 9:16 the pill stacks under the block and sits better. Still stands r2: 16:9 end card at 17 s, the 'tally.example' pill still floats alone at x 1185 to 1575, 70 px past the tagline, aligned to nothing, and stays the second loudest object; tagline still sits tight on the npm line and far from the wordmark. 9:16 stacks it and is fine. Still stands r3: 16:9 full frame 17 s: the \"tally.example\" pill still floats alone at x 1185 to 1575, about 70 px past the tagline, aligned to nothing, the second loudest thing on the card. 9:16 stacks it under the block and is fine.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "cc1-6",
+      "p": "P2",
+      "status": "open",
+      "note": "The handover from the chart to the word page leaves poster-bad frames. 16:9, 5.4 to 6.2 s: the window is zoomed and cropped, with two white slabs (window, then a second copy of the chart card's foot) sliding up off the frame while 'ASK' rises from the bottom edge. 9:16, 5.9 to 6.4 s: a vertical wipe cuts through the words, so 'SK IT.' shows with the A still hidden behind the white window. Start the words after the wipe has passed their left edge. Still stands r2: 16:9 at 5.4 to 5.8 s still shows two or three stacked copies of the window and chart card sliding up while 'ASK' rises from the bottom edge. 9:16 at 6.0 to 6.4 s the vertical wipe still cuts the words ('K IT.', 'SK IT.') beside a half hidden chart card. Still stands r3: 16:9 strip 5.3 to 6.4 s: at 5.3 s two copies of the chart card show in two stacked white slabs, then the slabs slide up while \"ASK\" rises cut by the bottom edge (5.5 to 5.7 s). 9:16 strip same span: the vertical wipe still slices the words (\"IT\", \"K IT.\", \"SK IT.\") beside a half hidden chart card at 5.9 to 6.3 s.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "cc1-7",
+      "p": "P2",
+      "status": "open",
+      "note": "Sound, measured only, so a person must listen: integrated -14.1 LUFS, true peak -1.4 dBFS, the same on both shapes. The loudest momentary is -11.6 LUFS at 7.5 s on the 'ASK IT. SEE WHY.' page. The answer opening (3 s, -16.5) and the end card's arrival (15.5 s, -12.4) are not the loudest moments. The first 2 s sit at -25 to -30 LUFS momentary, so the hook is nearly silent while the question types. Still stands r2: measured again, integrated -14.1 LUFS on both shapes; momentary is -25 to -28.5 LUFS from 0.5 to 2.1 s (the hook is near silent) and the loudest moments (-11.5) are at 7.6 s and 16.1 s, not the answer opening at 3 s (-15.6). A person must listen. Still stands r3: measured again (cannot hear): integrated -14.1 LUFS, true peak -1.2 (16:9) and -1.4 dBFS (9:16); momentary -24 to -30 LUFS from 0.5 to 2.1 s; loudest moments -11.7 at 7.5 s and -12.2 at 9.0 s, while the answer opening is -13.3 at 3.4 s. A person must listen.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "cc1-8",
+      "p": "P2",
+      "status": "fixed",
+      "note": "The thread bubble 'why did hosting go up?' and the chart label 'Cloud hosting, by month' are about 14 px type on 16:9 (2.5 to 5.5 s). A phone viewing a landscape film shows them at roughly 5 px. They are context the viewer already saw typed large, so it is not fatal, but the answer's label is the only words that say what the chart shows. Checked r2: on 16:9 the chart label 'Cloud hosting, by month' is now about 22 px (full frame 4.5 s) and the chart card is about 490 px wide, readable. The thread bubble no longer shows long enough to matter on 16:9 (see cc2-1). On 9:16 the bubble and label are about 30 px, readable. The legibility point is fixed; the thread problem is new and logged as cc2-1.",
+      "by": "fresh critic r1, an agent; checked fixed by fresh critic r2, an agent"
+    },
+    {
+      "id": "cc2-1",
+      "p": "P1",
+      "status": "fixed",
+      "note": "New since the composer now stays big: on 16:9 the thread has no room for the question. The user bubble 'why did hosting go up?' appears at the top of the thread at about 2.5 s and scrolls straight up under the header rule: at 2.8 s (full frame) it is cut in half by the header line, and by 3.3 s it is gone, so the answer chart opens with no question above it. The chart card's bottom is also cut flat by the thread's clip just above the composer (3.55 s and 4.5 s, square bottom corners, shadow cut). 9:16 keeps the bubble and is fine. Give the thread the height it needs (shorter composer after the send, or a taller window) so question and answer are seen together. Checked r3: 16:9 full frames 2.8 s and 4.5 s and strip 3.0 to 4.1 s: the question bubble sits right under the header rule, whole, from about 2.6 s through 5 s, and the chart card below it has round bottom corners and its full shadow, about 200 px clear of the composer. Question and answer are seen together. The cost is a smaller card, logged as cc3-1.",
+      "by": "fresh critic r2, an agent; checked fixed by fresh critic r3, an agent"
+    },
+    {
+      "id": "cc2-2",
+      "p": "P2",
+      "status": "open",
+      "note": "9:16 composition: from 0 to about 5 s the app window sits in the top 72 % of the frame and off centre (about 18 px margin left, 137 px right at 1080 wide; full frames 0.5 s and 3.5 s), leaving a 540 px empty band of canvas at the bottom. Reads as a misplaced layout, not as intent. Centre it and use the height. Still stands r3: 9:16 full frame 0.5 s: window still x 33 to 928 (33 px margin left, 152 right) and y 268 to 1364, with about 556 px of empty canvas below it, up to about 5 s.",
+      "by": "fresh critic r2, an agent"
+    },
+    {
+      "id": "cc2-3",
+      "p": "P2",
+      "status": "open",
+      "note": "9:16 answer card is too small for the payoff: the chart card is about 265 px wide on a 1080 frame (full frames 3.5 s and 4.5 s), with the label, the bubble and a lot of empty white window below it. The film's key image is a thumbnail until the zoom at about 5 s. Still stands r3: 9:16 full frame 4.5 s (zoom already starting): chart card about 280 px wide on 1080, the rest of the window empty white below it; the key image is still a thumbnail until the zoom.",
+      "by": "fresh critic r2, an agent"
+    },
+    {
+      "id": "cc3-1",
+      "p": "P2",
+      "status": "fixed",
+      "note": "16:9: the cc2-1 fix shrank the answer card. Full frame 4.5 s: the chart card is about 280 px wide (x 402 to 684) on a 1920 frame, under 15 % of the width, with the right two thirds of the thread empty between the bubble and the composer. The payoff image now reads as a thumbnail on 16:9 too (same as cc2-3 on 9:16). The room is there: a wider card, or a slightly shorter composer after the send, would let it be about twice the size. Fixed after r3 (builder agent): the clean hook, which is also the dock, is now set at the hook's smallest size (56 px on 16:9, 64 px on 9:16), so the docked composer is 171 px tall on 16:9 instead of 296 and the answer card is 393 px instead of 280 (checked on the render at 3.8 to 4.5 s). Not rechecked by a fourth critic: review.md stops at round 3.",
+      "by": "fresh critic r3, an agent; fixed by the builder agent after r3"
+    },
+    {
+      "id": "cc3-2",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Iris end, 16:9 strip 3.8 to 3.9 s and 9:16 the same: the accent ring grows past the card, so for two or three frames it shows only as four blue arc fragments at the card corners before it vanishes. Seen only on pause; fading the ring as it reaches the card edge would close it cleanly. Fixed after r3 (builder agent): the rim is drawn only while the whole ring is inside the card (test irisRim), so no arcs are left in the corners (checked at 3.77 to 3.97 s on both shapes). Not rechecked by a fourth critic.",
+      "by": "fresh critic r3, an agent; fixed by the builder agent after r3"
+    }
+  ]
+}

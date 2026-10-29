@@ -1,5 +1,7 @@
 # Melody: motif, contour, phrase
 
+**Contents:** 1. Start from a motif, then develop it · 2. Phrase and period · 3. Contour and climax · 4. Steps, leaps and recovery · 5. Range and tessitura · 6. Rhythm and melody together · 7. Non-chord tones: where the feeling is · 8. Phrase endings · Checklist
+
 Notation on this page: scale degrees (`1 2 3 ... 7`, `b3`, `#4`; `5,` = the octave below, `1'` = the octave
 above), durations in beats after a colon (`3:.5`). These are shapes to apply, never tunes to copy.
 `node tools/music.mjs craft <score>` measures every rule below (the **melody** line and `CRAFT melody:` findings).

@@ -1,6 +1,8 @@
 // SCAFFOLD. Turn the skill's engine into a working project: a still, a film, or both.
 //
 //   node <skill>/engine/tools/scaffold.mjs <dir> [--still myPicture] [--film myFilm] [--duration seconds] [--size WxH | --format 9x16] [--fps N] [--bpm N] [--example]
+//   node <skill>/engine/tools/scaffold.mjs <dir> --linked --film myFilm [--world] [...]   a project that USES the engine, no copy;
+//                   --world starts the film as one world under one camera (worldfilm.mjs), the default for launch films
 //
 // The engine ships as parts, not as a project: `engine/src` holds the portable art core and the
 // one page host, `example/src` holds the worked butterfly. A film needs them in ONE tree, because
@@ -17,8 +19,9 @@
 //                   use; the launch KIT (launchKit, kinetic, launchCut, launchTemplate, launchExample)
 //                   always ships, because that is what your own launch film is built on.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PROJECT_MARKER } from "./overlay.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ENGINE = resolve(HERE, "..");
@@ -63,12 +66,60 @@ const ownFilmFiles = () => {
   for (const f of files) if (!reach.has(f)) out.add(f);
   return out;
 };
+// --linked: a project of the person's own, beside their brand files and photos, that USES the installed
+// engine instead of copying it. Only the film, its host page, a tsconfig that sees the engine's modules
+// and a package.json whose scripts call the engine's tools are written. The tools run from the project
+// folder (cwd); overlay.mjs puts the project's src/ in front of the engine's, so "./core" resolves to the
+// engine. An engine update reaches every linked project; nothing is forked (lesson X4 from a brand launch film).
+if (opt.linked) {
+  if (still || opt.example) die("--linked takes --film only (a still or the example need the full copy)");
+  if (!film) die("--linked needs --film <name>");
+  const mod = join(target, "src/canvas-core", `${film}.ts`), host = join(target, "src/hosts", `page-${film}.ts`);
+  if (existsSync(mod) || existsSync(host)) die(`${film} already exists in ${target}; refusing to overwrite`);
+  mkdirSync(join(target, "src/canvas-core"), { recursive: true }); mkdirSync(join(target, "src/hosts"), { recursive: true });
+  const rel = (p) => relative(target, p).split(sep).join("/");
+  if (opt.world) { const { worldFilmSource } = await import("./worldfilm.mjs"); writeFileSync(mod, worldFilmSource(film, { format: opt.format ?? "16x9", fps, ...(opt.bpm ? { bpm } : {}) })); } // the one-world starter (worldfilm.mjs): the default for a motion or launch film
+  else writeFileSync(mod, `// ${film}: a film in a linked project. "./core", "./film" and every kit module come from the engine at
+// ${rel(join(ENGINE, "src"))} (tools/overlay.mjs). Keep this folder for the film's own modules, assets and facts.
+import { rng, type Ctx, type Env } from "./core";
+import type { Film } from "./film";
+
+const FPS = ${fps}, BPM = ${bpm}, DURATION = ${durationFrames};
+const draw = (ctx: Ctx, local: number, env: Env) => {
+  const W = env.W * env.scale, H = env.H * env.scale, r = rng(1), t = local / DURATION;
+  ctx.fillStyle = "#12161c"; ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < 90; i++) { const a = r() * Math.PI * 2, rad = (0.08 + r() * 0.36) * Math.min(W, H); ctx.globalAlpha = 0.25 + r() * 0.6; ctx.fillStyle = "#e8e3d2"; ctx.beginPath(); ctx.arc(W / 2 + Math.cos(a + t * Math.PI * 2) * rad, H / 2 + Math.sin(a + t * Math.PI * 2) * rad, (1 + r() * 2.5) * env.scale, 0, Math.PI * 2); ctx.fill(); }
+  ctx.globalAlpha = 1;
+};
+export const ${film}: Film = {
+  meta: { title: "${film}", W: ${size[0]}, H: ${size[1]}, fps: FPS, bpm: BPM, durationFrames: DURATION },
+  assets: { images: {} },
+  shots: [{ id: "one", start: 0, end: DURATION, draw }],
+};
+`);
+  writeFileSync(host, `import { ${film} } from "../canvas-core/${film}";\nimport { mountFilm } from "./page";\nmountFilm(${film});\n`);
+  const eng = rel(ENGINE);
+  if (!existsSync(join(target, "tsconfig.json"))) writeFileSync(join(target, "tsconfig.json"), JSON.stringify({ compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, noEmit: true, skipLibCheck: true, lib: ["DOM", "ES2022"], rootDirs: ["src", `${eng}/src`], paths: { three: [`${eng}/vendor/three/types/Three.d.ts`, `${eng}/vendor/three/three-untyped.d.ts`] } }, include: ["src"] }, null, 2) + "\n");
+  // npm runs a script through a shell (sh, or cmd.exe on Windows): the tool path is quoted so a folder
+  // with a space stays one word. Single quotes on sh (nothing inside expands), double quotes on cmd.exe.
+  const quote = (p) => (process.platform === "win32" ? `"${p}"` : `'${p.replace(/'/g, `'\\''`)}'`);
+  const tool = (t) => `node ${quote(join(ENGINE, "tools", t))}`;
+  // the marker that makes this folder a linked project: overlay.mjs puts its src/ in front of the engine's
+  // only when this file is here, so another repo that happens to have a src/ never replaces engine files
+  if (!existsSync(join(target, PROJECT_MARKER))) writeFileSync(join(target, PROJECT_MARKER), JSON.stringify({ linked: true, film, engine: ENGINE }, null, 2) + "\n");
+  if (!existsSync(join(target, "package.json"))) writeFileSync(join(target, "package.json"), JSON.stringify({ name: film.toLowerCase(), private: true, type: "module", dependencies: { three: "0.170.0" }, scripts: { still: `${tool("still.mjs")} ${film}`, render: `${tool("render.mjs")} ${film}`, framecheck: `${tool("framecheck.mjs")} ${film}`, ship: `${tool("ship.mjs")} ${film}` } }, null, 2) + "\n");
+  console.log(`linked project ${target}\n  src/canvas-core/${film}.ts, src/hosts/page-${film}.ts, tsconfig.json, package.json, ${PROJECT_MARKER}\n  engine: ${ENGINE}\nnext (from ${target}):\n  ${tool("still.mjs")} ${film} --out out/look.png\n  ${tool("render.mjs")} ${film}\n  ${tool("ship.mjs")} ${film}`);
+  process.exit(0);
+}
 const skip = opt.example ? new Set() : ownFilmFiles();
 
 mkdirSync(target, { recursive: true });
 cpSync(join(ENGINE, "src"), join(target, "src"), { recursive: true, filter: (f) => !skip.has(f) });
 cpSync(join(ENGINE, "tools"), join(target, "tools"), { recursive: true });
 for (const f of ["package.json", "package-lock.json", "tsconfig.json"]) if (existsSync(join(ENGINE, f))) cpSync(join(ENGINE, f), join(target, f));
+// three.js for 3D shots: the vendored, hash-pinned build and its types where the install has them; the
+// plugin install has neither, and npm install brings the same pinned release (package.json, overlay.mjs)
+if (existsSync(join(ENGINE, "vendor"))) cpSync(join(ENGINE, "vendor"), join(target, "vendor"), { recursive: true });
 
 if (opt.example) {
   const ex = join(SKILL, "example", "src");

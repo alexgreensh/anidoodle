@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Lantern, an invented brand for anidoodle's worked example of a custom launch look. Drawn for it; no one else's mark. -->
+  <path fill-rule="evenodd" d="M60 2 A13 13 0 1 1 59.99 2 Z M60 9 A6 6 0 1 0 60.01 9 Z" fill="#f2b544"/>
+  <path d="M40 24 H80 L92 38 H28 Z" fill="#f2b544"/>
+  <path fill-rule="evenodd" d="M32 40 H88 V98 H32 Z M42 48 V90 H78 V48 Z" fill="#f2b544"/>
+  <path d="M60 52 C70 64 73 74 68 82 C65 87 55 87 52 82 C47 74 50 64 60 52 Z" fill="#f2b544"/>
+  <path d="M24 100 H96 Q100 100 100 104 V108 Q100 112 96 112 H24 Q20 112 20 108 V104 Q20 100 24 100 Z" fill="#f2b544"/>
+</svg>

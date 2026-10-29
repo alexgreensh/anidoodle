@@ -1,5 +1,7 @@
 # Compose: from a brief to an original score
 
+**Contents:** The workflow · Recorded instruments · The material format · What makes it beautiful (check before you call it done) · What checks what
+
 A style is a **vocabulary**. It gives you:
 - sound: voices, levels and fx;
 - groove families;

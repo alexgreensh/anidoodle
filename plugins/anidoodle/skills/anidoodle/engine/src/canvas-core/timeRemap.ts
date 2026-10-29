@@ -26,8 +26,14 @@
 //   filmFrameOf(sceneFrame). A slowed world under a score at its own tempo is the effect.
 // Every function here is arithmetic over (frame, keys): no clock, no state, any order.
 
+// WHERE A KEY SITS, IN NAMED UNITS. `f` is a film frame. `film: s` is film time in seconds and `scene:
+// s` is SCENE time in seconds (the key lands on the first film frame that shows that scene moment);
+// both need timeRemap(keys, { fps }). Exactly one of the three, never a bare number: a brand launch
+// logo keys were typed in scene seconds where film seconds were meant, and nothing complained.
 export type TimeKey = {
-  f: number;              // the film frame this speed starts from (whole, increasing)
+  f?: number;             // the film frame this speed starts from (whole, increasing)
+  film?: number;          // or: film time in seconds (needs fps)
+  scene?: number;         // or: scene time in seconds, resolved through the keys before this one (needs fps)
   speed: number;          // scene frames per film frame from here on: 1 real time, 0.25 slow motion, 0 a freeze, 2 fast (0 or at least MIN_SPEED)
   ramp?: number;          // frames over which the speed glides from the old value to this one (default 0, a hard change)
   curve?: "smooth" | "linear"; // the glide's shape: smoothstep (default; no kick at either end) or a straight line
@@ -56,7 +62,8 @@ export const MIN_SPEED = 0.01;
 
 type Seg = { f: number; from: number; to: number; ramp: number; curve: (typeof CURVES)["smooth"]; t0: number };
 
-export const timeRemap = (keys: readonly TimeKey[]): TimeRemap => {
+export const timeRemap = (input: readonly TimeKey[], opts: { fps?: number } = {}): TimeRemap => {
+  const keys = resolveKeys(input, opts.fps);
   let last = -1, prevSpeed = 1;
   const segs: Seg[] = [], freezes: Freeze[] = [];
   // the frames first, all of them, so a later check never reports a symptom of keys out of order
@@ -109,4 +116,25 @@ const sceneAt = (s: Seg, f: number): number => {
   const x = f - s.f;
   if (s.ramp > 0 && x < s.ramp) return s.t0 + s.ramp * (s.from * (x / s.ramp) + (s.to - s.from) * s.curve.area(x / s.ramp));
   return s.t0 + s.ramp * (s.from + (s.to - s.from) * s.curve.area(1)) + s.to * (x - s.ramp);
+};
+
+// Every key's place in film frames, from whichever unit it names. A scene-time key is found on the
+// remap built from the keys before it, so "the logo starts at scene 30 s" means what it says even
+// after a slowdown earlier in the film.
+type Resolved = TimeKey & { f: number };
+const resolveKeys = (keys: readonly TimeKey[], fps?: number): Resolved[] => {
+  const out: Resolved[] = [];
+  for (const [i, k] of keys.entries()) {
+    if (typeof k !== "object" || k === null) throw new Error(`timeRemap: key ${i} is ${JSON.stringify(k)}; a key is an object that names its unit: { f: frame }, { film: seconds } or { scene: seconds }, plus speed`);
+    const named = (["f", "film", "scene"] as const).filter((u) => k[u] !== undefined);
+    if (named.length !== 1) throw new Error(`timeRemap: key ${i} ${named.length ? `names ${named.join(" and ")}` : "names no time"}; give exactly one of f (film frame), film (film seconds) or scene (scene seconds)`);
+    const u = named[0], v = k[u]!;
+    if (!Number.isFinite(v)) throw new Error(`timeRemap: key ${i} has ${u} = ${v}; it must be a number`);
+    if (u === "f") { out.push({ ...k, f: v }); continue; }
+    if (!(fps && fps > 0)) throw new Error(`timeRemap: key ${i} is in ${u} seconds; pass timeRemap(keys, { fps }) so seconds can become frames`);
+    if (u === "film") { out.push({ ...k, f: Math.round(v * fps) }); continue; }
+    const before = timeRemap(out.map(({ f, speed, ramp, curve, keepsMoving }) => ({ f, speed, ramp, curve, keepsMoving })));
+    out.push({ ...k, f: before.filmFrameOf(v * fps) });
+  }
+  return out;
 };

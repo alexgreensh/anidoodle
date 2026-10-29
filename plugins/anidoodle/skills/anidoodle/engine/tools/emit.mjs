@@ -22,6 +22,7 @@ import { pathToFileURL } from "node:url";
 import { buildPage } from "./build-page.mjs";
 import { requireFilm } from "./names.mjs";
 import { pageChecks, probe } from "./adapters/html-player.mjs";
+import { glArgs } from "./adapters/playwright.mjs";
 
 const VAL = new Set(["out", "frames", "scale"]);
 const pos = [], opt = {};
@@ -55,7 +56,7 @@ pageChecks(html, ship.assets).forEach((c) => say(c.ok, c.label, c.detail));
 say(statSync(out).size === ship.bytes, "the file on disk is the file that was built", `${statSync(out).size} bytes`);
 
 // ---------------------------------------------------------------- 2 & 3. run it
-const browser = await p.env.pw.lib.chromium.launch({ executablePath: p.env.browser.executablePath, args: ["--disable-background-timer-throttling"] });
+const browser = await p.env.pw.lib.chromium.launch({ executablePath: p.env.browser.executablePath, args: ["--disable-background-timer-throttling", ...glArgs(out)] });
 const context = await browser.newContext({ viewport: { width: 640, height: 640 }, deviceScaleFactor: 1 });
 const openPage = async (file) => {
   const page = await context.newPage(), errors = [], reached = [];

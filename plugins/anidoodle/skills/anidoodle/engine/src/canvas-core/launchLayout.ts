@@ -44,6 +44,8 @@ const ZONE_GAP = 8;
 
 // phone-safe minimums, px at the delivered size: `read` = a line the viewer must read (a prompt, a
 // label, the words, the install lines); `chrome` = the UI around them (a header, a button's word)
+// the footer is where the film says the product lives: it is on screen in the last second, so it meets
+// framecheck's last-second floor (28 px at 1080, tools/framerules.mjs RULES.endPx), not the chrome floor
 export const MIN_PX = { phone: { read: 32, chrome: 24, type: 64 }, desk: { read: 18, chrome: 16, type: 80 } };
 
 // A build-time estimate of a sans line's width, deliberately a little wide: layout decisions (how
@@ -104,7 +106,7 @@ export type LaunchLayout = {
   safe: Rect; zones: boolean;
   roles: Role[];
 };
-export type LayoutContent = { prompts: string[]; install: string[]; tagline: string; title?: string; band?: boolean };
+export type LayoutContent = { prompts: string[]; install: string[]; tagline: string; title?: string; band?: boolean; wrap?: (text: string, px: number, maxW: number) => string[] }; // wrap: the look's text face (default the stock estimate)
 
 // the desktop composition: the exact numbers of the 1920x1080 film
 const desk = (c: LayoutContent): LaunchLayout => {
@@ -113,9 +115,10 @@ const desk = (c: LayoutContent): LaunchLayout => {
     shape: "16x9", W, H, k: 1, phone: false, chat: g,
     thread: { top: 170, viewBottom: VIEW_BOTTOM, clip: [300, 158, 1320, VIEW_BOTTOM - 158], bubbleH: 58, bubbleLineH: 34, bubblePad: 26, bubbleR: 1560, bubbleMaxW: 1080, bubbleRad: 22, gap: 26, card: 460, cardX: g.REPLY.x, cardDy: 34, bubbles: c.prompts.map((p) => [p]) },
     cam: { home: { c: [960, 540], z: 1 }, macroZ: 2.4, macroCreep: 0.25, macroX0: 330, macroY: 934, follow: true, leanZ: 1.18, pointerOff: [1780, 1140], pointerS: 1.35, pointerOn: [g.GEN.x + g.GEN.w / 2 + 18, g.GEN.y + g.GEN.h / 2 + 6] },
-    bug: { x: W - 40, y: H - 34, px: 24 },
+    // the corner mark sits in the gutter right of the window, clear of its corner (24 px at the old 24 px size touched it)
+    bug: { x: W - 36, y: H - 30, px: 22 },
     type: { maxW: 1560, cap1: 190, capN: 130, minPx: MIN_PX.desk.type, cover: 1110 },
-    end: { cx: W / 2, titleY: 400, titleMax: 150, titleW: 1300, tagline: [c.tagline], taglineY: 520, taglinePx: 30, taglineLH: 40, panelY: py, monoPx: 30, rows: c.install.map((text) => ({ text, indent: 0 })), wrapped: false, rowH: 60, padX: 60, lineY0: py + 55, footerPx: 24, footerY: py + ph + 60, caret: [16, 34] },
+    end: { cx: W / 2, titleY: 400, titleMax: 150, titleW: 1300, tagline: [c.tagline], taglineY: 520, taglinePx: 30, taglineLH: 40, panelY: py, monoPx: 30, rows: c.install.map((text) => ({ text, indent: 0 })), wrapped: false, rowH: 60, padX: 60, lineY0: py + 55, footerPx: 28, footerY: py + ph + 60, caret: [16, 34] },
     // a two-column grid on the frame's centre line: words 40 %, a 100 px gutter, the live UI 46 %, equal margins
     split: { words: { x: 150, y: 150, w: 720, h: 780 }, ui: { x: 970, y: 120, w: 800, h: 840 }, vertical: false, wordsPx: 96 },
     stage: { x: 0, y: 0, w: W, h: H }, band: null,
@@ -135,27 +138,31 @@ const phone = (shape: Exclude<Shape, "16x9">, c: LayoutContent, H0: number, S: R
   const E = zones ? { x0: 0, y0: S.y - (m - ZONE_GAP), x1: S.x + S.w + (m - ZONE_GAP), y1: Math.min(S.y + S.h, H) } : { x0: 0, y0: 0, x1: W, y1: H };
   const Ew = E.x1 - E.x0, Eh = E.y1 - E.y0;
   const px = { head: Math.max(22 * k, min.chrome), sub: Math.max(18 * k, min.chrome), bubble: Math.max(26 * k, min.read), label: Math.max(20 * k, min.read), gen: Math.max(24 * k, min.chrome) };
-  // the window stops above the corner mark's own strip: the mark never sits on the UI
-  const bugPx = Math.max(24 * k, min.chrome), bugStrip = Math.round(bugPx + 34);
+  // the window stops above the corner mark's own strip: the mark never sits on the UI, and its letters stay
+  // clear of the window's corner while the hook's camera creeps 2 % about the window's centre
+  const bugPx = Math.max(24 * k, min.chrome), bugStrip = Math.round(bugPx + 56), bugY = zones ? E.y1 - 0.3 * bugPx - 2 : E.y1 - 20;
   const promptPx = Math.max(34 * k, min.read), chatR = { x: E.x0 + m, y: E.y0 + m, w: Ew - 2 * m, h: Eh - m - bugStrip, r: 34 * k };
   // the composer holds the longest prompt; the button sits on its last line
   const base = chatGeom(chatR, k, px, promptPx, 1), textW = base.GEN.x - 20 * k - base.TEXT.x;
-  const lines = Math.min(3, Math.max(1, ...c.prompts.map((p) => wrapEst(p, promptPx, textW).length)));
+  const lines = Math.min(3, Math.max(1, ...c.prompts.map((p) => (c.wrap ?? wrapEst)(p, promptPx, textW).length)));
   const g = chatGeom(chatR, k, px, promptPx, lines);
   const top = g.CHAT.y + 114 * k, viewBottom = g.INPUT.y - 26 * k, bubbleMaxW = g.INPUT.w * 0.86, bubbleLineH = Math.round(px.bubble * 1.3);
-  const bubbles = c.prompts.map((p) => wrapEst(p, px.bubble, bubbleMaxW - 52 * k));
+  const bubbles = c.prompts.map((p) => (c.wrap ?? wrapEst)(p, px.bubble, bubbleMaxW - 52 * k));
   // the answer card: as wide as the thread allows, and short enough that a card and the prompt above it both fit the view
   const card = Math.round(Math.min(g.INPUT.w, viewBottom - top - 58 * k - 2 * bubbleLineH - 60 * k));
   const cardX = g.CHAT.x + (g.CHAT.w - card) / 2;
-  // the end card, stacked and centred in E
-  const inst = installRows(c.install, Ew - 2 * 32 - 2 * 36, min.read, 30 * k), mono = inst.px;
-  const taglinePx = Math.max(30 * k, min.read), tagline = wrapEst(c.tagline, taglinePx, Ew - 2 * m - 60), tLH = Math.round(taglinePx * 1.3);
+  // the end card, stacked and centred. On 9x16 it centres on the frame itself, the column a viewer sees
+  // (centred on the safe rectangle it sat 60 px left of the middle, and read off-centre outside a feed), and
+  // stays as narrow as the room between the middle and the right-hand zone allows
+  const endCol = zones ? { cx: W / 2, w: 2 * (S.x + S.w + (m - ZONE_GAP) - W / 2) } : { cx: E.x0 + Ew / 2, w: Ew };
+  const inst = installRows(c.install, endCol.w - 2 * 32 - 2 * 36, min.read, 30 * k), mono = inst.px;
+  const taglinePx = Math.max(30 * k, min.read), tagline = (c.wrap ?? wrapEst)(c.tagline, taglinePx, endCol.w - 2 * m - 60), tLH = Math.round(taglinePx * 1.3);
   const titleMax = 150 * k, rowH = Math.round(mono * 2), ph = rowH * inst.rows.length + 50 * k;
   const block = titleMax + 60 + tagline.length * tLH + 60 + ph + 80, y0 = E.y0 + (Eh - block) / 2 - 20;
   const titleY = y0 + titleMax * 0.62, taglineY = y0 + titleMax + 60 + tLH / 2, panelY = taglineY + (tagline.length - 0.5) * tLH + 50;
   // the split beat, stacked: the words on top, the live UI under them. On 9x16 both sit in the window's
   // rectangle, and the UI is inset so its push (12 % at most) never carries its text past that rectangle.
-  const PUSH = 1.12, R = { x: chatR.x, y: chatR.y, w: chatR.w, h: chatR.h };
+  const PUSH = 1.12, R = { x: chatR.x, y: chatR.y, w: chatR.w, h: chatR.h + 22 }; // (+22: a product's panel keeps the room the corner mark's wider strip took from the chat window; it never creeps as the hook does)
   const wordsH = Math.round(R.h * 0.32), uiTop = R.y + wordsH + 30, uiW = Math.floor(R.w / PUSH), uiH = Math.floor((R.y + R.h - uiTop) / PUSH);
   const split = zones
     ? { words: { x: R.x + 20, y: R.y + 10, w: R.w - 40, h: wordsH }, ui: { x: Math.round(R.x + (R.w - uiW) / 2), y: Math.round(uiTop + (R.y + R.h - uiTop - uiH) / 2), w: uiW, h: uiH }, vertical: true, wordsPx: 96 }
@@ -171,9 +178,9 @@ const phone = (shape: Exclude<Shape, "16x9">, c: LayoutContent, H0: number, S: R
     thread: { top, viewBottom, clip: [g.CHAT.x, g.CHAT.y + 102 * k, g.CHAT.w, viewBottom - (g.CHAT.y + 102 * k)], bubbleH: 58 * k + (px.bubble - 26 * k) * 1.2, bubbleLineH, bubblePad: 26 * k, bubbleR: g.INPUT.x + g.INPUT.w, bubbleMaxW, bubbleRad: 22 * k, gap: 26 * k, card, cardX, cardDy: 34 * k + (px.label - 20 * k), bubbles },
     // on 9x16 the lean on a new card goes further: the card is smaller there, and the rest of the window fades as it leaves the safe area
     cam: { home: { c: [W / 2, H / 2], z: 1 }, macroZ, macroCreep: macroZ * 0.08, macroX0: W / 2 / macroZ - 60 * k, macroY: g.INPUT.y + g.INPUT.h / 2, follow: true, leanZ: zones ? 1.5 : 1.1, pointerOff: [W - 110, H + 70], pointerS: 1.35 * k, pointerOn: [g.GEN.x + g.GEN.w / 2 + 18 * k, g.GEN.y + g.GEN.h / 2 + 6 * k] },
-    bug: { x: E.x1 - m - 10, y: E.y1 - bugStrip / 2 + bugPx * 0.1, px: bugPx },
+    bug: { x: chatR.x + chatR.w - 20, y: bugY, px: bugPx }, // under the window's right edge, 20 px in: aligned to the content, with room before the right-hand zone
     type: { maxW: Ew - 2 * 90, cap1: 190, capN: 150, minPx: min.type, cover: zones ? Math.ceil(Math.max(...[[0, 0], [W, 0], [0, H], [W, H]].map(([x, y]) => Math.hypot(x - typeAt[0], y - typeAt[1])))) + 9 : Math.ceil(Math.hypot(W, H) / 2) + 9, ...(zones ? { at: typeAt } : {}) }, // cover: the bloom's reach to the farthest corner from where it opens
-    end: { cx: E.x0 + Ew / 2, titleY, titleMax, titleW: Ew - 2 * m - 80, tagline, taglineY, taglinePx, taglineLH: tLH, panelY, monoPx: mono, rows: inst.rows, wrapped: inst.wrapped, rowH, padX: 36, lineY0: panelY + 25 * k + rowH / 2, footerPx: Math.max(24 * k, min.read), footerY: panelY + ph + 60, caret: [Math.round(mono * 0.53), Math.round(mono * 1.13)] },
+    end: { cx: endCol.cx, titleY, titleMax, titleW: endCol.w - 2 * m - 80, tagline, taglineY, taglinePx, taglineLH: tLH, panelY, monoPx: mono, rows: inst.rows, wrapped: inst.wrapped, rowH, padX: 36, lineY0: panelY + 25 * k + rowH / 2, footerPx: Math.max(28 * k, min.read), footerY: panelY + ph + 60, caret: [Math.round(mono * 0.53), Math.round(mono * 1.13)] },
     split, stage: { x: 0, y: 0, w: W, h: H }, band: null, uiFull, safe: S, zones,
     roles: [],
   };

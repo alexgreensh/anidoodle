@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "about": "The ledger of launchExampleBrand, a demo launch film for an invented product ('Lantern', no real company) in a custom look: anidoodle's worked example of the look layer. Its words describe the mock product shown on screen, written for the template, labelled generated. The source map and the library rows are made-up sample data in mock screens, not claims.",
+  "claims": [
+    { "claim": "READ LESS.", "where": "on-screen", "generated": true, "note": "demo slogan for an invented product, states no fact" },
+    { "claim": "KNOW MORE.", "where": "on-screen", "generated": true, "note": "demo slogan for an invented product, states no fact" },
+    { "claim": "Then it cites", "where": "on-screen", "generated": true, "note": "describes the mock library screen beside it; the product is invented" },
+    { "claim": "every page.", "where": "on-screen", "generated": true, "note": "second line of 'Then it cites every page.', describes the mock library screen beside it; the product is invented" },
+    { "claim": "A reading desk that keeps your sources straight", "where": "on-screen", "generated": true, "note": "demo tagline for an invented product, states no fact" }
+  ]
+}

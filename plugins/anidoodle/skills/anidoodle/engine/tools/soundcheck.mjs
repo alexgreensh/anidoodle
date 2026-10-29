@@ -2,7 +2,10 @@
 // it without any model, checks each value against a range, and lists the changes to make, most
 // important first, each tied to a moment in the film.
 //   node tools/soundcheck.mjs <film|file.mp4|file.wav> [--profile references/music/sound-profile.json]
-//        [--allow 3.1:3.6,...] [--no-video] [--json] [--out f.json]
+//        [--allow 3.1:3.6,...] [--no-video] [--json] [--out f.json] [--sfx stem.wav]
+//   --sfx: the effects stem of a film whose music is an external track (track.mjs mix --stem). Every
+//   effect in it must be a transient, never a note: a cue with pitch salience over 0.5 FAILS, because a
+//   note the engine did not choose clashes with the track's key (a brand launch "disharmonious" note).
 //   node tools/soundcheck.mjs profile <files...> -o references/music/sound-profile.json [--name "drawing film"]
 // Decodes what a player would (ffmpeg, stereo float at 48 kHz). The metrics are pure functions in
 // src/canvas-core/music/soundcheck.ts (unit-tested on synthetic signals); visual sync reuses
@@ -43,7 +46,19 @@ export const loadProfile = (C, path) => {
 };
 
 /** Everything for one file: measures, curves, visual sync (when there is a picture and `video`), rows and the fix list. */
-export const check = async (C, file, { profile, allow = [], video = "auto" } = {}) => {
+let trackP = null;
+const loadPitch = () => (trackP ??= build({ entryPoints: [join(here, "../src/canvas-core/music/track.ts")], bundle: true, write: false, format: "esm", platform: "neutral", target: "es2022", logLevel: "error" }).then((r) => import("data:text/javascript;base64," + Buffer.from(r.outputFiles[0].text).toString("base64"))));
+/** One row per effect in an effects stem: its onset, and how much of a note it carries. */
+export const pitchedCues = async (stemFile) => { const T = await loadPitch(), [L, R] = decode(stemFile); return T.stemCues(L, R, SR); };
+export const pitchRows = (cues, threshold = 0.5) => {
+  const bad = cues.filter((c) => c.salience > threshold), worst = [...cues].sort((a, b) => b.salience - a.salience)[0];
+  const at = (s) => `${Math.floor(s / 60)}:${(s % 60).toFixed(2).padStart(5, "0")}`;
+  if (!cues.length) return [{ key: "sfxPitch", label: "effects pitch (external track)", value: null, text: "no effects found", status: "FAIL", fix: "the --sfx stem is silent: pass the stem track.mjs mix --stem wrote" }];
+  return [{ key: "sfxPitch", label: "effects pitch (external track)", value: worst.salience, text: `${bad.length} of ${cues.length} carry a note`, status: bad.length ? "FAIL" : "PASS", range: { max: threshold }, at: bad[0]?.atS,
+    fix: bad.length ? `effects carry notes under a track the engine did not write (${bad.slice(0, 4).map((c) => `${at(c.atS)} ${c.hz} Hz, salience ${c.salience}`).join("; ")}): use the tap kind (sfx.mjs list) or cut strikes under 25 ms (track.mjs kit --from-pack)` : undefined }];
+};
+
+export const check = async (C, file, { profile, allow = [], video = "auto", sfx = null } = {}) => {
   const p = probe(file);
   if (!p.audio) throw new Error(`${basename(file)} has no audio stream`);
   const [L, R] = decode(file), prof = profile ?? C.DEFAULT_PROFILE;
@@ -55,6 +70,7 @@ export const check = async (C, file, { profile, allow = [], video = "auto" } = {
     sync = { ...C.visualSync(events, curves.onsets, measures.durationS), times: events, fps: p.video.fps };
   }
   const rows = C.evaluate(measures, prof);
+  if (sfx) rows.push(...pitchRows(await pitchedCues(sfx)));
   return { file, profile: prof.name, measures, curves, sync, rows, fixes: C.startHere(rows), video: p.video, L, R };
 };
 
@@ -87,7 +103,7 @@ export const asJson = (r) => ({ file: r.file, profile: r.profile, verdict: r.row
 
 if (isMain(import.meta.url)) {
   const argv = process.argv.slice(2), flag = (k) => argv.includes(`--${k}`), opt = (...ks) => { for (const k of ks) { const i = argv.indexOf(k); if (i >= 0) return argv[i + 1]; } return undefined; };
-  const VAL = new Set(["--profile", "--out", "--allow", "-o", "--name"]), pos = argv.filter((a, i) => !a.startsWith("-") && !VAL.has(argv[i - 1]));
+  const VAL = new Set(["--profile", "--out", "--allow", "-o", "--name", "--sfx"]), pos = argv.filter((a, i) => !a.startsWith("-") && !VAL.has(argv[i - 1]));
   const die = (msg, code = 2) => { console.error(msg); process.exit(code); };
   if (!pos.length) die("usage: node tools/soundcheck.mjs <film|file.mp4|file.wav> [--profile p.json] [--allow a:b] [--no-video] [--json] [--out f.json]\n       node tools/soundcheck.mjs profile <files...> -o references/music/sound-profile.json [--name \"drawing film\"]");
   const C = await loadCheck();
@@ -101,7 +117,7 @@ if (isMain(import.meta.url)) {
       console.log(`profile of ${sets.length} film(s) -> ${out}`); for (const [k, v] of Object.entries(p.metrics)) console.log(`  ${pad(k, 12)} ${v.min} .. ${v.max}   median ${v.median}`);
       process.exit(0);
     }
-    const file = resolveInput(pos[0]), r = await check(C, file, { profile: loadProfile(C, opt("--profile")), allow: parseAllow(opt("--allow")), video: flag("no-video") ? false : "auto" });
+    const file = resolveInput(pos[0]), r = await check(C, file, { profile: loadProfile(C, opt("--profile")), allow: parseAllow(opt("--allow")), video: flag("no-video") ? false : "auto", sfx: opt("--sfx") ? resolveInput(opt("--sfx")) : null });
     const j = asJson(r);
     if (opt("--out")) { mkdirSync(dirname(resolve(opt("--out"))), { recursive: true }); writeFileSync(resolve(opt("--out")), JSON.stringify(j, null, 1) + "\n"); }
     console.log(flag("json") ? JSON.stringify(j, null, 1) : report(C, r));

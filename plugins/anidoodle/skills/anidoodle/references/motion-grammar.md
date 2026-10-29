@@ -1,5 +1,7 @@
 # Motion grammar: six ways to get from one picture to the next
 
+**Contents:** 1. Foreground as transition · 2. Persistent actor · 3. Selection to expansion · 4. Registered decomposition · 5. Continuous canvas · 6. Exploded layers · Three ready-made seams · Cuts that carry motion · Dealing a hand · Names people use · Names we refuse · Callouts and the label handoff · Choosing
+
 A film that shows one good thing, then another unrelated good thing, reads as a slideshow however
 well each is animated. These six mechanisms are ways to make the next picture come OUT of the
 current one. They are a grammar to compose from, never presets: pick the one the story is already
@@ -144,6 +146,10 @@ roughest. The difference is arithmetic, and `engine/src/canvas-core/seams.ts` do
   camera look; the entry distance is worked out from the exit speed, so the two always agree.
   The incoming shot owns the cut frame: the outgoing shot's last frame on screen is the one
   before it, and that is its fastest.
+  **This short, fast exit is for camera and world moves only.** Type and photos of people leave in
+  0.5 to 0.7 s, eased in (they accelerate away from rest), and are never motion-blurred: a launch
+  film that whipped every speaker card out in 0.4 s with blur on type and faces was called violent,
+  twice. A fast exit used as the seam for many cuts is a preset, however well each is timed.
 - **Through the cut, in depth.** `matchedZoom({ push, exitF, entryF })` does the same for a
   camera that flies into one shot and out in the next: a dolly push through the cut. A push is a
   ratio, so both sides run in log space and grow at the same rate per frame across the cut. With the default push the
@@ -152,7 +158,8 @@ roughest. The difference is arithmetic, and `engine/src/canvas-core/seams.ts` do
 - **There is a top speed.** Past about two and a half frame widths a second
   (`speedCeiling(W, fps)`), blur stops reading as motion and shows as a streak with stepped
   copies. A move that needs more than that wants a shorter travel with the rest hidden behind
-  the cut, or a plain cut on the beat. Render fast seams with `--blur auto`.
+  the cut, or a plain cut on the beat. Render fast seams with `--blur auto`, which leaves text
+  and photo layers sharp.
 - **Match everything, once.** Whatever crosses the cut keeps its position, size, colour and
   edge; a property that flips on the cut frame pops. And the resting pose is shown once: if one
   shot settles onto a pose and the next opens on it, the first shot's last frame is the move's

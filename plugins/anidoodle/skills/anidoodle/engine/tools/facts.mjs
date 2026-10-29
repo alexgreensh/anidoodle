@@ -20,7 +20,9 @@
 //   - a sourced entry has the exact sentence and a URL (http/https) or a file;
 //   - a generated entry says what it is, and states no number (a number needs a source);
 //   - every number in a sourced claim appears in its source sentence;
-//   - a TODO is not a claim yet.
+//   - a TODO is not a claim yet;
+//   - a fact is said once: the same line twice, or the same number in two entries, needs `reuse: "<reason>"`;
+//   - a site source ({ kind: "site", url, fetched: "YYYY-MM-DD" }) carries the day it was read.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { isMain } from "./is-main.mjs";

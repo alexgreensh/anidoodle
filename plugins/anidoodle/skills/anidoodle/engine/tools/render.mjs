@@ -9,6 +9,9 @@
 //           matching two sharp renders at the shutter's ends: subframes at most --blur-px apart
 //           (default 3 px), 1 on a still frame (the sharp frame, untouched), at most --blur-max (32).
 //           Deterministic: the count is a function of the frame's pixels.
+//           Type, photos and anything drawn inside sharp() are NEVER blurred (hosts/instrument.ts): they
+//           are left out of the subframes and laid over the result sharp. Blurred type and faces read
+//           as violent motion (a brand launch film, critic round 2). --blur-all blurs everything, as before.
 // --shutter DEG  the shutter angle: 180 (default, film's standard: half the frame interval) to 360
 //           (the whole interval, the old --blur behaviour). 180-240 reads as natural motion.
 // --from/--to  render only frames [from, to): for checking a passage, not for shipping. A range
@@ -28,6 +31,8 @@
 //          whatever sits behind the page shows through
 //   .apng  animated PNG, alpha kept, loops forever, plays in every browser
 // --width only applies to the silent formats; the MP4 is always the film's own size.
+// Every render also writes <out>.film.json beside the file: the film id, frame range, blur, sha256 and
+//           the film's meta, so the checks on a delivered file never infer the film from its name.
 // --shapes 16x9,1x1,4x5,9x16  a launch template film in several frame shapes from ONE timeline: each
 //           shape is re-composed by its layout (launchLayout.ts), never cropped, and rendered as the
 //           film <film>-<shape> to out/<film>-<shape>.mp4, one after another, with the other flags.
@@ -35,8 +40,9 @@ import { spawn, spawnSync, execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { cpus } from "node:os";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { buildPage } from "./build-page.mjs";
+import { enginePath } from "./overlay.mjs";
 import { detect } from "./detect.mjs";
 import * as playwright from "./adapters/playwright.mjs";
 import { defaultOutput, requireFilm } from "./names.mjs";
@@ -58,7 +64,8 @@ const BLUR = arg("blur", "1") === "auto" ? "auto" : Number(arg("blur", 1)), SHUT
 if (BLUR !== "auto" && (!Number.isInteger(BLUR) || BLUR < 1)) { console.error(`--blur wants a whole number of subframes >= 1 or 'auto', got '${arg("blur")}'`); process.exit(2); }
 if (!(SHUTTER > 0 && SHUTTER <= 360)) { console.error(`--shutter wants an angle in (0, 360] degrees, got '${arg("shutter")}'`); process.exit(2); }
 if (!Number.isInteger(BMAX) || BMAX < 2 || !(BPX > 0)) { console.error(`--blur-max wants a whole number >= 2 and --blur-px a number > 0`); process.exit(2); }
-const BLURRED = BLUR === "auto" || BLUR > 1, BSPEC = BLUR === "auto" ? { samples: 0, shutter: SHUTTER, max: BMAX, px: BPX } : { samples: BLUR, shutter: SHUTTER };
+const SHARP = !process.argv.includes("--blur-all"); // type and photos stay sharp under the blur unless asked otherwise
+const BLURRED = BLUR === "auto" || BLUR > 1, BSPEC = BLUR === "auto" ? { samples: 0, shutter: SHUTTER, max: BMAX, px: BPX, sharp: SHARP } : { samples: BLUR, shutter: SHUTTER, sharp: SHARP };
 const scale = Number(arg("scale", 1)), fmt = (arg("out", "").match(/\.(gif|webm|apng)$/i)?.[1] ?? "mp4").toLowerCase(), workers = Number(arg("workers", Math.max(1, Math.min(4, Math.floor(cpus().length / 2)))));
 const HASHES = arg("hashes", null) ? new Map() : null;
 const RANGE_ASKED = process.argv.includes("--from") || process.argv.includes("--to");
@@ -92,7 +99,7 @@ const drawAt = (n, w) => (posterAt(n) ? session.poster(n, POSTER, FADE, BLURRED 
 // a film whose cuts sit on its beat grid (meta.score.grid) must hear its score at that grid's tempo
 if (meta.score?.grid && Math.abs(meta.score.tempo / meta.bpm - 1) > 0.005) { console.error(`render: the score plays at ${meta.score.tempo.toFixed(2)} bpm but this film's cuts sit on a ${meta.bpm} bpm grid (${((meta.score.tempo / meta.bpm - 1) * 100).toFixed(1)} %, limit 0.5 %): the cuts would drift off the downbeats. Play the score at the film's bpm and make the film whole bars of it (launchTemplate does), or compose a 1-bar stretch section`); process.exit(2); }
 console.log(`film: "${meta.title}" ${meta.W}x${meta.H} @ ${meta.fps} fps, ${N} frames, ${meta.bpm} bpm, scale ${scale}, ${session.workers} page(s)`);
-if (BLURRED) console.log(`motion blur: ${BLUR === "auto" ? `adaptive (subframes <= ${BPX} px apart, max ${BMAX})` : `${BLUR} subframes per frame`}, ${SHUTTER}-degree shutter, linear light`);
+if (BLURRED) console.log(`motion blur: ${BLUR === "auto" ? `adaptive (subframes <= ${BPX} px apart, max ${BMAX})` : `${BLUR} subframes per frame`}, ${SHUTTER}-degree shutter, linear light, ${SHARP ? "type and photos kept sharp" : "EVERYTHING blurred (--blur-all), type and photos too"}`);
 if (ranged) console.log(`range render: frames [${FROM}, ${TO}) of ${N}, silent by design`);
 
 // audio: the page returns its embedded recorded track or its code-built mix -> WAV here
@@ -100,7 +107,8 @@ if (ranged) console.log(`range render: frames [${FROM}, ${TO}) of ${N}, silent b
 mkdirSync(resolve(".tmp"), { recursive: true }); const wav = resolve(`.tmp/${film}.wav`), a = ranged ? null : await session.audio(48000);
 if (a) writeFileSync(wav, float32Wav(a));
 if (a) { // the audio report: loudness and true peak, and the score's fit against the picture's grid
-  const { build } = await import("esbuild"), js = (await build({ entryPoints: [resolve("src/canvas-core/music/meter.ts")], bundle: true, write: false, format: "esm", platform: "neutral", logLevel: "error" })).outputFiles[0].text;
+  // the meter is an engine file: a linked project (scaffold --linked) runs from its own folder and has no copy
+  const { build } = await import("esbuild"), js = (await build({ entryPoints: [enginePath("src/canvas-core/music/meter.ts")], bundle: true, write: false, format: "esm", platform: "neutral", logLevel: "error" })).outputFiles[0].text;
   const { loudness, truePeak } = await import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
   const pcm = new Float32Array(Uint8Array.from(Buffer.from(a.float32, "base64")).buffer), L = new Float32Array(a.frames), R = new Float32Array(a.frames);
   for (let i = 0; i < a.frames; i++) { L[i] = pcm[2 * i]; R[i] = pcm[2 * i + 1]; }
@@ -129,7 +137,7 @@ const done = new Promise((res, rej) => ff.on("close", (c) => (c ? rej(new Error(
 const cost = [], pending = new Map(); let next, write;
 const pump = async () => { while (pending.has(write)) { const b = pending.get(write); pending.delete(write); if (!ff.stdin.write(b)) await new Promise((r) => ff.stdin.once("drain", r)); write++; } };
 next = FROM; write = FROM;
-await Promise.all(Array.from({ length: session.workers }, async (_, w) => { while (next < TO) { const n = next++; while (n - write > session.workers * 3) await new Promise((r) => setTimeout(r, 5)); const f = await drawAt(n, w); if (HASHES) HASHES.set(n, createHash("md5").update(f.png).digest("hex")); cost.push({ n, shot: f.shot, draw: f.drawMs, enc: f.encodeMs, rt: f.roundTripMs, samples: f.samples ?? 1 }); pending.set(n, f.png); await pump(); } }));
+await Promise.all(Array.from({ length: session.workers }, async (_, w) => { while (next < TO) { const n = next++; while (n - write > session.workers * 3) await new Promise((r) => setTimeout(r, 5)); const f = await drawAt(n, w); if (HASHES) HASHES.set(n, createHash("md5").update(f.png).digest("hex")); cost.push({ n, shot: f.shot, draw: f.drawMs, enc: f.encodeMs, rt: f.roundTripMs, samples: f.samples ?? 1, sharp: f.sharpPx ?? 0, typeInLayers: f.typeInLayers ?? 0 }); pending.set(n, f.png); await pump(); } }));
 await pump(); ff.stdin.end(); await done;
 const wall = (Date.now() - t0) / 1000;
 if (HASHES) { const hf = resolve(arg("hashes")); mkdirSync(join(hf, ".."), { recursive: true }); writeFileSync(hf, [...HASHES].sort((a, b) => a[0] - b[0]).map(([n, h]) => `${n} ${h}`).join("\n") + "\n"); console.log(`frame hashes -> ${hf}`); }
@@ -151,6 +159,22 @@ for (const n of probe) fwd.push(await hashOf(n, 0)); for (const n of [...probe].
 const same = probe.filter((_, i) => fwd[i] === rev[i]).length;
 console.log(`\ndeterminism: ${same}/${probe.length} probe frames${BLURRED ? ` (blurred, ${BLUR === "auto" ? "adaptive" : `${BLUR} subframes`}, ${SHUTTER} degrees)` : ""} hash-identical (forward on page 0 vs reversed on page ${session.workers - 1})${same === probe.length ? "" : "  -> fall back to PSNR > 45 dB in the Phase 2 gate"}`);
 await session.close();
+// THE SIDECAR. <out>.film.json says which film and which frames this file is, so the checks that read a
+// delivered file (verify-export, motionscan, soundcheck) never have to guess the film from its name: the
+// A brand film's deliverables were called brandLaunch-v12.mp4 while the film was brandHook, and verify-export
+// could not find them. The sha256 ties the sidecar to these exact bytes; a re-encode or a rename-and-
+// replace is caught by comparing it. The file is named without its folder: the sidecar travels with the
+// film, and an absolute path would carry the maker's home folder with it.
+{
+  const { readFileSync } = await import("node:fs"), sha = createHash("sha256").update(readFileSync(out)).digest("hex");
+  const pick = ({ title, W, H, fps, bpm, durationFrames, kind, holds, quiet, sync, captions, poster, motion, checks, shots }) => ({ title, W, H, fps, bpm, durationFrames, kind, holds, quiet, sync, captions, poster, motion, checks, shots });
+  writeFileSync(`${out}.film.json`, JSON.stringify({ film, file: basename(out), sha256: sha, frames: [FROM, TO], scale, blur: BLURRED ? { samples: BLUR, shutter: SHUTTER, sharp: SHARP } : null, poster: POSTER, meta: pick(meta) }, null, 1) + "\n");
+}
+const sharpFrames = cost.filter((c) => c.sharp > 0).length;
+if (BLURRED && SHARP) console.log(`blur mask: type and photos kept sharp on ${sharpFrames} of ${cost.length} frames`);
+// the mask only sees type drawn on the frame's own canvas: type composited from an offscreen layer blurs with it (instrument.ts)
+const layerTypeFrames = cost.filter((c) => c.typeInLayers > 0).length;
+if (BLURRED && SHARP && layerTypeFrames) console.log(`  NOTE ${layerTypeFrames} frame(s) composited type from layers that blurred: that type is NOT kept sharp. Draw it on the frame's canvas, not in a layer, to keep it crisp`);
 const pr = execFileSync("ffprobe", ["-v", "error", "-show_entries", "stream=codec_type,codec_name,width,height,nb_frames,duration", "-of", "csv=p=0", out]).toString().trim().split("\n");
-console.log(`\noutput: ${out}`); pr.forEach((l) => console.log(`  ${l}`));
+console.log(`\noutput: ${out}\nsidecar: ${out}.film.json`); pr.forEach((l) => console.log(`  ${l}`));
 if (fmt === "mp4" && !ranged) { const t = firstFrameBlank(out); if (t.blank) console.log(`\nWARNING  frame 0 is near-blank (${t.detail}). Platforms use frame 0 as the thumbnail: re-render with --poster-frame N (a legible frame: the wall, the logo).`); }

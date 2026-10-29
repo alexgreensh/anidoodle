@@ -1,0 +1,97 @@
+{
+  "about": "anidoodle's own review record for launchExampleBrand, the worked example of a brand's own look. Written by a fresh critic (an agent), not a person's review.",
+  "verdict": "fix: no P0, but six P1 open. The type, palette and end card read as Lantern's own, but the declared shapes are not honoured (pill composer and pill button), the 9:16 cut is off centre and top heavy, both transitions out of the answer have dead or colliding frames, the logo is a 20 px glyph that never reaches the end card, and the answer map says nothing a viewer can read (fresh critic r1, an agent). What works: Lora and Instrument Sans read crisply on the dark ground, the amber is used sparingly, the answer iris reads at speed, and the end card is centred and readable on both shapes",
+  "findings": [
+    {
+      "id": "br1-1",
+      "p": "P1",
+      "status": "open",
+      "note": "The brand's declared shapes are not what renders, so it reads as the clean template with a dark palette. The source declares shape { bubble: square, composer: bar, button: square }. Bubbles are square (good), but the composer is a fully rounded pill with a thin outline on both shapes (16:9 full frames 1.6 s and 4.4 s, 9:16 1.0 s and 3.6 s), and the library's 'Check all' button is a full pill (16:9 and 9:16, 11 to 16 s), while the composer's Ask button is a near square. Three corner languages in one film. Fix: make the composer a flat bar (square or the 14 px radius) and 'Check all' the same square button as Ask.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-2",
+      "p": "P1",
+      "status": "open",
+      "note": "9:16 layout is off centre and top heavy through the chat and library beats. Full frame 1.0 s and 3.6 s (540 px wide sample): the window runs from x 9 to 15 on the left to x 466 to 471, so the left margin is about 2 to 3 percent of width and the right about 13 percent; everything sits in the top 72 percent with the bottom 28 percent empty dark ground. Library beat (12.5 s): card from x 36 to 444, right margin more than double the left, bottom third empty. On a phone this reads as a 16:9 layout squeezed into a corner. Fix: centre the window and library horizontally and use the full height (or centre the block vertically).",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-3",
+      "p": "P1",
+      "status": "open",
+      "note": "The exit from the answer to the word page has dead frames on both shapes. 16:9, 4.8 to 6.4 s (10 fps strip): the composer fades, then the whole window slides slowly up off frame for about 1.3 s; from 5.8 to 6.3 s the screen is mostly an empty grey slab (the bottom of the window) with nothing to read before READ rises in. 9:16, 4.4 to 6.4 s: the window zooms in slowly for about 1.5 s (header and bubble fade), then is pushed right; the full frame at 6.0 s is the left 40 percent bare ground and a grey slab with the map card cut by the right edge, and at 6.1 to 6.3 s 'AD LESS.' is clipped against the slab's edge. The two shapes also use different transitions (vertical lift vs horizontal push). Fix: one quick, matched push (about 0.5 s) that carries the map card out as the words come in, with no empty slab frames.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-4",
+      "p": "P1",
+      "status": "open",
+      "note": "The iris from the library to the end card collides on 9:16. 15.9 to 16.6 s (15 fps strip, full frame 16.1 s): the iris opens from the drop at the upper right, so the end card is revealed lopsided: for about 0.5 s the wordmark reads 'ern.', 'tern.', 'antern.' while the tagline and the npm pill are drawn over the still visible library card (the 'Field notes' and 'Interview' rows sit under 'npm install lantern' at 16.3 to 16.5 s, and a tagline fragment 'es' pokes out of the ring at 16.1 s). 16:9 is cleaner but shows a faint dark ring edge over the end card at about 16.2 s and the wordmark settles about 20 px sideways after the reveal (16.4 to 16.5 s). Fix: hide or fade the library inside the iris, centre the iris on the frame (or the wordmark), and land the end card without the post reveal drift.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-5",
+      "p": "P1",
+      "status": "open",
+      "note": "The logo is not doing a logo's job. The brand has its own lantern mark (assets/brand/lantern/lanternMark.svg), but in the film it appears only as a roughly 20 by 30 px glyph in the window header (16:9 crop at 1.6 s), where it reads as a battery or jar, with a large gap before the 'Lantern' title so it looks detached. It never appears on the end card (19 s, both shapes), which uses the type wordmark plus an amber dot. A brand film should close on its mark. Fix: put the lantern mark on the end card beside or above the wordmark at a size where the lantern shape reads, and tighten the header gap.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-6",
+      "p": "P1",
+      "status": "open",
+      "note": "The answer does not answer the question. 'which sources disagree?' is answered by six unlabelled dots, two ringed in amber (16:9 4.4 s, 9:16 6.0 s). A viewer cannot tell which sources these are or that the rings mean 'these two disagree'; the label is only 'Your sources, mapped'. On 16:9 the card is about 410 px wide on the left of a 1380 px window and the right 60 percent of the window is empty, so the payoff is small as well as mute. On 9:16 it is about a quarter of the frame width. Fix: label the two ringed nodes (for example 'Field notes, 2019' and 'Survey, spring', which the library beat then reuses), a short 'these two disagree' line, and a bigger card.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-7",
+      "p": "P2",
+      "status": "open",
+      "note": "The corner 'Lantern' stamp is small grey type and on 9:16 it is not in a corner. 16:9: bottom right, about 18 px tall, grey, 0 to 16 s. 9:16: it hangs at about two thirds height just under the window and the library card (full frames 1.0, 3.6, 12.5, 16.1 s), so it reads as a stray caption. The header subtitle 'your reading desk' and the 'Ask Lantern...' placeholder are also grey. The person has rejected grey and tiny text before. Fix: drop the stamp (the header already says Lantern) or put it in the real corner at a readable size.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-8",
+      "p": "P2",
+      "status": "open",
+      "note": "The second drop is born on top of the library nav. 15.3 to 15.6 s on both shapes: the amber dot appears over the 'Map' tab (covering its label) and next to 'Check all' before lifting. It reads as a glitch on the tab, not a drop leaving the product. Fix: emit it from the highlighted 'Field notes' row or from 'Check all' itself.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-9",
+      "p": "P2",
+      "status": "open",
+      "note": "The cursor idles above the library. After 'Check all' is pressed (cue 11.27 s) the cursor sits in empty ground above the card, outside the UI, until about 16 s on both shapes (16:9 full frame 12.5 s at x 1680, y 295). Fix: let it rest on the button or leave the frame after the click.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-10",
+      "p": "P2",
+      "status": "open",
+      "note": "Copy mismatch in the library beat: the headline says 'Then it cites every page.' but the button pressed is 'Check all' and the tags say 'cited' while the values are page counts (12 p., 40 p., 8 p.). 'every page' plus a page count suggests the whole document was cited. Minor, but a launch film's one claim should match its UI word for word. Fix: a button like 'Cite all', or show a page reference such as 'p. 4' in the tag.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-11",
+      "p": "P2",
+      "status": "open",
+      "note": "The word page holds still for about 2.5 s. 16:9 and 9:16, about 6.9 to 9.4 s: READ LESS. / KNOW MORE. lands and nothing moves (6 fps strip shows identical frames). For a 'lively' temperament that is a freeze. On 16:9 the block also sits left (x 160 to 1310) with the right third empty, which is fine as editorial type but makes the hold feel emptier. Fix: shorten the hold to about 1.5 s or give it a small live move (the amber line drawing under, a slow drift).",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-12",
+      "p": "P2",
+      "status": "open",
+      "note": "9:16 hook: the question breaks into three short lines ('which / sources / disagree?') inside a narrow composer, with the Ask button vertically off the text block (full frame 1.0 s). It reads cramped next to the one line 16:9 hook. Fix: a wider composer (see br1-2) so it fits on two lines, Ask aligned to the text's last line or centre.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "br1-13",
+      "p": "P2",
+      "status": "open",
+      "note": "Sound, measured only (not listened to): integrated about -14.1 LUFS, true peak -1.4 dBTP, LRA 4.8 LU, which is fine for social. The first 2 s average about -30 dB (key ticks only), so the hook is near silent on a phone. The film also reuses the clean example's score (tallyScore), so the brand example does not have its own sound. Fix: a soft bed under the typing, and a short Lantern cue rather than the Tally score.",
+      "by": "fresh critic r1, an agent"
+    }
+  ]
+}

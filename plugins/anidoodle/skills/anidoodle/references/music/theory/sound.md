@@ -1,5 +1,7 @@
 # Sound theory: psychoacoustics for composing and mixing
 
+**Contents:** 1. Critical bands and roughness · 2. Masking: why the tune gets buried · 3. Equal loudness (Fletcher-Munson / ISO 226) · 4. Tonal balance by genre (long-term spectrum) · 5. Stereo and depth · 6. Reverb and delay timing · 7. Loudness and dynamics
+
 You write notes, and the engine mixes. Most "muddy", "thin" or "buried" results are decided by the
 notes: register, spacing, density and which parts overlap. This page is the physics behind those
 choices. The engine's guards and `craft` check the parts you can control from the score. The mix

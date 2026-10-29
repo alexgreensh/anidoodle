@@ -495,11 +495,55 @@ const thread: Def = {
   },
 };
 
-export const SFX = { tick, press, pop, ink, scratch, paper, whoosh, swish, riser, impact, chime, bubble, brick, thread } as const;
+// The unpitched family, for films whose music the engine does not control (a generated or supplied
+// track). Every layer is filtered noise or a falling sweep under 150 Hz, and the contact lasts a few
+// milliseconds, so nothing carries a note that could clash with the track's key: a brand launch
+// note was "the sound effects cannot be melodic, it makes disharmonious interruptions to the music".
+// Modelled on that film's approved kit (strikes cut to 10-25 ms from their peak). tools/track.mjs kit
+// prints each variant's pitch salience; trackMix refuses anything over 0.5 under an external track.
+const tap: Def = {
+  variants: ["tick", "tickHi", "tock", "thump", "impact"], level: -19, duckDb: 0,
+  use: "under someone else's music: a small landing or a typed line (tick), a sparkle-sized touch (tickHi), a card or button (tock), a stage or block landing (thump), the one big lock-in (impact). No pitch, so no clash with the track's key",
+  make(c, v) {
+    const { sr, r } = c, p0 = (r() - 0.5) * 0.3;
+    if (v === "tick" || v === "tickHi") {
+      const hi = v === "tickHi", b = new Bus(sr, secs(sr, 0.05));
+      b.add(burst(sr, r, hi ? 0.01 : 0.016, c.j(hi ? 0.0007 : 0.0013, 0.1), { hp: hi ? 3200 : 1800, lp: hi ? 14000 : 9000 }), 0, 1, p0);
+      b.add(burst(sr, r, 0.004, 0.0004, { hp: hi ? 6000 : 4000 }), 0, 0.5, p0);
+      punch(b, 0.3);
+      return { bus: b, hit: 0 };
+    }
+    if (v === "tock") {
+      const b = new Bus(sr, secs(sr, 0.08));
+      b.add(burst(sr, r, 0.03, c.j(0.0045, 0.1), { hp: 450, lp: 5500 }), 0, 1, p0);
+      b.add(burst(sr, r, 0.004, 0.0005, { hp: 2500 }), 0, 0.45, p0);
+      punch(b, 0.35);
+      return { bus: b, hit: 0 };
+    }
+    const big = v === "impact", n = secs(sr, big ? 1.8 : 0.16), b = new Bus(sr, n);
+    // weight: a sweep that falls from about 110 to 45 Hz, under the 150 Hz line where a sound reads as a note
+    const lo = c.j(big ? 42 : 48, 0.04), tau = big ? 0.42 : 0.045;
+    b.add(chirp(sr, secs(sr, big ? 1.7 : 0.15), (t) => lo + 65 * Math.exp(-t / 0.018), ad(0.0015, tau)).map((x) => Math.tanh(x * 1.6) / Math.tanh(1.6)), 0, 1, 0);
+    // body: low noise (lowpassed twice, as the approved kit was) and a dull contact so phones hear the hit
+    const body = burst(sr, r, big ? 1.6 : 0.12, c.j(big ? 0.35 : 0.03, 0.1), { lp: big ? 500 : 160 }); filt(body, sr, { lp: big ? 500 : 160 });
+    b.add(body, 0, big ? 1.6 : 1.2, p0 * 0.5);
+    b.add(burst(sr, r, 0.006, 0.0009, { hp: 1200, lp: 6000 }), 0, big ? 0.22 : 0.3, p0);
+    if (big) space(b, r, { rt60: 0.9, mix: 0.12, hp: 120, lp: 3000 });
+    punch(b, 0.3);
+    return { bus: b, hit: 0 };
+  },
+};
+
+export const SFX = { tick, press, pop, ink, scratch, paper, whoosh, swish, riser, impact, chime, bubble, brick, thread, tap } as const;
+/** Per-variant level (LUFS over the speaking window) where a kind's variants differ a lot in weight. */
+const VARIANT_LEVEL: Partial<Record<string, number>> = { "tap:tickHi": -22, "tap:tock": -18, "tap:thump": -14, "tap:impact": -10 };
+const VARIANT_DUCK: Partial<Record<string, number>> = { "tap:thump": 1.5, "tap:impact": 6 };
 export type SfxKind = keyof typeof SFX;
 export const SFX_KINDS = Object.keys(SFX) as SfxKind[];
 /** kind -> its variants (the first is the default). */
 export const sfxVariants = (k: SfxKind) => SFX[k].variants;
+/** How far the score dips under one variant (dB): the kind's own, or the variant's where weights differ. */
+export const sfxDuckDb = (k: SfxKind, variant?: string) => VARIANT_DUCK[`${k}:${variant ?? SFX[k].variants[0]}`] ?? SFX[k].duckDb;
 export const sfxInfo = (k: SfxKind) => ({ variants: SFX[k].variants, levelLufs: SFX[k].level, duckDb: SFX[k].duckDb, use: SFX[k].use });
 
 export const parseKey = (key: string) => {
@@ -543,7 +587,7 @@ export const renderSfx = (kind: SfxKind, o: SfxOpts = {}, sr = 48000): SfxSound 
   const c: Ctx = { sr, r, P: Math.pow(2, (o.pitch ?? 0) / 12) * wobble, o, dir: o.dir ?? 1, key: o.key === undefined ? null : parseKey(o.key), bpm: o.bpm ?? NaN, j: (x, amt) => x * (1 + (r() * 2 - 1) * amt) };
   const made = d.make(c, variant), [L, R] = finish(made.bus, made.hit);
   const kL = kWeight(L, sr), kR = kWeight(R, sr), window = speakingWindow(kL, kR, sr), now = winLufs(kL, kR, window[0], window[1]);
-  let g = d.level + (r() * 2 - 1) + (o.gainDb ?? 0) - now;
+  let g = (VARIANT_LEVEL[`${kind}:${variant}`] ?? d.level) + (r() * 2 - 1) + (o.gainDb ?? 0) - now;
   let peak = 0; for (let i = 0; i < L.length; i++) peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]));
   g = Math.min(g, -1 - 20 * Math.log10(Math.max(peak, 1e-9)));
   const G = db(g); for (let i = 0; i < L.length; i++) { L[i] *= G; R[i] *= G; }

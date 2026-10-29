@@ -9,10 +9,15 @@
 //                    plates baked once): the cheap way to review a cut. Ranges work: 0-300:50.
 //   --sheet file     also lay the frames out as one contact sheet at --sheet-scale (default 0.4)
 //   --no-bake-cache  draw every finished plate cold instead of reading .cache/bakes
+//   --grips          3D films: a 2x crop of every grip the film registers (three-core/checks3d) on each
+//                    frame, plus one board of them all, each labelled PASS or with its findings. A green
+//                    check with a prop through a hand is still a failure: look at the crops (lesson 37).
 // With no --frame/--frames, one still per shot, at the shot's first frame.
+import { gripFindings } from "./gaterules.mjs";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { buildPage } from "./build-page.mjs";
 import { requireFilm } from "./names.mjs";
@@ -89,4 +94,43 @@ if (opt.sheet) {
   const r = spawnSync("ffmpeg", [...args, "-filter_complex", all.length === 1 ? `[0:v]scale=${w}:${hh}` : graph, "-frames:v", "1", "-q:v", "3", out], { encoding: "utf8" });
   if (r.status !== 0) die(`contact sheet failed: ${r.stderr.trim()}`);
   console.log(`  contact sheet ${cols}x${rows} at ${k}x -> ${out}`);
+}
+
+// GRIP CROP BOARD. A page of its own at 2x with the 3D checks listening (hosts/page.ts FILM.checks3d):
+// each frame is drawn once, its registered grips come back as points on screen, and a crop around
+// each one is cut from that same 2x frame. Never touches the stills above.
+if (opt.grips) {
+  if (!readFileSync(page.out, "utf8").includes("__ANIDOODLE_WEBGL__")) die("--grips is for 3D films (this page draws no WebGL, so nothing registers a grip)");
+  const K = 2, CW = 240, CH = 170, dir = resolve(String(opt.out ?? "out/").endsWith("/") ? opt.out ?? "out/" : dirname(resolve(opt.out)), "grips");
+  mkdirSync(dir, { recursive: true });
+  const browser = await env.pw.lib.chromium.launch({ executablePath: env.browser.executablePath, args: ["--disable-background-timer-throttling", ...playwright.glArgs(page.out)] });
+  const crops = [];
+  try {
+    const gp = await (await browser.newContext({ viewport: { width: 640, height: 640 } })).newPage();
+    await gp.goto(pathToFileURL(page.out).href + "?adapter=still-grips");
+    await gp.evaluate(async (k) => { await window.FILM.ready; window.FILM.mount(k); }, K);
+    for (const [n] of jobs) {
+      const r = await gp.evaluate((f) => { const rec = window.FILM.checks3d([f]); return { rec, png: window.FILM.png() }; }, n);
+      const rec = r.rec[0]; if (!rec?.grips.length) { console.log(`  grips        frame ${String(n).padEnd(5)} none registered`); continue; }
+      const full = resolve(dir, `.frame-${n}.png`); writeFileSync(full, Buffer.from(r.png, "base64"));
+      rec.grips.forEach((g, i) => {
+        const w = CW * K, h = CH * K, x = Math.max(0, Math.min(meta.W * K - w, Math.round(g.x * K - w / 2))), y = Math.max(0, Math.min(meta.H * K - h, Math.round(g.y * K - h / 2)));
+        const out = resolve(dir, `${film}-${n}-grip${i}.png`), bad = gripFindings(g, rec.findings); // this grip's own findings, not every grip's on the frame
+        const cr = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", full, "-vf", `crop=${w}:${h}:${x}:${y}`, out], { encoding: "utf8" });
+        if (cr.status !== 0) die(`grip crop failed: ${cr.stderr.trim()}`);
+        crops.push(out);
+        console.log(`  grips        frame ${String(n).padEnd(5)} ${g.name}  ${bad.length ? "FINDINGS: " + bad.map((x) => x.kind).join(", ") : "PASS"}  -> ${out}`);
+      });
+      rmSync(full, { force: true });
+    }
+  } finally { await browser.close(); }
+  if (crops.length > 1) {
+    const cols = Math.ceil(Math.sqrt(crops.length)), rows = Math.ceil(crops.length / cols), w = CW * K, h = CH * K, args = ["-v", "error", "-y"];
+    crops.forEach((f) => args.push("-i", f));
+    const pads = Array.from({ length: cols * rows - crops.length }, (_, i) => `color=c=white:s=${w}x${h}:d=1[p${i}]`), ids = [...crops.map((_, i) => `[${i}:v]`), ...pads.map((_, i) => `[p${i}]`)];
+    const layout = ids.map((_, i) => `${(i % cols) * w}_${Math.floor(i / cols) * h}`).join("|"), board = resolve(dir, `${film}-grips.png`);
+    const r = spawnSync("ffmpeg", [...args, "-filter_complex", [...pads, `${ids.join("")}xstack=inputs=${ids.length}:layout=${layout}:fill=white`].join(";"), "-frames:v", "1", board], { encoding: "utf8" });
+    if (r.status !== 0) die(`grip board failed: ${r.stderr.trim()}`);
+    console.log(`  grip board ${cols}x${rows} -> ${board}`);
+  }
 }

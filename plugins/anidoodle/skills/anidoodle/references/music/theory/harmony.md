@@ -1,5 +1,7 @@
 # Harmony: function, voice leading, colour, tension
 
+**Contents:** 1. Function: home, away, leaning, home · 2. Cadences: where a phrase breathes · 3. Voice leading · 4. Voicing and the low end · 5. Colour: modes, borrowed chords, extensions · 6. Secondary dominants, pedals, modulation · 7. Harmonic rhythm: pacing · 8. Tension curve
+
 Roman numerals are relative to the key (`I ii iii IV V vi vii°` in major, `i ii° III iv v VI VII` in
 minor, `b` = borrowed or lowered). These are idioms, which are vocabulary. A multi-bar progression
 together with its rhythm and groove is a piece, and novelty checks for that. `craft` measures this page

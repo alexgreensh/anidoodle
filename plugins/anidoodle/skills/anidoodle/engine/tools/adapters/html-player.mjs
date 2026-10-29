@@ -10,6 +10,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { glArgs } from "./playwright.mjs";
 import { buildPage } from "../build-page.mjs";
 import { detect } from "../detect.mjs";
 import { loadBakes, saveBakes } from "../bake-cache.mjs";
@@ -32,7 +33,8 @@ export const pageChecks = (html, declared = []) => {
   const has = (re) => { const m = rest.match(re); return m ? m.length : 0; };
   let names = null; try { names = assets ? Object.keys(JSON.parse(assets[1])) : null; } catch { names = null; }
   return [
-    { ok: has(/https?:\/\//g) === 0, label: "no http(s) reference of any kind", detail: `${has(/https?:\/\//g)} found` },
+    // an XML namespace name (three.js creates its canvas with createElementNS) is an identifier, never fetched
+    { ok: has(/https?:\/\/(?!www\.w3\.org\/(1999\/xhtml|2000\/svg)")/g) === 0, label: "no http(s) reference of any kind", detail: `${has(/https?:\/\/(?!www\.w3\.org\/(1999\/xhtml|2000\/svg)")/g)} found (XML namespace names excepted)` },
     { ok: has(/<(img|audio|video|source|link|iframe)\b/gi) === 0, label: "no external element (img, audio, video, link)", detail: `${has(/<(img|audio|video|source|link|iframe)\b/gi)} found` },
     { ok: has(/@font-face/gi) === 0, label: "no web font", detail: `${has(/@font-face/gi)} found` },
     { ok: has(/data:[a-z]+\/[a-z0-9.+-]+;base64/gi) === 0, label: "no embedded binary outside the asset manifest", detail: `${has(/data:[a-z]+\/[a-z0-9.+-]+;base64/gi)} found` },
@@ -51,7 +53,7 @@ export const open = async (film, opts = {}) => {
   const built = await buildPage({ entry: `src/hosts/page-${film}.ts`, out, title: film });
   const html = readFileSync(out, "utf8");
 
-  const browser = await p.env.pw.lib.chromium.launch({ executablePath: p.env.browser.executablePath, args: ["--disable-background-timer-throttling"] });
+  const browser = await p.env.pw.lib.chromium.launch({ executablePath: p.env.browser.executablePath, args: ["--disable-background-timer-throttling", ...glArgs(out)] });
   const context = await browser.newContext({ viewport: { width: 640, height: 640 }, deviceScaleFactor: 1 });
   const pages = [], bv = browser.version();
   for (let i = 0; i < workers; i++) {

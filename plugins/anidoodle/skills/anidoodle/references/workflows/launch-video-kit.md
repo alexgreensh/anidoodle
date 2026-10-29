@@ -1,5 +1,7 @@
 # The launch kit: build your product's launch film
 
+**Contents:** Start from the template (16 s, one file) · The parts, for a film of your own shape · Worked example
+
 The pieces anidoodle's own launch film is made of, in `engine/src/canvas-core/`, usable for any
 product. The rules they serve are in `launch-video.md`.
 
@@ -8,7 +10,9 @@ product. The rules they serve are in `launch-video.md`.
 `launchTemplate.ts` turns data into a film: one to three asks, a type frame between them, and an
 end card with your install lines. `launchExample.ts` is a complete one for a made-up product (the
 drawn look, chat asks); `launchExampleClean.ts` is the second look on a UI-first product (the
-product's own UI in three screens, two of them split beats, 60 fps). Copy their shape, not their contents:
+product's own UI in three screens, two of them split beats, 60 fps), and `launchExampleCleanChat.ts`
+is the clean look with a chat ask (the hook, an answer card opening as an iris, a word page, then the
+product's screen). Copy their shape, not their contents:
 the plates, the UI data and the score are the product's own, made for its brief.
 
 ```bash
@@ -77,11 +81,20 @@ What you get, from data:
 - **Chat asks** (`kind` omitted): the hook: the first prompt is the hero, already being typed at
   frame 0 in a big composer across most of the frame (at least 64 px type on 1x1/4x5/9x16, 56 px on
   16x9, wrapping to 2-3 lines, never clipped; a prompt too long for that is an error), which shrinks
-  and docks at the bottom of the chat as Generate is pressed. Later prompts are typed with the whole
+  and docks at the bottom of the chat as Generate is pressed (over a second, or longer when the
+  distance would take its fastest point past what the brand's motion temperament allows: a calm
+  brand's hook on a phone frame docks over nearly two). Later prompts are typed with the whole
   composer in frame, the camera easing out for the press, an ink drop arcing from Generate
   into the thread and blooming open into a card where the plate draws itself live (the card opens
   on a spring), the thread keeping earlier answers and scrolling, a gentle lean onto each new card that keeps it whole with a margin (what the camera is about
-  to cut fades first).
+  to cut fades first). The drawn dock keeps the hook's line breaks until it lands (no word jumps a
+  line on the move) and re-wraps once, at rest. In the clean look the hook's composer glides down
+  whole and IS the dock: it never shrinks, on the move or after it lands, and rests a moment before
+  Ask is pressed (on 9x16 it is laid out a little narrower, to dock clear of the phone's right-hand
+  zone). The drop flies as one solid streak of the accent, over as many frames as its distance needs
+  to stay inside the brand's temperament, the answer card opens as an iris, and the window
+  stays whole and opaque while the camera leans in (still moving as a travel takes over), so no
+  brand colour is ever see-through.
 - **UI asks** (`kind: "ui"`): the product's interface drawn from data (`productUI.ts`) in its
   `before` state; the ask typed into its command bar if it has a `prompt`; the pointer presses its
   `action`; every item springs to its place in the `after` state (matched by `id`: rows move,
@@ -89,9 +102,13 @@ What you get, from data:
 - **Film asks** (`kind: "film"`): any film of this engine (a `webTour`, a loop, a plate) in a card.
 - **Split feature beats**: a UI or film ask with `split: [lines]` puts its words in their own
   column beside the live UI (above it on a phone), never over it: faster than a full word page.
+  The words are sized to their column's width and height (set smaller and rewrapped when they would
+  run down over the product); their read, once set and the product has landed, is a declared hold
+  (after a travel in, from the moment they are set, through the press, until they sink).
 - **Seams**: chat to chat is one thread; a seam between kinds with no word page opens as a bloom.
 - **The motif**: an ink drop lifts off Generate (or the product's action, or the film's card) and
   lands as the dot of the end card's mark ("NAME."); the end card blooms open FROM it and stays.
+  The last split beat's words finish sinking halfway through its flight, gone before it lands.
 - **Sound from the picture** (`launchSound.ts`): a key per character typed (the space bar its
   own), the press on the frame Generate goes down, the drop and its bloom, each card landing on its
   spring's first arrival, each UI item's landing; every cue panned to where it happens on screen;
@@ -133,13 +150,38 @@ Every line a viewer must read is phone-safe on 1x1, 4x5 and 9x16: at least 32 px
 (about 11 pt on a phone) for prompts, bubbles, card labels, tagline and install lines, 64 px for a
 word page; the layout throws with the fix when one cannot be (an install line too long for 9x16).
 
-### Two looks
+### Looks: the film wears the product's own look
 
-`preset: "drawn"` (default): ink blooms, hand-lettered words (`writeOn`), a warm paper palette.
-`preset: "clean"`: a quiet canvas, ONE accent colour (the button, the drop, the dot, the caret;
-`accent` sets it), type as the design: word pages SET in a heavy sans (`setType`: each word rises
-into place behind its own baseline), round iris seams instead of ink, the answer card opening as
-an iris. Both are ours: the clean look is a register, not a copy of anyone's film.
+A look is a base grammar plus the product's own tokens. `look.base` picks the grammar; every other
+field dresses it, and any field left out keeps the base's value. `preset: "clean"` is shorthand for
+`look: { base: "clean" }` (a preset and a base that disagree are an error). With no look the film
+draws exactly what it drew before (launch, launch2 and launch3 render byte-identical).
+
+The two bases:
+- `drawn` (default): ink blooms, hand-lettered words (`writeOn`), a warm paper palette.
+- `clean`: a quiet canvas, ONE accent (the button, the drop, the dot, the caret), type as the design:
+  word pages SET in the display face (`setType`), round iris seams, the answer card opening as an
+  iris. It takes every kind of ask: chat asks (the hook's composer glides down whole and IS the dock;
+  give the answer plate a ground other than the card's, or the iris opens unseen), product screens and
+  films. `registerLook(name, { clean, palette })` adds a base of your own.
+
+| Field | What it sets | Notes |
+|---|---|---|
+| `look.base` | the grammar: `"drawn"`, `"clean"`, or a registered look | `preset` is its shorthand |
+| `look.palette` | any of `bg card ink soft mute line chip accent accentDeep paper` | merged over the base; checked for contrast (below) |
+| `look.fonts` | `{ display, text, mono }`, each `{ family, file }` | `file` is a local `.ttf` imported into the film (`import f from "../../assets/fonts/X.ttf"`); registered before the first frame, no network; every measure, wrap and reading-time path uses its own glyph advances. A missing file or an `.otf`/`.woff2` is a clear error (convert to `.ttf`) |
+| `look.shape` | `radius`, `bubble` (`rounded` `square` `none`), `composer` (`box` `bar`), `button` (`pill` `square`), `buttonLabel` | the radius caps every corner, the chat's and the product UI's alike |
+| `look.chat` | `header` on/off, `title`, `subtitle`, `logo` (a brand element, drawn with brandKit `drawEl`), `bubble` and `reply` `{ fill, ink }` | a logo also opens the clean end card, before the name, on its baseline |
+| `look.from` | a brand file from `node tools/brand.mjs import` | fills the palette (its saturated colour the accent; a dark-first file the ground and ink) and the logo; explicit fields win |
+
+The product's own screen is a `kind: "ui"` ask (`productUI.ts`): it takes the look's face, label colour
+and shape too. READABILITY: a custom palette is checked pair by pair (WCAG AA: 4.5:1 for body text,
+3:1 for large type and the button's label), only on pairs that touch a token you changed, and the build
+fails naming the token and both colours. On a dark ground the pointer turns light. `launchExampleBrand.ts`
+is the worked example: an invented brand, dark ground, a serif display face, square shapes, its own logo,
+a chat ask and a product ask; `node tools/launch.mjs new` scaffolds a commented `look` block.
+With two or more install lines, use `endCard: "grid"`: the stacked card is then five blocks centred
+on one axis, which framecheck fails as a centred stack.
 
 ### Frame rate and motion blur
 
@@ -157,7 +199,7 @@ many subframes as each frame's measured on-screen speed needs (1 on a still fram
 | `claims` | extra on-screen or narrated claims for `facts.json`; the words, split words and tagline are claims already |
 | `claimBar` | land the end card on this bar's downbeat, counting from bar 0 (`claimBar: 4` = frame 4 x bar); throws if it cannot. A longer last ask is really longer, never slowed |
 | `score` (required) or `audio` | the score composed for this product (the `Material` function compose.md writes, or a `Piece`), as a bed; `null` for silence; or your own finished mix (not checked; it replaces the cues too) |
-| `shape`, `preset`, `sfx`, `motif`, `captions` | the frame (16x9 default); the look (drawn, clean); sound cues (default on); the relay into the end card (default on); `"sidecar"` (default) or `"burn"` |
+| `shape`, `preset`, `sfx`, `motif`, `captions` | the frame (16x9 default); the look (drawn, clean); sound cues (default on; `launch.mjs new` writes `sfx: false` beside `score: null`, since cues alone are clicks on silence that soundcheck fails: turn them on with the score); the relay into the end card (default on); `"sidecar"` (default) or `"burn"` |
 
 The template refuses a feature list (more than 3 asks) and an end card too short to read.
 
@@ -180,7 +222,9 @@ The template refuses a feature list (more than 3 asks) and an end card too short
 - `writeOn(ctx, env, text, x, y, size, p, style, opts)`: a line written stroke by stroke by a
   visible tool, in `ink`, `crayon`, `thread`, `chalk`, `brick` or `marker`. `measure` sizes it.
 - `setType(ctx, env, text, x, y, size, p, opts)`: a line SET in a heavy sans, each word rising
-  into place behind its baseline: the clean look's type. `setWidth` measures it.
+  into place behind its baseline: the clean look's type. `setWidth` measures it. `{ out }` sinks it out
+  last word first on an ease-in over 1.3x its size (no slivers at the clip edge); `{ space: "world" }`
+  draws it inside a camera or a region (`motion-film.md`).
 - `sentence` (one medium per word, one word per beat), `caption` (a small callout with an
   underline or arrow), `logo`/`logoCentred` and `logoBug` (anidoodle's own wordmark and corner
   mark; for your product, write your name with `writeOn` as the template does).
@@ -230,3 +274,4 @@ scaffold leaves them out; `scaffold.mjs <dir> --example` brings them in (with th
 are built on) to study. Study them for pacing, then build yours on
 the template with your own pictures and your own music; anidoodle's launch is one example of the
 grammar, not a skin to reuse.
+`launch.ts`, `launch2.ts` and `launch3.ts` are frozen reference builds of that published film, made before the 0.10 checks (their declarations say so, `FROZEN` in `launchKit.ts`): never templates; start from `launch.mjs new`, whose examples pass `ship.mjs`.

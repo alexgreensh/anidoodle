@@ -1,5 +1,7 @@
 # Rhythm and groove
 
+**Contents:** 1. Metric hierarchy · 2. Syncopation · 3. The backbeat and core patterns · 4. Swing and feel · 5. Polyrhythm and hemiola · 6. Fills and transitions · 7. Density arcs · 8. Rhythm in the melody · 9. Humanize or quantize
+
 Positions are beats in the bar (`1`, `1&` = the eighth after it, `1e&a` = sixteenths). In 6/8 and 12/8 a
 beat is a dotted quarter. `craft` measures this page on the **rhythm** line.
 

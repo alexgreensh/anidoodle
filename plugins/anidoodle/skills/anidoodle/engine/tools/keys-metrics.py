@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Needs numpy (offline research tool, not used by renders): pip install numpy
 """Anti-MIDI metrics for the keys phrases (research sec. 9.2): per-band inter-channel correlation
 (< 0.9 above 500 Hz = real width; ~1 below 120 Hz = mono lows), click detector (sample steps far above the
 local signal), spectral flux in sustains (a static oscillator is ~flat). numpy only.

@@ -1,5 +1,7 @@
 # Launch and product videos
 
+**Contents:** Inputs the person brings · Ground it in the real product first · Made for this product, every frame and every note · The story · Type · Motion · The motif · Two registers · Brand and the end card · Sound · Delivery · The process
+
 A launch video makes one promise about a product and shows it being kept. It is a short film
 with a job: in the first seconds the viewer knows what the thing is, by the end they know where
 to get it. Every rule below was paid for on anidoodle's own 77 s launch film (four cuts) and
@@ -10,7 +12,11 @@ a template film renders a 16 s launch for any product from data.
 
 Product screenshots, a logo, UI captures, a repo link, a feature list, the exact install or
 sign-up line. Images they bring may be embedded (pinned by sha256, provenance in the manifest);
-everything around them is drawn in code. Never generate or fetch images.
+everything around them is drawn in code. Never generate or fetch images on your own. One exception
+the person opts into: a photo they supplied may be restored or cut out by an image model they choose,
+shown beside the original on the film's background before use, with the original kept and the
+model recorded in the manifest (`brand-film.md`, people). A film in someone else's brand starts with
+`brand-film.md`: the brand's exact elements, logos and motion are imported and signed off first.
 
 ## Ground it in the real product first
 
@@ -48,6 +54,10 @@ pieces are examples of the craft, never material for someone else's film.
 - **Arc**: hook, one core interaction, a fast proof of range (a wall, never a slow tour), the
   brand moment, the call. A visual payoff every 3-5 s; no dead waits.
 - **No footnotes, no eyebrow text, no terminal jargon on screen** unless the product is one.
+- **A board row is an action, never a fact**, and names what it carries in from the row before; the
+  brand arrives as the answer, built from the thing that just acted; one message line beside the
+  story sentence; a promise that says what the viewer does and leaves with; one landing at the end.
+  The why is `../storytelling.md` ("Launch, brand and event films", "Comedy"); `board.mjs` checks it.
 
 ## Type
 
@@ -67,11 +77,16 @@ pieces are examples of the craft, never material for someone else's film.
 - **3-7 words a frame, few frames.** Collapse word cards into one claim then proof ("JUST CODE."
   then "32 STYLES"); fewer cards leave more time for the proof.
 - **Hold each settled word 0.5 s or more**, longer for the claim.
+- **Text meant as texture looks unreadable** ("blah blah", greeked lines). Real sentences that are
+  up too briefly make viewers try, and fail, to read them.
 - **Judge DESIGN in review stills, not only collisions**: hierarchy, spacing, whether the frame
   would pass as a poster. A frame with nothing overlapping can still be ugly.
 
 ## Motion
 
+- **One world, one camera, by default.** Start with `worldfilm.mjs` and build on `world.ts`: every beat
+  a region of one canvas, every seam a camera move. Built scene by scene, a film plays as slides however
+  well each scene moves. `motionscan` and `layerscan` hold it (`motion-film.md`).
 - **A gentle move is the default transition**: bloom, card flip, push, the card GROWS into the
   frame. Ease in and out; the camera is `references/camera.md`.
 - **A hard cut is a judgement.** It works when it is matched: the same shape, position or
@@ -113,8 +128,19 @@ into place), round iris seams, the product's own UI. Pick one per film; never mi
 ## Brand and the end card
 
 - **The logo recurs**: a small corner mark on every frame (`logoBug`), not once at the start.
+- **One landing.** The last thing on screen is the card or the stinger, never card, stinger, card.
+- **Event programs** show every speaker as name, role and company logo (from the live site, dated),
+  no talk titles and no mystery speakers; the panel's title once. Hosts and sponsors are in the brief.
+- **Logos of other companies** are copied from where they are rendered in production, sized to equal
+  visual weight, never "fixed" (`brand-film.md`, logos).
 - **The end card is composed for the frame**: the name, one line, the exact install lines in a
-  panel, held **3 s or more** so a viewer can screenshot them. anidoodle's are both lines:
+  panel, held **3 s or more** so a viewer can screenshot them. For an event or campaign, build it on
+  `endCard.ts` (`endCardLayout`, `drawEndCard`): one card, one frame, an asymmetric grid with the
+  lockup top-left, the event lines under it, the call as a stamp on the right on the venue's baseline,
+  a hairline, then a sponsor band (label 38 px, weight 800 at 1080; each sponsor switchable), in every
+  shape. Never a centred stack of five or more items, never extra slides for what did not fit.
+- **People** (speakers, hosts) are placed by head height with crowns level (`people.ts` `drawPerson`);
+  `popOut` puts a person on a disc with the head free above it. anidoodle's are both lines:
   `/plugin marketplace add alexgreensh/anidoodle` and
   `/plugin install anidoodle@alexgreensh-anidoodle`. One primary call; the link smaller below.
 
@@ -124,7 +150,11 @@ into place), round iris seams, the product's own UI. Pick one per film; never mi
   Compose it for THIS brand: pick the style and a mood per section from the brief (energy,
   audience, where it runs), then write the notes (`references/music/compose.md`). anidoodle's own
   launch chose chill lo-fi electronic, one example (`references/music/styles/lofi-electronic.md`);
-  never reuse our score or a stock piece.
+  never reuse our score or a stock piece. When the person asks for a generated or licensed track,
+  it takes its own route (`references/music/generated-tracks.md`): pinned and costed, cut by whole
+  bars, effects unpitched, the music never ending before the picture.
+- **Effects and a 10 s mix sample are heard first**, on a listening page (`track.mjs listen`), before
+  the full mix. You cannot hear; the person can.
 - **Balance by stem RMS, not only LUFS**: an integrated -14 LUFS hid a sub 7-10 dB too hot.
 - **Cut on downbeats, not every beat.** Land the claim on a chord (launch3's lands on bar 26,
   the home chord); `beatGrid().solve()` fits a flexible segment so it does.
@@ -139,8 +169,13 @@ into place), round iris seams, the product's own UI. Pick one per film; never mi
 ## Delivery
 
 - **Length**: about 60 s for a launch post (LinkedIn, YouTube, the README); 15-45 s for X; cut
-  a platform version rather than pushing one master everywhere. Cut whole beats; never speed
-  the whole film up (it breaks the beat grid and reads rushed).
+  a platform version rather than pushing one master everywhere. Set `length.target` and
+  `length.max` in the brief before the board (`board.mjs` fails a board over the max), and the same
+  numbers in the film's `meta.checks.length` (ship fails a cut over the max and prints the reading
+  floor: how short the film can get without cutting into reading time). Cut whole
+  beats, and only from non-reading holds; never speed the film up to hit a length (it reads rushed).
+  Slowing everything for reading through one master pace map is fine, if the key hits are re-solved
+  onto their downbeats afterwards.
 - **Shapes**: `16x9` for YouTube and the site, `1x1` or `4x5` for feeds, `9x16` for Reels and
   Shorts. Re-compose per shape from one timeline; never crop a wide render. The template does it
   through `launchLayout.ts` (`launch.mjs ship <film> --shapes 16x9,1x1,9x16`), with phone-safe type:
@@ -162,8 +197,10 @@ into place), round iris seams, the product's own UI. Pick one per film; never mi
 
 ## The process
 
-1. **Story sentence** and the sourced brief. ✋ One approval.
-2. **Storyboard**: one line per beat with its length in beats, the words, the transition.
+1. **Story sentence** and the sourced brief (a brand film: `brand-film.md` steps 0 to 5 first). ✋ One approval.
+2. **Storyboard**: one row per beat with its length, the action, what it carries in, the words, the
+   transition, as `board.json`; `node tools/board.mjs board.json` must pass. The person sees it as a
+   page of drawn stills with timing, never text only.
 3. **Options sheet**: transitions and type styles side by side as one cheap still sheet (e.g.
    three blooms, three lettering media). The person picks; nothing is rendered in full yet.
 4. **One still per scene**, at 0.3-0.5 scale on a contact sheet, reviewed for design:
@@ -176,7 +213,9 @@ into place), round iris seams, the product's own UI. Pick one per film; never mi
    sheets, cuts as before/after pairs, DESIGN first (type over art, spacing, hierarchy), then timing. Render only the changed range
    (`render.mjs --from F --to T` writes `out/<film>.<F>-<T>.mp4`, silent). Give notes in camera words ("slow this zoom to 0.7x",
    "hold the word 10 frames longer"), never "make it better".
-8. **QA**: review every shape's contact sheet against the design checklist in
+8. **Ship before showing**: `node tools/ship.mjs <film> --file out/<file>.mp4` on the exact file you
+   will send, for every version, its table attached (`review.md`). For template films, also:
+   **QA**: review every shape's contact sheet against the design checklist in
    `launch-video-kit.md` (no clipped type, no edge-cropped content, balanced per shape, coherent
    content). `launch.mjs ship <film> --shapes ... --gate` runs, for EVERY shape shipped, `framecheck`
    (text and cards whole on every frame; each text up long enough to read; on 9:16 nothing under

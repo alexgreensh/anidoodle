@@ -55,18 +55,19 @@ export type BloomOpts = { inF?: number; outF?: number; close?: boolean; radius?:
   // where the bloom opens from (default the frame's centre): a match cut opens it from the motif (motif.ts)
   center?: P;
   // "circle": a clean round iris instead of the ink blot (the clean preset); rim: the ink edge's width (default 26)
-  shape?: "blot" | "circle"; rim?: number };
+  shape?: "blot" | "circle"; rim?: number;
+  // the opening's ease, 0..1 over inF + 2 frames (default expo: shut, then most of the frame in four frames)
+  ease?: (t: number) => number };
 // A full-frame page inside an ink bloom. `under` draws the picture the bloom opens over (and closes
 // onto); `page` draws the page, in screen coordinates, on an offscreen sheet. With close: false the
 // bloom stays open (an end card).
 // the bloom's radius at a local frame: a page is fully covered while it is 1110 or more (1920x1080)
 export const bloomRadius = (local: number, len: number, o: BloomOpts = {}) => {
-  const IN = o.inF ?? 14, OUT = o.outF ?? 14, u = expo(ramp(local, 0, IN + 2)), v = o.close === false ? 0 : expo(ramp(local, len - OUT, len));
+  const IN = o.inF ?? 14, OUT = o.outF ?? 14, u = (o.ease ?? expo)(ramp(local, 0, IN + 2)), v = o.close === false ? 0 : expo(ramp(local, len - OUT, len));
   return (o.radius ?? 1250) * (v > 0 ? 1 - v : u);
 };
 export const bloomFrame = (ctx: Ctx, env: Env, local: number, len: number, under: (first: boolean) => void, page: (c: Ctx) => void, o: BloomOpts = {}) => {
-  const IN = o.inF ?? 14, OUT = o.outF ?? 14, W = o.W ?? 1920, H = o.H ?? 1080;
-  const u = expo(ramp(local, 0, IN + 2)), v = o.close === false ? 0 : expo(ramp(local, len - OUT, len)), R = (o.radius ?? 1250) * (v > 0 ? 1 - v : u);
+  const W = o.W ?? 1920, H = o.H ?? 1080, R = bloomRadius(local, len, o);
   under(local < len / 2);
   if (R < 2) return;
   const L = selfLayer(env, "sheet", Math.round(W * env.scale), Math.round(H * env.scale)), c = L.ctx;

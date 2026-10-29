@@ -14,9 +14,12 @@
 import { fractal, probeRect, rng, sample, type Ctx, type Env, type Layer, type P } from "./core";
 import { G, type Glyph } from "./drafting";
 import { DOT, TAIL, WORD, inkStroke, outlineOf, type Nib } from "./lettering";
+import { typeExit } from "./motionKit";
 
 export type KStyle = "ink" | "crayon" | "thread" | "chalk" | "brick" | "marker";
-export type WriteOpts = { color?: string; align?: "left" | "center" | "right"; slant?: number; track?: number; seed?: number; tool?: boolean; weight?: number; pop?: number };
+// `out` 0..1 is a written line's exit, as setType's: the line sinks behind its own baseline on the same
+// ease-in (motionKit.typeExit, 1.3x its size) and stops reporting itself to the frame probe while it leaves
+export type WriteOpts = { color?: string; align?: "left" | "center" | "right"; slant?: number; track?: number; seed?: number; tool?: boolean; weight?: number; pop?: number; out?: number };
 
 const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -88,6 +91,17 @@ const layout = (env: Env, text: string, x: number, y: number, size: number, o: W
   });
   const total = strokes.reduce((a, k2) => a + k2.L + GAP, 0);
   const L: Layout = { strokes, boxes, W, total }; env.cache.set(key, L); return L;
+};
+/** Where a line written in the ink style starts and ends, in px from its left-aligned origin: [left, right]. measure()
+ * is the advance width, which starts at the first letter's origin, not its first stroke, so a line centred
+ * by measure() sits a side bearing off its axis (the end card's name, a fresh critic's d4-1). */
+export const inkSpan = (text: string, size: number, o: WriteOpts = {}): [number, number] => {
+  const lay = layout({ cache: new Map() } as unknown as Env, text, 0, size, size, { ...o, align: "left" });
+  // (the strokes are the nib's centre line; the ink style's nib is up to 0.115 of the size wide, so its edge
+  // reaches half that past them: drawInk's `sh`)
+  const pen = size * (o.weight ?? 1) * 0.115 / 2;
+  let lo = Infinity, hi = -Infinity; for (const k of lay.strokes) for (const [x] of k.pts) { lo = Math.min(lo, x); hi = Math.max(hi, x); }
+  return lo <= hi ? [lo - pen, hi + pen] : [0, lay.W];
 };
 // how much of each stroke is laid at progress p (a constant-speed hand, pen lifts between)
 const reach = (lay: Layout, p: number) => { let d = clamp(p) * lay.total; return lay.strokes.map((k) => { const u = clamp(d / k.L); d -= k.L + GAP; return u; }); };
@@ -291,19 +305,25 @@ const drawBricks = (c: Ctx, env: Env, lay: Layout, p: number, size: number, key:
 
 // ---------------------------------------------------------------- writeOn
 export const writeOn = (ctx: Ctx, env: Env, text: string, x: number, y: number, size: number, p: number, style: KStyle, o: WriteOpts = {}) => {
-  if (p <= 0) return;
+  const out = Math.max(0, Math.min(1, o.out ?? 0));
+  if (p <= 0 || out >= 1) return;
   screen(ctx, env);
   if (style === "brick" && o.track === undefined) o = { ...o, track: 2.6, slant: o.slant ?? 0 };
-  const lay = layout(env, text, x, y, size, o), us = reach(lay, p), color = o.color ?? PALETTE[style], popK = o.pop ?? 1, seed = o.seed ?? 1;
-  if (env.root && lay.boxes.length) { const bx = lay.boxes; probeRect(ctx, env, Math.min(...bx.map((b) => b.c[0] - b.w / 2)), y - size * 1.05, Math.max(...bx.map((b) => b.c[0] + b.w / 2)) - Math.min(...bx.map((b) => b.c[0] - b.w / 2)), size * 1.3, text, "text"); }
+  // a leaving line is laid out lower by its sink and drawn inside its own window (cap height plus the
+  // ink's reach under the baseline), so every style, textured ones included, sinks out of it the same way
+  const sink = out > 0 ? typeExit(out) * size * 1.4 : 0;
+  const lay = layout(env, text, x, y + sink, size, o), us = reach(lay, p), color = o.color ?? PALETTE[style], popK = o.pop ?? 1, seed = o.seed ?? 1;
+  if (out > 0) { const xs = lay.boxes.map((b) => b.c[0]), x0 = Math.min(...xs) - size, x1 = Math.max(...xs) + size; ctx.save(); ctx.beginPath(); ctx.rect(x0, y - size * 1.15, x1 - x0, size * 1.4); ctx.clip(); }
+  if (out <= 0 && env.root && lay.boxes.length) { const bx = lay.boxes; probeRect(ctx, env, Math.min(...bx.map((b) => b.c[0] - b.w / 2)), y - size * 1.05, Math.max(...bx.map((b) => b.c[0] + b.w / 2)) - Math.min(...bx.map((b) => b.c[0] - b.w / 2)), size * 1.3, text, "text"); }
   ctx.save();
   if (style === "ink") drawInk(ctx, lay, us, size * (o.weight ?? 1), color, p, popK);
   else if (style === "marker") drawMarker(ctx, lay, us, size * (o.weight ?? 1), color, p, popK);
   else if (style === "crayon") textured(ctx, env, "crayon", waxHoles(env), 1, (c) => drawCrayon(c, lay, us, size * (o.weight ?? 1), color, p, popK, seed));
   else if (style === "chalk") textured(ctx, env, "chalk", chalkHoles(env), 1, (c) => drawChalk(c, lay, us, size * (o.weight ?? 1), color, p, popK, seed));
   else if (style === "thread") drawThread(ctx, lay, us, size * (o.weight ?? 1), color, p, popK);
-  else if (style === "brick") drawBricks(ctx, env, lay, p, size, `${text}|${x}|${y}|${size}|${o.seed}|${o.align}|${o.track}`, o.color);
+  else if (style === "brick") drawBricks(ctx, env, lay, p, size, `${text}|${x}|${y + sink}|${size}|${o.seed}|${o.align}|${o.track}`, o.color);
   ctx.restore();
+  if (out > 0) { ctx.restore(); return; } // the line's window; a leaving line has no tool
   // the tool, while the hand is still writing
   if (o.tool === false || p >= 1 || style === "brick") return;
   const tp = tipOf(lay, us); if (!tp) return;
@@ -422,13 +442,21 @@ export const caption = (ctx: Ctx, env: Env, text: string, x: number, y: number, 
 // Type as the design: a line SET in a heavy sans, not written. Each word rises into place from
 // behind its own baseline (a mask the size of the line), one after another, on an out-cubic: a
 // gentle move with no bounce and no fade-in. `p` 0..1 is the line's progress. Screen space.
-export type SetOpts = { color?: string; align?: "left" | "center" | "right"; weight?: number; font?: (w: number, px: number) => string; track?: number };
+// `out` 0..1 is its exit: the words sink back behind the baseline, last word first, on an EASE-IN over
+// 1.3x the size (motionKit.typeExit), so they accelerate away and clear the clip whole. The ease-out,
+// 1.0x exit left letter tops at the clip edge for half a second on a brand launch film.
+// `space: "world"` draws in the CURRENT transform (inside a camera, a world region) instead of
+// resetting to the screen: x, y and size are then world units.
+export type SetOpts = { color?: string; align?: "left" | "center" | "right"; weight?: number; font?: (w: number, px: number) => string; track?: number; out?: number; space?: "screen" | "world" };
 const SET_FONT = (w: number, px: number) => `${w} ${px}px "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif`;
 export const setWidth = (ctx: Ctx, text: string, size: number, o: SetOpts = {}) => { ctx.font = (o.font ?? SET_FONT)(o.weight ?? 700, size); return ctx.measureText(text).width + Math.max(0, text.length - 1) * (o.track ?? -0.02) * size; };
 export const setType = (ctx: Ctx, env: Env, text: string, x: number, y: number, size: number, p: number, o: SetOpts = {}) => {
-  if (p <= 0) return;
-  screen(ctx, env);
-  { const w = setWidth(ctx, text, size, o), x0 = o.align === "center" ? x - w / 2 : o.align === "right" ? x - w : x; probeRect(ctx, env, x0, y - size * 0.8, w, size, text, "text"); }
+  const out = Math.max(0, Math.min(1, o.out ?? 0));
+  if (p <= 0 || out >= 1) return;
+  if (o.space !== "world") screen(ctx, env);
+  // a standing line reports its box to the frame probe; a line on its way out does not, because its
+  // glyphs speak for what is still showing (the whole-line box let a one-frame "read" through on the exit)
+  if (out <= 0) { const w = setWidth(ctx, text, size, o), x0 = o.align === "center" ? x - w / 2 : o.align === "right" ? x - w : x; probeRect(ctx, env, x0, y - size * 0.8, w, size, text, "text"); }
   ctx.save();
   ctx.font = (o.font ?? SET_FONT)(o.weight ?? 700, size); ctx.textBaseline = "alphabetic"; ctx.fillStyle = o.color ?? "#111214";
   const tr = (o.track ?? -0.02) * size, words = text.split(" "), space = ctx.measureText(" ").width;
@@ -437,7 +465,8 @@ export const setType = (ctx: Ctx, env: Env, text: string, x: number, y: number, 
   ctx.beginPath(); ctx.rect(cx - size, y - size * 1.05, total + 2 * size, size * 1.35); ctx.clip(); // the line's own window: words rise into it
   words.forEach((w, i) => {
     const q = Math.max(0, Math.min(1, p * (1 + 0.35 * (words.length - 1)) - 0.35 * i)), e = 1 - Math.pow(1 - q, 3);
-    if (q > 0) { const dy = (1 - e) * size * 0.9; let wx = cx; for (const ch of w) { ctx.fillText(ch, wx, y + dy); wx += ctx.measureText(ch).width + tr; } }
+    const qo = Math.max(0, Math.min(1, out * (1 + 0.3 * (words.length - 1)) - 0.3 * (words.length - 1 - i))), sink = typeExit(qo) * size; // last word leaves first
+    if (q > 0 && qo < 1) { const dy = (1 - e) * size * 0.9 + sink; let wx = cx; for (const ch of w) { ctx.fillText(ch, wx, y + dy); wx += ctx.measureText(ch).width + tr; } }
     cx += wOf(w) + space;
   });
   ctx.restore();

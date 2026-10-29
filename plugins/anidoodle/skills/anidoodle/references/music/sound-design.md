@@ -1,5 +1,7 @@
 # Sound design: the effects kit, placed by frame, heard over the score
 
+**Contents:** What makes an effect sound designed, not generated · The kit · Placing effects in a film · Sound across a cut (J-cut and L-cut) · Levels and the audibility rule · Taste: when to use effects · The finished mix · Checking the finished film's sound · Tools and checks
+
 Every anidoodle sound effect is **built in code, from nothing**: no samples, no recordings, ever.
 (The music's acoustic instruments can play recordings from the optional sound pack; effects never
 do.) Every effect is deterministic: the same cue and seed give identical samples.
@@ -47,6 +49,11 @@ speaking window (K-weighted, see below). Duck is how far the score dips under it
 | bubble | bubbles, splash, gloop | water life, the koi | -16.5 | 1.5 |
 | brick | clack, snap, tumble | toy bricks: tap, press onto studs, drop on a pile | -15 | 1.5 |
 | thread | pull, pierce, stitch | embroidery: thread through cloth (hit = the tug), the needle | -17.5 | 1.5 |
+
+**Under someone else's music, effects are transients, never notes.** Use the unpitched `tap` kind
+(tick, tickHi, tock, thump, impact); tuned kinds are refused unless the cue says why (`pitched`).
+The impact's in-key shimmer applies only to scores the engine composes. The route for a generated or
+supplied track: `generated-tracks.md`.
 
 ## Placing effects in a film
 

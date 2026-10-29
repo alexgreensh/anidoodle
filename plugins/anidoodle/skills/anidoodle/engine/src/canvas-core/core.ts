@@ -11,6 +11,9 @@ export type Layer = { canvas: CanvasImageSource & { width: number; height: numbe
 export type Env = {
   W: number; H: number; scale: number; // logical size, device pixels per logical pixel
   canvas(w: number, h: number): Layer; // the ONLY way the core obtains an offscreen surface
+  // OPTIONAL, host-provided: a WebGL-capable surface for 3D shots (three-core/stage.ts asks for it
+  // once and keeps it). The core never creates canvases itself; a host without WebGL leaves it out.
+  webgl?(w: number, h: number): OffscreenCanvas | HTMLCanvasElement;
   image?(name: string): CanvasImageSource | undefined; // assets are decoded by the ADAPTER before frame 0
   cache: Map<string, unknown>;
   // OPTIONAL, host-provided: a store of finished plate frames that outlives the page (the adapters

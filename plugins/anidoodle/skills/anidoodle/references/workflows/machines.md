@@ -1,5 +1,7 @@
 # Machines: explain an idea by building it, in any style
 
+**Contents:** 1. Turn the idea into a machine · 2. Parts list before geometry · 3. One model drives everything · 4. Build with the kit · 5. Draw it in a style: the hand · 6. Films and interactive pieces · 7. Check it
+
 A machine is a subject, not a look. The kit (`engine/src/canvas-core/mechanismKit.ts`) builds real
 parts in 3D, sorts them, takes them apart and folds them back; a **hand** marks them in a style's
 own medium. The same music box draws as cyanotype, coloured pencil, stipple or flat iso planes.

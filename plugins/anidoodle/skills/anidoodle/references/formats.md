@@ -1,5 +1,7 @@
 # Formats: what you are making, and how each one ships
 
+**Contents:** Stills: hero art, spots, covers, cards, diagrams · Motion without a story: loops, stickers, logos, ambient art · Films: the story ones · Delivering
+
 Everything is a `Film`: meta, shots that tile `[0, duration)`, and optionally a score. A still
 is a film one frame long, so every tool works on every format. Scaffold the kind you need:
 
@@ -88,9 +90,21 @@ Render options that hold for every moving format:
 
 Words on screen, wherever the shape:
 
-- **Reading time.** Each text stays up at least `max(0.7 s, 0.3 s per word)`. A launch film's cues
-  are `meta.captions`; `node tools/framecheck.mjs <name>` fails any cue held shorter and reports
-  `N/A` for a film that declares no cues (it cannot see words it was not told about).
+- **Reading time.** Each text stays up at least `max(0.7 s, 0.3 s per word)`. `node tools/framecheck.mjs
+  <name>` times every block of text the film DRAWS (glyphs joined into words and blocks, through
+  layers and clips; typed text is timed from its last character) and fails any block held shorter.
+  It is never N/A while text is drawn: a film that draws none says NONE with the evidence, and no
+  frame checked is a FAIL. Text meant as texture is drawn inside `texture(ctx, draw)` and skipped.
+  Build holds from the rule, not by feel: `readable.ts` `chatHold(text)` is think time (about 0.6 s)
+  plus typing (about 52 characters a second) plus the full read AFTER the last character, times one
+  `pace` scalar (`paced`, per section if needed). Worked example: an 11-word typed reply needs 3.3 s
+  of reading after it finishes; a launch film held it 0.9 s, viewers said "too fast" twice, and even a
+  25% slowdown left it under the floor. "20% slower" is then one number, `pace: 1.2`.
+- **Layout and the last second.** framecheck also fails more than 7 text blocks in a frame, 5 or more
+  packed into under 30% of it, a centred stack of 5 or more, gaps under 3% of the short side, text
+  over text or across a card's edge (held 0.5 s), any line under 28 px at 1080 in the last second,
+  an end card that lands twice, and people in one sequence whose heads differ by more than 10%.
+  A deliberate dense frame (a UI beat) is declared in `meta.checks.layoutExempt` with its reason.
 - **No text on a busy picture without a plate** (`craft-bar.md`).
 - **Phone safe zones, 9:16 only.** Reels, TikTok and Shorts lay their own name, caption, buttons
   and progress bar over the frame. Keep text and key content out of the top 14 % and bottom 25 %
@@ -115,6 +129,13 @@ first frame's average colour and its fidelity to the source frame (`--frame N` p
 frame `--fidelity-psnr` compares; default 0). All of it is opt-in beyond the container facts,
 so transparent and non-uniform pieces pass cleanly. For a file that ships, add `--delivery`: a
 near-blank frame 0 then FAILS instead of warning; the fix is `render --poster-frame N`.
+
+**Venue screens.** A film that will also loop on screens at an event: ask first what plays it (a
+video player, a presentation app), make the loop seam clean (`gate` checks the last frame against
+frame 0 for loops), and never depend on the sound, which venues often mute.
+
+**Ship.** Before any version is shown to anyone, `node tools/ship.mjs <film> --file out/<file>.mp4`
+runs every check on that exact file and writes a table and a critic sheet beside it (`workflows/review.md`).
 
 A still needs a browser only (`npx playwright-core install chromium`). Anything that moves also needs
 `ffmpeg`. `gate.mjs` runs on all of them and marks the checks that do not apply to the piece,
