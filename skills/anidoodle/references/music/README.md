@@ -21,6 +21,8 @@ notes. You compose every note, and nothing is filled in for you. There is no def
 
 Pages:
 - [`compose.md`](compose.md): the workflow, the material format, craft, and the never-reuse rule.
+- [`generated-tracks.md`](generated-tracks.md): when the person wants a music-model take or a licensed
+  track instead: pinned and costed, cut by whole bars, unpitched effects, mastered and checked.
 - [`theory/`](theory/README.md): the craft behind it: melody, harmony, rhythm, mood mapping, form and
   orchestration, sound (psychoacoustics for voicing and mixing). Cited, and measured by
   `node tools/music.mjs craft`.

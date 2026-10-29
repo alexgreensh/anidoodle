@@ -1,9 +1,11 @@
 // THE ONE GENERATED PAGE. Playwright, the HTML player and (Phase 5) Hyperframes all drive this
 // same page through window.FILM. Everything host-specific (DOM, clocks, asset decoding, Web
 // Audio) lives HERE; the art core never sees it.
-import type { Ctx, Env, Layer, ProbeRec } from "../canvas-core/core";
+import type { Ctx, Env, Layer } from "../canvas-core/core";
 import { Film, renderFrame, validate } from "../canvas-core/film";
 import { embeddedAudio, type AudioPayload } from './audio';
+import { instruments } from "./instrument";
+import { frameProbe } from "./probe";
 
 declare global { interface Window { FILM: unknown; __ASSETS__?: Record<string, string>; __BAKE_SRC__?: Record<string, string>; __ANIDOODLE_SRC__?: WeakMap<object, string>; __SHAPE__?: string; __AUDIO__?: AudioPayload } }
 
@@ -48,7 +50,10 @@ export const mountFilm = (film: Film) => {
   // contract rule 4: every asset is loaded AND decoded before frame 0, or the film refuses to start
   const ready = (async () => {
     const problems = validate(film); if (problems.length) throw new Error("timeline: " + problems.join("; "));
-    await Promise.all(Object.entries(film.assets.images).map(async ([name, url]) => { const img = new Image(); img.src = window.__ASSETS__?.[name] ?? url; await img.decode(); images.set(name, img); }));
+    await Promise.all(Object.entries(film.assets.images).map(async ([name, url]) => { const img = new Image(); img.src = window.__ASSETS__?.[name] ?? url; await img.decode(); (img as unknown as { __name: string }).__name = name; images.set(name, img); }));
+    // a launch look's own font files (launchLook.registerFaces) are loaded before frame 0, so no frame is set
+    // in a fallback face; a film that added none waits for nothing
+    if ((document.fonts as unknown as { size: number }).size) await document.fonts.ready;
     mount(1); return film.meta;
   })();
   const seek = (frame: number) => { const t0 = performance.now(); const shot = renderFrame(film, ctx, frame, env); ctx.getImageData(0, 0, 1, 1); current = frame; return { shot, ms: performance.now() - t0 }; }; // getImageData forces the deferred raster so the timing is real
@@ -74,7 +79,9 @@ export const mountFilm = (film: Film) => {
   // divided by `px` (default 3: subframes at most 3 px apart), is the count, 1 on a still frame (the
   // sharp frame itself, untouched), at most `max` (default 32). Pure pixels in, a number out:
   // deterministic like the frames it measures.
-  type BlurSpec = { samples?: number; shutter?: number; max?: number; px?: number };
+  // sharp: true (the default) keeps type, photos and sharp() out of the blur (hosts/instrument.ts); false blurs everything.
+  type BlurSpec = { samples?: number; shutter?: number; max?: number; px?: number; sharp?: boolean };
+  const inst = instruments({ ctx: () => ctx, images: () => new Set(images.values()), draw: (f) => { renderFrame(film, ctx, f, env); }, read: () => ctx.getImageData(0, 0, canvas.width, canvas.height).data, clearCache: () => env.cache.clear() });
   const lumaGrid = (f: number, cell: number) => {
     renderFrame(film, ctx, f, env); const w = canvas.width, h = canvas.height, d = ctx.getImageData(0, 0, w, h).data, gw = Math.floor(w / cell), gh = Math.floor(h / cell), g = new Float32Array(gw * gh);
     for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) { let s = 0; for (let yy = 0; yy < cell; yy += 2) for (let xx = 0; xx < cell; xx += 2) { const p = ((y * cell + yy) * w + x * cell + xx) * 4, a = d[p + 3] / 255; s += (0.2126 * d[p] + 0.7152 * d[p + 1] + 0.0722 * d[p + 2]) * a; } g[y * gw + x] = s / ((cell * cell) / 4); }
@@ -113,49 +120,27 @@ export const mountFilm = (film: Film) => {
     if (shot && !stepped && samples === 0) { speed = speedOf(win(n - sh / 2), win(n + sh / 2)); samples = Math.max(1, Math.min(o.max ?? 32, Math.ceil(speed / (o.px ?? 3)))); }
     if (!shot || samples < 2 || stepped) { const r = seek(n); return { shot: r.shot, ms: r.ms, samples: 1, speed }; }
     const t0 = performance.now(), w = canvas.width, h = canvas.height, acc = new Float64Array(w * h * 4);
-    for (let i = 0; i < samples; i++) {
+    const keep = o.sharp === false ? null : inst.sharpLayers(n); // the frame's type and photos, drawn sharp
+    const sub = () => { for (let i = 0; i < samples; i++) {
       const t = win(n + ((i + 0.5) / samples - 0.5) * sh);
       renderFrame(film, ctx, t, env);
       const d = ctx.getImageData(0, 0, w, h).data;
       for (let p = 0; p < d.length; p += 4) { const a = d[p + 3], k = a / 255; acc[p] += toLin[d[p]] * k; acc[p + 1] += toLin[d[p + 1]] * k; acc[p + 2] += toLin[d[p + 2]] * k; acc[p + 3] += a; }
-    }
+    } };
+    if (keep) inst.withoutSharp(sub); else sub();
     const img = ctx.createImageData(w, h), out = img.data, inv = 1 / samples, full = 255 * samples;
     for (let p = 0; p < out.length; p += 4) {
       const A = acc[p + 3]; if (A === 0) continue; // nothing was ever drawn here: stays transparent black
       const c = A === full ? inv : 255 / A; // premultiplied average, un-premultiplied by the mean alpha
       out[p] = fromLin(acc[p] * c); out[p + 1] = fromLin(acc[p + 1] * c); out[p + 2] = fromLin(acc[p + 2] * c); out[p + 3] = Math.round(A * inv);
     }
+    if (keep) for (let i = 0, p = 0; i < keep.mask.length; i++, p += 4) if (keep.mask[i]) { out[p] = keep.whole[p]; out[p + 1] = keep.whole[p + 1]; out[p + 2] = keep.whole[p + 2]; out[p + 3] = keep.whole[p + 3]; }
     ctx.putImageData(img, 0, 0); current = n;
-    return { shot: shot.id, ms: performance.now() - t0, samples, speed };
+    return { shot: shot.id, ms: performance.now() - t0, samples, speed, sharpPx: keep?.count ?? 0, typeInLayers: keep?.layerType ?? 0 }; // typeInLayers: layers holding type that blurred (instrument.ts)
   };
-  // THE FRAME PROBE (tools/framecheck.mjs). For each frame asked, every line of text (fillText on the
-  // frame or a full-frame sheet, writeOn, setType) and every content box the art core reports
-  // (probeRect: a card, a window) is collected in device pixels; a box the frame's edge cuts through
-  // is returned. Whatever lies wholly outside the frame, or wholly inside it, is fine. With `all`, every
-  // visible line of text is returned too (cut: false when whole), for the checks that judge where
-  // text sits (the 9:16 safe zones, textrules.mjs).
-  const probe = (frames: number[], all = false) => {
-    const out: (ProbeRec & { frame: number; cut?: boolean })[] = [], g = globalThis as { __ANIDOODLE_PROBE__?: (r: ProbeRec) => void };
-    const protos = [CanvasRenderingContext2D.prototype, ...(typeof OffscreenCanvasRenderingContext2D !== "undefined" ? [OffscreenCanvasRenderingContext2D.prototype] : [])] as unknown as { fillText: (t: string, x: number, y: number, w?: number) => void }[];
-    const orig = protos.map((p) => p.fillText);
-    let frame = 0, recs: ProbeRec[] = [];
-    protos.forEach((p, i) => { p.fillText = function (this: Ctx & { __frame?: boolean }, t: string, x: number, y: number, w?: number) {
-      if ((this === ctx || this.__frame) && this.globalAlpha >= 0.1 && String(t).trim()) {
-        const m = this.measureText(t), a = this.textAlign, dx = a === "center" ? -m.width / 2 : a === "right" || a === "end" ? -m.width : 0, T = this.getTransform();
-        const bx = [[x + dx, y - m.actualBoundingBoxAscent], [x + dx + m.width, y - m.actualBoundingBoxAscent], [x + dx, y + m.actualBoundingBoxDescent], [x + dx + m.width, y + m.actualBoundingBoxDescent]].map(([u, v]) => [T.a * u + T.c * v + T.e, T.b * u + T.d * v + T.f]);
-        recs.push({ kind: "text", label: String(t), x0: Math.min(...bx.map((q) => q[0])), y0: Math.min(...bx.map((q) => q[1])), x1: Math.max(...bx.map((q) => q[0])), y1: Math.max(...bx.map((q) => q[1])) });
-      }
-      return (orig[i] as (t: string, x: number, y: number, w?: number) => void).call(this, t, x, y, w);
-    }; });
-    g.__ANIDOODLE_PROBE__ = (r) => recs.push(r);
-    try {
-      for (frame of frames) {
-        recs = []; seek(frame); const W = canvas.width, H = canvas.height, tol = 1.5;
-        for (const r of recs) { const inter = r.x1 > 0 && r.x0 < W && r.y1 > 0 && r.y0 < H, inside = r.x0 >= -tol && r.y0 >= -tol && r.x1 <= W + tol && r.y1 <= H + tol; if (inter && !inside) out.push({ ...r, frame }); else if (all && inter && r.kind === "text") out.push({ ...r, frame, cut: false }); }
-      }
-    } finally { protos.forEach((p, i) => (p.fillText = orig[i] as never)); delete g.__ANIDOODLE_PROBE__; }
-    return out;
-  };
+  // THE FRAME PROBE (tools/framecheck.mjs): hosts/probe.ts. Every call rebuilds the film's layer memo under
+  // its hooks, so text in a reused layer (a bake() sprite, a held plate) is seen in every batch.
+  const probe = frameProbe({ canvas: () => canvas, ctx: () => ctx, seek: (f) => { seek(f); }, clearCache: () => env.cache.clear() });
   // 3D CHECKS (tools/gate.mjs, still.mjs --grips). Turns three-core/checks3d.ts on, draws each frame asked
   // and returns what every frame's runChecks found, plus where its grips sit on screen (logical px).
   // A frame whose film never calls runChecks returns no record. Off by default: no hook, no cost.
@@ -187,7 +172,11 @@ export const mountFilm = (film: Film) => {
     if (u > 0 && posterOf) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = Math.min(1, u); ctx.globalCompositeOperation = "source-over"; if (u >= 1) ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(posterOf.img, 0, 0); ctx.restore(); }
     current = n; return r;
   };
-  window.FILM = { probe, checks3d, meta: { ...film.meta, hasAudio: typeof film.audio === "function", shots: film.shots.map(({ id, start, end }) => ({ id, start, end })) }, ready, mount, seek, hash, audio, warm, blur, poster, bakes: { load: bakes.load, take: bakes.take, hashes: bakes.hashes, stats: () => bakes.stats }, png: () => canvas.toDataURL("image/png").slice(22), frame: () => current };
+  // THE LAYER PROBE (tools/layerscan.mjs): per frame, text, photos and reported boxes in draw order, and
+  // translucent fills in the brand's colours; ink(): how much each text box shows on a frame.
+  const layers = (frames: number[], brand: string[] = []) => { const r = inst.layers(frames, brand); current = frames[frames.length - 1] ?? current; return r; };
+  const ink = (frame: number, boxes: { x0: number; y0: number; x1: number; y1: number }[]) => inst.ink(frame, boxes, canvas.width);
+  window.FILM = { probe, checks3d, layers, ink, meta: { ...film.meta, placeholders: (window as unknown as { __PLACEHOLDERS__?: string[] }).__PLACEHOLDERS__ ?? [], hasAudio: typeof film.audio === "function", shots: film.shots.map(({ id, start, end }) => ({ id, start, end })) }, ready, mount, seek, hash, audio, warm, blur, poster, bakes: { load: bakes.load, take: bakes.take, hashes: bakes.hashes, stats: () => bakes.stats }, png: () => canvas.toDataURL("image/png").slice(22), frame: () => current };
 
   // ---- the player: click or space to play, arrows to step, ?frame=N to open on a frame
   ready.then(() => {

@@ -1,0 +1,76 @@
+{
+  "about": "anidoodle's own review record for launchExample, the drawn worked example of the launch template. Written by fresh critics (agents), not a person's review. A film made from the template gets its own record, written for that film (references/workflows/review.md).",
+  "verdict": "ship (critic r4, an agent): no open P0 or P1; 1 open optional P2",
+  "findings": [
+    {
+      "id": "d1-1",
+      "p": "P1",
+      "status": "fixed",
+      "note": "Frames 120 to 140 (9:16): the answer card's byline words vanished under the thread's top while its dot stayed behind. The dot now goes with its words (inkCard), and a byline nearing the window's top fades out whole.",
+      "by": "fresh critic r1, an agent; r2 (an agent) found d1-1 still open on 9:16 (the zone fade withheld the words, not the dot); fixed again and confirmed by fresh critic r3, an agent"
+    },
+    {
+      "id": "d1-2",
+      "p": "P1",
+      "status": "fixed",
+      "note": "The corner mark touched the chat window's bottom right corner (16:9 frames 0 and 345, 9:16 frames 0 and 270). It now sits clear of the window: beside it on 16:9 (the room creeps about that corner), under it on 9:16 with room for the hook's creep.",
+      "by": "fresh critic r1, an agent; confirmed fixed by fresh critics r2 and r3 (agents)"
+    },
+    {
+      "id": "d1-3",
+      "p": "P1",
+      "status": "fixed",
+      "note": "The end card's install lines were each centred, so they started at different places. Every line now starts at the panel's left padding, as a terminal sets them.",
+      "by": "fresh critic r1, an agent; confirmed fixed by fresh critics r2 and r3 (agents)"
+    },
+    {
+      "id": "d2-1",
+      "p": "P2",
+      "status": "fixed",
+      "note": "9:16 frames 110 to 120: the corner mark hid behind the leaned card, then popped back on top at 120. It now fades back over the travel's second half (r3: frames 142 to 148).",
+      "by": "fresh critic r2, an agent; confirmed fixed by r3"
+    },
+    {
+      "id": "d2-2",
+      "p": "P2",
+      "status": "fixed",
+      "note": "9:16 frames 128 to 132: the cursor vanished in one frame during the lean. It now fades with the lean (r3: 106 to 114).",
+      "by": "fresh critic r2, an agent; confirmed fixed by r3"
+    },
+    {
+      "id": "d2-3",
+      "p": "P2",
+      "status": "fixed",
+      "note": "9:16: the corner mark's right end sat on the right-hand zone's edge. It now sits 20 px inside the window's right edge, about 29 px clear of the zone.",
+      "by": "fresh critic r2, an agent; confirmed fixed by r3"
+    },
+    {
+      "id": "d3-1",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (round 2): a carried string fades over the band before a zone (9:16) or the frame's top and bottom edges (16:9, drawn look), measured from where it rests; the byline's dot fades with its words (critic r4 saw the dot pop on 9:16; fixed after, checked on the re-render: 16:9 fades over frames 126 to 129, 9:16 dot and words fade together 130 to 133).",
+      "by": "fresh critic r3, an agent; checked by fresh critic r4, an agent"
+    },
+    {
+      "id": "d3-2",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (round 2): the chat header recedes with the lean, fully faded before the travel carries it off (critic r4: fades from 108, gone by 116).",
+      "by": "fresh critic r3, an agent; checked by fresh critic r4, an agent"
+    },
+    {
+      "id": "d3-3",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (round 2): the 9:16 end card centres on the frame, x 540, inside the right-hand zone's edge (critic r4 measured centres 528 to 532, rightmost text at 889 of 929).",
+      "by": "fresh critic r3, an agent; checked by fresh critic r4, an agent"
+    },
+    {
+      "id": "d4-1",
+      "p": "P2",
+      "status": "fixed",
+      "note": "End card sits 8 to 20 px left of centre on both shapes, consistent across lines: likely the headline glyphs' side bearing. Optional polish; centring by ink bounds instead of advance width would fix it. Fixed (template round 3): the cause was the end card's settle, a 3 % lean about the dot at the name's right end, which carried every line left by 3 % of the dot's distance from the axis. The settle now zooms about the card's axis, and the name with its dot is centred by its ink (kinetic.inkSpan). Measured on the render: every line within 1.5 px of the centre on 16:9 and 9:16 (test endCardCentre).",
+      "by": "fresh critic r4, an agent"
+    }
+  ]
+}

@@ -19,3 +19,19 @@ node -e 'const fs=require("fs"),b=fs.readFileSync("assets/fonts/Poppins-Bold.ttf
 
 The OFL allows bundling and redistribution with software; the font may not be sold on its own, and
 a modified version may not use the reserved name. We ship it unmodified.
+
+## Lora Bold and Instrument Sans Regular and Bold (the launch template's look example, launchExampleBrand)
+
+- `Lora-Bold.ttf`, 133828 bytes, sha256 `7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87`.
+  Copyright 2011 The Lora Project Authors, SIL Open Font License 1.1, full text in `Lora-OFL.txt`
+  (sha256 `62e37a82d3f1ef2a70712885fa8b3144b65fd144d8e748d6196b690a354d792c`). Reserved Font Name "Lora".
+- `InstrumentSans-Regular.ttf`, 68028 bytes, sha256 `a22cb26e48fd79bcb01bf2fc92d36785474dce36d9c544ab0a8868c2657c4a87`.
+  Copyright 2022 The Instrument Sans Project Authors, SIL Open Font License 1.1, full text in
+  `InstrumentSans-OFL.txt` (sha256 `bf4dc6d13a8cccd4807133c77a1ee9619a16b92cb23322258725ab6731c2f6e5`).
+- `InstrumentSans-Bold.ttf`, 68084 bytes, sha256 `444f85bf1c4b0e1ce1ca624f6be54bcd832207714ccaf4ea99ee531341683bdf`.
+  Same family, copyright and licence as the Regular above.
+- Source: copied unmodified from a local copy of Anthropic's canvas-design skill font folder (the same
+  Google Fonts releases), 2026-10-29; nothing fetched.
+- Why: a serif display face and a plain text face for the worked example of a custom look, so the template
+  is proven on fonts that are not ours. A film imports them by path (`import f from ".../Lora-Bold.ttf"`);
+  tools/overlay.mjs inlines the bytes, so the page carries them and nothing is read or fetched at draw time.

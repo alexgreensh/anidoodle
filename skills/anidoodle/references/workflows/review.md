@@ -1,6 +1,6 @@
 # The review: a fresh critic, three rounds at most
 
-**Contents:** The loop · What the critic does · The four readings · Severity · The check before fixing · The scorecard · The gate · The fix ledger
+**Contents:** The loop · No version is shown without its ship table · Before any critic: the design pass · What the critic does · The four readings · Severity · The check before fixing · The scorecard · The gate · The fix ledger
 
 The builder never judges its own work. A builder who has watched the film forty times sees what
 they meant, forgives the hand they know is hard, and grades the effort. So every review is done by
@@ -15,7 +15,11 @@ film), and after each **full render**. The loop is the same each time.
    the builder is already re-rendering.
 2. **Brief the critic.** Give it the frozen file (for a storyboard, the rows), the story in three
    sentences, the shapes and sound the film promised, and this page. Give it none of the build:
-   no conclusions, no chat history, no list of what you think is wrong.
+   no conclusions, no chat history, no list of what you think is wrong. DO give it the person's
+   own earlier rejections, verbatim, from the project ledger ("that end card is a mess... who is
+   going to read this overload of info?"). Critics calibrate on collisions and counts; the person's
+   words are the only record of their taste for density, hierarchy and humour. A critic that called
+   an end card "generous" which the person had already rejected three times was judging the wrong film.
 3. **The critic reports** (below). It returns ranked problems with timestamps and a verdict.
 4. **Fix the biggest problem first.** Then the next, if they share a rebuild. Re-render.
 5. **A NEW critic rechecks.** Not the one who found the problems; it would see only what it expects.
@@ -23,6 +27,35 @@ film), and after each **full render**. The loop is the same each time.
 6. **Stop at the verdict "ship", or after round 3.** Open-ended loops never converge: a fourth round
    finds new taste, not new faults. After round 3, report what remains, honestly, in the ledger
    and to the person ("two P2 left: the brush wipe is used twice, the tail rings 0.4 s long").
+
+## No version is shown without its ship table
+
+`node tools/ship.mjs <film> --file out/<the file you will send>.mp4` runs every check on the exact
+delivered file (framecheck, verify-export, the gate, motionscan, layerscan, the locks, the sound or
+track checks, the cues, facts, the review ledger, the length budget) and writes `SHIP.md`, `ship.json`
+and a critic sheet (a frame every 2 s, every shot start, the last frame) beside it. A check that
+cannot look is a FAIL, never a pass; an N/A shows as a FLAG with its reason; `--quick` skips the gate
+and can never say PASS. Nine versions of a launch film reached the person with no check at all, and
+the checks that did run had passed while blind. Attach the table to every version you show.
+
+The critic's findings and the person's own notes live in `reviews/<film>.json`, which ship reads:
+
+```json
+{ "findings": [{ "id": "r1-4", "p": "P0", "status": "open", "note": "the end card is crammed", "by": "critic r1" }],
+  "notes": [{ "at": "2026-10-27 21:36", "from": "<the person>", "text": "who is going to read this overload of info?" }] }
+```
+
+An open P0 fails the ship, an open P1 flags it, and the person's last three notes are printed
+verbatim in the table, to be re-read against the new sheet.
+
+## Before any critic: the design pass
+
+The builder checks bugs well and taste badly ("I checked my frames for bugs, not for design"). So
+before a version is shown to anyone, the builder judges a still sheet of it **for design first**:
+hierarchy, flow, whether each frame would pass as a poster, the brand's temperament; then bugs. It
+re-reads the person's last three notes against the new sheet, one by one. Before the first full
+render, run a design critique of the storyboard stills with whatever design skills the person has
+installed (name them in the brief). Changed beats are shown as a still sheet before any re-render.
 
 ## What the critic does
 
@@ -125,8 +158,8 @@ The film ships when all of these hold:
 
 - every line is 3 or more, Finish is 5, and the average is 4 or more;
 - no P0 is open (a P0 still open after round 3 is a blocker the person is told about, never shipped quietly);
-- `gate.mjs` and `verify-export.mjs` pass, and for a scored film `music.mjs check` passes and a
-  human has listened;
+- `ship.mjs` passes on the delivered file (it runs the gate, verify-export and every scan), and for
+  a scored film `music.mjs check` passes and a human has listened;
 - the last critic's verdict is `ship`, or three rounds are used and what remains is in the ledger.
 
 After the rebuild, the new critic goes down the earlier list item by item against the new file and

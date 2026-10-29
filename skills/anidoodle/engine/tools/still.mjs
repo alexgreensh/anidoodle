@@ -13,6 +13,7 @@
 //                    frame, plus one board of them all, each labelled PASS or with its findings. A green
 //                    check with a prop through a hand is still a failure: look at the crops (lesson 37).
 // With no --frame/--frames, one still per shot, at the shot's first frame.
+import { gripFindings } from "./gaterules.mjs";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -114,7 +115,7 @@ if (opt.grips) {
       const full = resolve(dir, `.frame-${n}.png`); writeFileSync(full, Buffer.from(r.png, "base64"));
       rec.grips.forEach((g, i) => {
         const w = CW * K, h = CH * K, x = Math.max(0, Math.min(meta.W * K - w, Math.round(g.x * K - w / 2))), y = Math.max(0, Math.min(meta.H * K - h, Math.round(g.y * K - h / 2)));
-        const out = resolve(dir, `${film}-${n}-grip${i}.png`), bad = rec.findings.filter((x) => x.kind.startsWith("grip") || x.kind === "proximity");
+        const out = resolve(dir, `${film}-${n}-grip${i}.png`), bad = gripFindings(g, rec.findings); // this grip's own findings, not every grip's on the frame
         const cr = spawnSync("ffmpeg", ["-v", "error", "-y", "-i", full, "-vf", `crop=${w}:${h}:${x}:${y}`, out], { encoding: "utf8" });
         if (cr.status !== 0) die(`grip crop failed: ${cr.stderr.trim()}`);
         crops.push(out);

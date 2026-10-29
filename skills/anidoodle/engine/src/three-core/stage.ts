@@ -30,7 +30,7 @@ export type StageOpts = {
 export type Stage = { renderer: THREE.WebGLRenderer; w: number; h: number; ss: number };
 
 const KEY = "three:stage";
-/** The film's one WebGL renderer, sized to the frame at env.scale (x ss). Built on first use, then kept. */
+/** The film's one WebGL renderer, sized to the frame at env.scale (x ss). Built on first use, then kept. draw3d sets its tone mapping and exposure on every call. */
 export const stage = (env: Env, opts: StageOpts = {}): Stage => {
   const ss = Math.max(1, Math.min(3, Math.round(opts.ss ?? 2)));
   const w = Math.round(env.W * env.scale * ss), h = Math.round(env.H * env.scale * ss);
@@ -72,6 +72,10 @@ export const memo = <T>(env: Env, key: string, build: (env: Env) => T): T => {
  */
 export const draw3d = (ctx: Ctx, env: Env, scene: THREE.Scene, camera: THREE.Camera, opts: StageOpts & { clear?: string | null } = {}) => {
   const st = stage(env, opts), { renderer } = st;
+  // the renderer is shared by every shot of this size, but its look belongs to THIS shot: set it on
+  // every call, or a shot inherits the exposure of whichever shot happened to build the renderer
+  renderer.toneMapping = opts.toneMapping ?? THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = opts.exposure ?? 1;
   if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) { const c = camera as THREE.PerspectiveCamera; c.aspect = env.W / env.H; c.updateProjectionMatrix(); }
   scene.updateMatrixWorld(true);
   if (renderer.shadowMap.enabled) renderer.shadowMap.needsUpdate = true;

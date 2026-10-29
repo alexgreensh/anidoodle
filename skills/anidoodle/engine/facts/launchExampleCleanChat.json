@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "about": "The ledger of launchExampleCleanChat, a demo launch film for a made-up product ('Tally') in the clean look with a chat ask. Its words describe the mock product shown on screen, written for the template, labelled generated. The chart and the UI's figures are made-up sample data in mock screens, not claims.",
+  "claims": [
+    { "claim": "ASK IT.", "where": "on-screen", "generated": true, "note": "demo slogan for a made-up product, states no fact" },
+    { "claim": "SEE WHY.", "where": "on-screen", "generated": true, "note": "demo slogan for a made-up product: the chart answering the chat ask is mock data" },
+    { "claim": "Then it fixes", "where": "on-screen", "generated": true, "note": "describes the mock inbox screen beside it; the product is made up" },
+    { "claim": "the books.", "where": "on-screen", "generated": true, "note": "second line of 'Then it fixes the books.', describes the mock inbox screen beside it; the product is made up" },
+    { "claim": "Bookkeeping that does itself", "where": "on-screen", "generated": true, "note": "demo tagline for a made-up product, states no fact" }
+  ]
+}

@@ -31,6 +31,8 @@ const fmt = (p: V3) => p.toArray().map((x) => x.toFixed(2)).join(", ");
 type Obj = THREE.Object3D;
 const objOf = (x: Rig | Obj): Obj => ("hips" in x && "limbs" in x ? (x as Rig).root : (x as Obj));
 const within = (o: Obj, anc: Obj) => { let n: Obj | null = o; while (n) { if (n === anc) return true; n = n.parent; } return false; };
+// visible itself and every ancestor visible: what the renderer would actually draw
+const shown = (o: Obj) => { let n: Obj | null = o; while (n) { if (!n.visible) return false; n = n.parent; } return true; };
 const partName = (m: THREE.Mesh) => String(m.userData.part ?? (m.name || m.geometry.type));
 
 // ---------------------------------------------------------------- surface sampling
@@ -43,21 +45,29 @@ const localSamples = (g: THREE.BufferGeometry, spacing: number): Float32Array =>
   let byS = sampleCache.get(g); if (!byS) sampleCache.set(g, (byS = new Map()));
   const hit = byS.get(spacing); if (hit) return hit;
   const pos = g.attributes.position, idx = g.index, n = idx ? idx.count : pos.count, tri = (i: number) => (idx ? idx.getX(i) : i);
-  const A = v3(), B = v3(), C = v3(), out: number[] = [];
-  let sp = spacing;
-  for (let pass = 0; pass < 6; pass++) {
-    out.length = 0;
-    // every vertex once, then extra points only inside triangles bigger than the spacing (a dense
-    // sphere needs no more than its vertices; a two-triangle wall needs a grid)
-    for (let i = 0; i < pos.count; i++) out.push(pos.getX(i), pos.getY(i), pos.getZ(i));
-    for (let t = 0; t + 2 < n; t += 3) {
-      A.fromBufferAttribute(pos, tri(t)); B.fromBufferAttribute(pos, tri(t + 1)); C.fromBufferAttribute(pos, tri(t + 2));
-      const k = Math.ceil(Math.max(A.distanceTo(B), B.distanceTo(C), C.distanceTo(A)) / sp);
-      if (k < 2) continue;
-      for (let i = 0; i <= k; i++) for (let j = 0; j <= k - i; j++) { if ((i === 0 && j === 0) || (i === k && j === 0) || (i === 0 && j === k)) continue; const a = i / k, b = j / k, c = 1 - a - b; out.push(A.x * c + B.x * a + C.x * b, A.y * c + B.y * a + C.y * b, A.z * c + B.z * a + C.z * b); }
-    }
-    if (out.length / 3 <= MAX_PTS) break;
-    sp *= 1.6;
+  const A = v3(), B = v3(), C = v3();
+  // The longest edge of each triangle, once. Then COUNT the points a spacing would make before making
+  // any: a rig built in centimetres, or a prop scaled to almost nothing, asks for millions of points
+  // at the spacing it was given. The spacing grows by 1.6x until the count fits the cap (or only the
+  // vertices are left), so a tiny or non-finite spacing can never stall or overflow an array.
+  const edge: number[] = [];
+  for (let t = 0; t + 2 < n; t += 3) {
+    A.fromBufferAttribute(pos, tri(t)); B.fromBufferAttribute(pos, tri(t + 1)); C.fromBufferAttribute(pos, tri(t + 2));
+    edge.push(Math.max(A.distanceTo(B), B.distanceTo(C), C.distanceTo(A)));
+  }
+  const extra = (s: number) => { let c = 0; for (const e of edge) { const k = Math.ceil(e / s); if (k >= 2) c += ((k + 1) * (k + 2)) / 2 - 3; } return c; };
+  const longest = edge.reduce((m, e) => Math.max(m, e), 0);
+  let sp = Number.isFinite(spacing) && spacing > 0 ? spacing : longest || 1;
+  for (let c = extra(sp); c > 0 && pos.count + c > MAX_PTS; c = extra(sp)) sp *= 1.6;
+  // every vertex once, then extra points only inside triangles bigger than the spacing (a dense
+  // sphere needs no more than its vertices; a two-triangle wall needs a grid)
+  const out: number[] = [];
+  for (let i = 0; i < pos.count; i++) out.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+  for (let t = 0, e = 0; t + 2 < n; t += 3, e++) {
+    const k = Math.ceil(edge[e] / sp);
+    if (k < 2) continue;
+    A.fromBufferAttribute(pos, tri(t)); B.fromBufferAttribute(pos, tri(t + 1)); C.fromBufferAttribute(pos, tri(t + 2));
+    for (let i = 0; i <= k; i++) for (let j = 0; j <= k - i; j++) { if ((i === 0 && j === 0) || (i === k && j === 0) || (i === 0 && j === k)) continue; const a = i / k, b = j / k, c = 1 - a - b; out.push(A.x * c + B.x * a + C.x * b, A.y * c + B.y * a + C.y * b, A.z * c + B.z * a + C.z * b); }
   }
   const arr = new Float32Array(out); byS.set(spacing, arr); return arr;
 };
@@ -186,7 +196,11 @@ const handPart = (prop: Obj, m: THREE.Mesh) => !!m.userData.handlePart || (withi
 export const checkGrip = (holder: Rig | Obj, hand: Limb | Obj, prop: Obj, frame = 0, camera?: THREE.Camera, o: GripOpts = {}): CheckResult => {
   const H = objOf(holder), end = isLimb(hand) ? hand.end : hand, F: Finding[] = [], where = `${H.name || "holder"} holding ${prop.name || "prop"}`;
   H.updateWorldMatrix(true, true); prop.updateWorldMatrix(true, true);
-  const h = handleOf(prop), sc = prop.getWorldScale(v3()).x, a = prop.localToWorld(h.a.clone()), b = prop.localToWorld(h.b.clone()), r = h.r * sc;
+  // Hidden objects never count: a prop switched off, inside a hidden group, or still scaled to almost
+  // nothing (popIn starts at 2.2e-16) is not held yet, so there is nothing to judge.
+  const sc = prop.getWorldScale(v3()).x;
+  if (!shown(prop) || !(Math.abs(sc) >= 1e-3 * Math.abs(H.getWorldScale(v3()).x))) return result([]);
+  const h = handleOf(prop), a = prop.localToWorld(h.a.clone()), b = prop.localToWorld(h.b.clone()), r = h.r * sc;
   const { point: gp } = gripFrame(hand);
   const handMeshes = meshesOf(end), handPts = handMeshes.flatMap((m) => surfacePoints(m, r * 0.6));
   const handR = handPts.reduce((mx, p) => Math.max(mx, p.distanceTo(gp)), 0);

@@ -1,0 +1,5 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- GREEN fixture: a hard white mask is imported as a clip and draws exactly -->
+  <mask id="half"><rect width="50" height="100" fill="#fff"/></mask>
+  <rect width="100" height="100" fill="#FFD900" mask="url(#half)"/>
+</svg>

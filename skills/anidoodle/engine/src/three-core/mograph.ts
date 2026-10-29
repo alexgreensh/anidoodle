@@ -103,6 +103,9 @@ export const moveAlongPath = (o: THREE.Object3D, curve: THREE.Curve<THREE.Vector
 // ---- morphs
 /** n points spaced evenly by arc length along a polyline (closed adds the edge back to the start) */
 export const resample = (pts: V3[], n: number, closed = false): V3[] => {
+  if (!pts.length) throw new Error("resample: the shape has no points");
+  // a single point (a dot that grows into a line) has no length to walk: it is that point n times
+  if (pts.length === 1) return Array.from({ length: Math.max(0, n) }, () => [...pts[0]] as V3);
   const P = closed ? [...pts, pts[0]] : pts, cum = [0];
   for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1], P[i][2] - P[i - 1][2]));
   const L = cum[cum.length - 1], out: V3[] = [], m = closed ? n : n - 1;
@@ -179,6 +182,37 @@ export const wave = (g: THREE.Object3D | THREE.Object3D[], f: number, at: number
   cs.forEach((c, i) => { const r = rest(c), d = (i - head) / w, b = Math.abs(d) < 1 ? 0.5 + 0.5 * Math.cos(Math.PI * d) : 0; c.position.copy(r.position).addScaledVector(ax, (o.height ?? 0.4) * b); });
 };
 
+/**
+ * Give each object its own copy of any material it shares with another one in the list. text3d puts
+ * one material on every letter, so fading letter by letter wrote all of them, and the last letter's
+ * opacity won (the whole word hid). The copy starts from the shared material's REST state, so it does
+ * not matter which frame is drawn first. Done once per object; the material passed in is never changed.
+ */
+const OWN = "anidoodleOwnMaterials";
+const ownMaterials = (objs: THREE.Object3D[]) => {
+  if (objs.every((o) => o.userData[OWN])) return;
+  const users = new Map<THREE.Material, Set<THREE.Object3D>>();
+  for (const o of objs) for (const m of mats(o)) { let u = users.get(m); if (!u) users.set(m, (u = new Set())); u.add(o); }
+  for (const o of objs) {
+    if (o.userData[OWN]) continue;
+    o.userData[OWN] = true;
+    const copies = new Map<THREE.Material, THREE.Material>();
+    const own = (m: THREE.Material) => {
+      if ((users.get(m)?.size ?? 0) < 2) return m;
+      let c = copies.get(m);
+      if (!c) {
+        const r = matRest(m); c = m.clone();
+        c.opacity = r.opacity; c.transparent = r.transparent;
+        const em = (c as THREE.MeshStandardMaterial).emissive; if (em && r.emissive) em.copy(r.emissive);
+        c.userData[REST] = { opacity: r.opacity, transparent: r.transparent, emissive: r.emissive?.clone() } as MatRest;
+        copies.set(m, c);
+      }
+      return c;
+    };
+    o.traverse((n) => { const mesh = n as THREE.Mesh; if (mesh.material) mesh.material = Array.isArray(mesh.material) ? mesh.material.map(own) : own(mesh.material); });
+  }
+};
+
 /** a verb as lagged() and grid() call it: one child, the frame, its own start frame, its index */
 export type Verb = (o: THREE.Object3D, f: number, at: number, i: number) => void;
 /** start a verb on each child `stagger` frames after the one before (Manim's LaggedStart) */
@@ -199,6 +233,7 @@ export const grid = (g: THREE.Object3D | THREE.Object3D[], f: number, start: num
  */
 export const kinetic = (letters: THREE.Object3D, f: number, start: number, stagger = 2, o: { style?: "rise" | "pop" | "drop" | "spin"; len?: number } = {}) => {
   const len = o.len ?? 12, style = o.style ?? "rise";
+  if (style === "rise") ownMaterials(kids(letters));
   lagged(letters, f, start, stagger, (c, ff, at) => {
     if (style === "pop") popIn(c, ff, at, len);
     else if (style === "drop") dropIn(c, ff, at, len, { height: 1 });

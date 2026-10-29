@@ -92,4 +92,15 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   ok(b2.y + b2.h <= 1080 * 0.95 && b2.x >= 1920 * 0.05, "16:9: a phrase stays inside 5 % margins");
   const b3 = subtitleBox(fake, env169, e0, 50, { home: (f) => (f < 48 ? [0.3, 0.2] : [0.7, 0.2]) });
   ok(Math.abs(b3.x + b3.w / 2 - 0.7 * 1920) < 1, "a per-shot home moves the phrase only where the function says (a cut)");
+
+  // L7: a line whose display text is "" reaches the planner with no words; phrasePlan read words[0] of
+  // an empty list and `narrate check` died on a TypeError instead of saying which line was empty.
+  {
+    const tm = timing([["a", "the first line is fine"], ["b", "so is the third"]]);
+    tm.lines.splice(1, 0, { id: "blank", text: "", start: tm.lines[0].end + 6, end: tm.lines[0].end + 12, words: [] });
+    let plan: ReturnType<typeof phrasePlan> | null = null, err = "";
+    try { plan = phrasePlan(tm); } catch (e) { err = String(e); }
+    ok(!!plan && plan.problems.some((p) => p.includes("blank") && p.includes("no words")), `L7 a line with no words is a named problem, not a crash (${err || plan?.problems.join(" | ")})`);
+    ok(!!plan && plan.events.every((e) => e.text.length > 0) && plan.events.some((e) => e.line === "b"), "L7 and the lines around it are still planned");
+  }
 };

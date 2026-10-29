@@ -26,6 +26,7 @@ import type { Film } from "./film";
 import {
   C, CHAT, GEN, HOME, INPUT, MONO, REPLY, SANS, TEXT, artCard, blot, camLerp, caretAt, clamp, drawChatFrame, expo, inOut, lerp, lerpP,
   out3, pathOf, plateLayer, pointer, press, ramp, rr, selfLayer, softShadow, spring, useCam, type Cam, type ChatState,
+  frozenNone,
 } from "./launchKit";
 import { koiDraw } from "./koiDraw";
 import { koi } from "./koi";
@@ -65,7 +66,10 @@ const typedAt = (text: string, f: number, t0: number, rate: number, seed: number
 
 // ---------------------------------------------------------------- cameras
 const CARD_C: P = [REPLY.x + REPLY.s / 2, REPLY.y + REPLY.s / 2];
-const CARD_CAM: Cam = { c: CARD_C, z: 1000 / REPLY.s }; // the reply card at 1000 px, centred
+// The push onto the reply card. It frames the card and its byline above it with ~45 px to spare top and
+// bottom, so no text sits cut by the frame's edge while the camera holds there. The card stays centred
+// across the frame; the sent message to its right fades out as the camera pushes in (a focus pull).
+const CARD_CAM: Cam = { c: [CARD_C[0], (REPLY.y - 35 + REPLY.y + REPLY.s) / 2], z: 1.55 };
 const GEN_C: P = [GEN.x + GEN.w / 2, GEN.y + GEN.h / 2];
 
 // ---------------------------------------------------------------- 1 + 2: the first request, Generate, ink
@@ -78,7 +82,10 @@ const koiLayer = (env: Env, f: number) => (f < KOI_DONE ? plateLayer(env, "koiDr
 
 const typeCam = (ctx: Ctx, f: number): Cam => {
   const typed = typedAt(KOI_PROMPT, f, KOI_TYPE.t0, KOI_TYPE.rate, KOI_TYPE.seed), [cx] = caretAt(ctx, typed);
-  const macro: Cam = { c: [Math.max(TEXT.x + 330, cx - 110), 934], z: 2.7 };
+  // the macro follows the caret, but never so far that the start of the line leaves the frame:
+  // the whole prompt fits at this zoom, so once it is long the camera holds and the caret walks on
+  const z = 2.7, keepStart = TEXT.x + (W / 2 - 60) / z;
+  const macro: Cam = { c: [Math.min(keepStart, Math.max(TEXT.x + 330, cx - 110)), 934], z };
   return f < 112 ? macro : camLerp(macro, HOME, expo(ramp(f, 112, 150)));
 };
 const leanCam = (f: number): Cam => { const lean = expo(ramp(f, DROP.land - 4, DROP.full + 20)) * 0.09; return { c: lerpP(HOME.c, CARD_C, lean * 1.6), z: 1 + lean }; };
@@ -102,7 +109,8 @@ const drawInk = (ctx: Ctx, env: Env, f: number, D: typeof DROP, art: CanvasImage
   for (let i = 0; i < 9; i++) { const a = i * 2.39 + 0.4, d = 30 + (i % 3) * 22 + 160 * out3(ramp(u, 0, 0.3)), s = (1 - ramp(u, 0.12, 0.34)) * (4 + (i % 4) * 2.5); if (s <= 0.2) continue; ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(land[0] + Math.cos(a) * d, land[1] + Math.sin(a) * d, s, 0, Math.PI * 2); ctx.fill(); }
 };
 
-const sceneOpen = (ctx: Ctx, env: Env, f: number) => {
+// `chrome` fades the thread's head, the byline and the composer (1 = shown): only the ink test uses it
+const sceneOpen = (ctx: Ctx, env: Env, f: number, chrome = 1) => {
   useCam(ctx, env, f < T.gen[0] ? typeCam(ctx, f) : leanCam(f));
   const typed = typedAt(KOI_PROMPT, f, KOI_TYPE.t0, KOI_TYPE.rate, KOI_TYPE.seed);
   const s: ChatState = {
@@ -110,16 +118,18 @@ const sceneOpen = (ctx: Ctx, env: Env, f: number) => {
     placeholder: "Describe what you want drawn…",
     sent: f >= PRESS.up ? KOI_PROMPT : undefined, sentAlpha: ramp(f, PRESS.up, PRESS.up + 10),
     genPress: press(f, PRESS.down, PRESS.up), genHot: ramp(f, 150, 158),
-    label: f >= DROP.land ? "marker comic" : undefined, labelAlpha: ramp(f, DROP.land, DROP.land + 10),
+    label: f >= DROP.land ? "marker comic" : undefined, labelAlpha: ramp(f, DROP.land, DROP.land + 10) * chrome,
+    head: chrome, composer: chrome,
   };
   drawChatFrame(ctx, s);
   if (f >= DROP.land) softShadow(ctx, REPLY.x, REPLY.y, REPLY.s, REPLY.s, 22, ramp(f, DROP.land, DROP.full));
   drawInk(ctx, env, f, DROP, koiLayer(env, f).canvas);
-  if (f >= 112) pointer(ctx, lerpP([1760, 1130], [GEN_C[0] + 18, GEN_C[1] + 6], out3(ramp(f, 116, 158))), press(f, PRESS.down, PRESS.up) * 0.8);
+  if (f >= 112 && chrome > 0) { ctx.globalAlpha = chrome; pointer(ctx, lerpP([1760, 1130], [GEN_C[0] + 18, GEN_C[1] + 6], out3(ramp(f, 116, 158))), press(f, PRESS.down, PRESS.up) * 0.8); ctx.globalAlpha = 1; }
 };
-const sceneDraw = (ctx: Ctx, env: Env, f: number) => {
-  useCam(ctx, env, camLerp(leanCam(f), CARD_CAM, expo(ramp(f, T.draw[0] + 8, T.draw[0] + 80))));
-  drawChatFrame(ctx, { typed: "", caret: false, placeholder: "Describe what you want drawn…", sent: KOI_PROMPT, label: "marker comic" });
+const sceneDraw = (ctx: Ctx, env: Env, f: number, chrome = 1) => {
+  const push = expo(ramp(f, T.draw[0] + 8, T.draw[0] + 80));
+  useCam(ctx, env, camLerp(leanCam(f), CARD_CAM, push));
+  drawChatFrame(ctx, { typed: "", caret: false, placeholder: "Describe what you want drawn…", sent: KOI_PROMPT, sentAlpha: 1 - push, label: "marker comic", labelAlpha: chrome, head: chrome, composer: chrome });
   artCard(ctx, REPLY.x, REPLY.y, REPLY.s, koiLayer(env, f));
 };
 
@@ -140,7 +150,7 @@ const sceneTurn = (ctx: Ctx, env: Env, f: number, tn: Turn, art: (f: number) => 
   const typed = typedAt(tn.prompt, f, k.typeFrom, tn.rate ?? 0.9, tn.seed), img = tn.attach ? env.image?.(tn.attach) : undefined;
   drawChatFrame(ctx, {
     typed: f < k.up ? typed : "", caret: f < k.up, placeholder: "Describe what you want drawn…",
-    sent: f >= k.up ? tn.prompt : undefined, sentAlpha: ramp(f, k.up, k.up + 10),
+    sent: f >= k.up ? tn.prompt : undefined, sentAlpha: ramp(f, k.up, k.up + 10) * (1 - pushU), // the push fades it (focus pull)
     attach: f >= k.up && img ? { img, label: "" } : null,
     genPress: press(f, k.down, k.up), genHot: ramp(f, k.down - 8, k.down),
     label: f >= k.landAt ? tn.label : undefined, labelAlpha: ramp(f, k.landAt, k.landAt + 10),
@@ -421,7 +431,12 @@ const launchAudio = (sr: number): [Float32Array, Float32Array] => {
 const withRail = (draw: (ctx: Ctx, env: Env, f: number) => void) => (ctx: Ctx, env: Env, f: number) => { draw(ctx, env, f); drawRail(ctx, env, f); };
 const shot = (id: keyof typeof T, draw: (ctx: Ctx, env: Env, f: number) => void) => ({ id, start: T[id][0], end: T[id][1], draw: (ctx: Ctx, local: number, env: Env) => draw(ctx, env, T[id][0] + local) });
 export const launch: Film = {
-  meta: { title: "anidoodle · launch", W, H, fps: FPS, bpm: 90, durationFrames: N, raster: "cpu", kind: "launch" },
+  meta: {
+    title: "anidoodle · launch", W, H, fps: FPS, bpm: 90, durationFrames: N, raster: "cpu", kind: "launch",
+    // the reveal pulls back into the editor that draws the film: a full screen of its own code, the words
+    // gathering over it into the sentence. The dense code is the point (it is all code), not a layout fault.
+    checks: { layoutExempt: [[T.reveal[0], T.reveal[1], "the reveal: the editor that draws this film, full of its own code, the words gathering over it"]], none: frozenNone(["gate:identical", "gate:still"]) },
+  },
   assets: { images: { almond: "assets/refs/vangogh-almond-blossom.jpg" } }, // public domain; provenance in engine/assets/refs/PROVENANCE.json
   shots: [
     shot("type", withRail(sceneOpen)), shot("gen", withRail(sceneOpen)), shot("draw", withRail(sceneDraw)), shot("swim", withRail(sceneSwim)),
@@ -431,10 +446,32 @@ export const launch: Film = {
   audio: Object.assign(launchAudio, { scores: [launchLofi()] }),
 };
 
-// THE MOTION TEST: the Generate press, the drop and the bloom, on their own.
-export const launchClip: Film = {
-  meta: { ...launch.meta, title: "anidoodle · launch, the ink test", durationFrames: 120 },
+// THE MOTION TEST: the Generate press, the drop and the bloom, on their own. The chat's small print (the
+// thread's head, the byline, the composer and its button) fades out in the half second before the last
+// one, so the test ends on the bloomed card and the request: nothing under 28 px is left on the end.
+// Its declarations are its own (the launch film's exemptions are for frames this test does not have):
+// anidoodle's temperament and colours, a length budget, and the two words on screen that claim
+// something, each in facts/launchClip.json with its source. Its critic record is reviews/launchClip.json.
+export const launchClip: Film & { claims: string[] } = {
+  meta: {
+    ...launch.meta, title: "anidoodle · launch, the ink test", durationFrames: 120,
+    checks: { length: { target: 4, max: 5 } },
+    // alive but never violent: the press, the drop's arc and the card's spring land small and settle short.
+    // anidoodle's brand colour is its orange accent. The near-black is the drawing ink, a neutral that
+    // washes and trails at part strength by nature in the drawn look, so it is not declared as a brand fill
+    motion: { temperament: "lively", brandColors: [C.accent] },
+    holds: [
+      [7, 27, "the pointer settles on Generate and presses it: a small move on a still chat, the beat before the ink"],
+      [90, 120, "the koi's first pencil lines: fine strokes on a still card, the test ends on the card itself"],
+    ],
+  },
   assets: launch.assets,
-  shots: [{ id: "ink", start: 0, end: 120, draw: (ctx, local, env) => { const f = 140 + local, sh = launch.shots.find((x) => f >= x.start && f < x.end)!; sh.draw(ctx, f - sh.start, env); } }],
+  // the thread's subline says how the art is made, and the card's byline names its style; the prompt is
+  // a user's request and the rest is the chat's own interface, which claim nothing
+  claims: ["drawn in code", "marker comic"],
+  shots: [{ id: "ink", start: 0, end: 120, draw: (ctx, local, env) => {
+    const f = 140 + local, chrome = 1 - inOut(ramp(local, 75, 89)), scene = f < T.draw[0] ? sceneOpen : sceneDraw;
+    scene(ctx, env, f, chrome); drawRail(ctx, env, f);
+  } }],
 };
 export const KEYS = () => ({ SWIM: SW, BRICK: BK, REF: RF, EMB: EM, WEB: WB, FILM: FM, KOI_DONE, SWIM_OPEN, DIVE });

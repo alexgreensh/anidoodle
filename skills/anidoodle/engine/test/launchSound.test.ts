@@ -23,8 +23,9 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   const f = makeLaunchFilm(spec), cues = f.cues, at = (c: number) => Math.round(f.cut.cutOf(c));
   const by = (r: string) => cues.filter((c) => c.role === r);
 
-  // keys: one per character typed on screen (the first prompt is under way at frame 0: only what is typed after it)
-  const typed = f.timing.reduce((a, t) => a + t.times.filter((x) => x >= Math.max(0, t.tin)).length, 0);
+  // keys: one per character typed on screen (the first prompt is under way at frame 0: only what is typed
+  // after it; a later prompt starts as its composer travels in, and those keys are on screen and heard)
+  const typed = f.timing.reduce((a, t) => a + t.times.filter((x) => x >= 0).length, 0);
   ok(by("key").length === typed, `a key cue for every character typed on screen (${by("key").length} of ${typed})`);
   const spaces = prompts.join("").split("").filter((c) => c === " ").length;
   ok(by("key").filter((c) => c.variant === "space").length <= spaces && by("key").some((c) => c.variant === "space"), "the space bar has its own sound");

@@ -123,7 +123,11 @@ const splitLine = (words: string[], d: ReturnType<typeof defaults>, problems: st
 export const phrasePlan = (timing: VoiceTiming, o: PhraseOpts = {}) => {
   const fps = timing.fps, d = defaults(fps, o), problems: string[] = [], events: CaptionEvent[] = [];
   const raw: { line: string; words: TimedWord[] }[] = [];
-  for (const ln of timing.lines) for (const ix of splitLine(ln.words.map((w) => w.w), d, problems, ln.id)) raw.push({ line: ln.id, words: ix.map((i) => ln.words[i]) });
+  for (const ln of timing.lines) {
+    // a line with nothing to show (its display text was "") has no phrase to time: say which, then go on
+    if (!ln.words?.length) { problems.push(`${ln.id}: no words to caption (is its display text empty?)`); continue; }
+    for (const ix of splitLine(ln.words.map((w) => w.w), d, problems, ln.id)) raw.push({ line: ln.id, words: ix.map((i) => ln.words[i]) });
+  }
   // Speech runs at about the reading rule's own pace (0.3 s a word), so phrases placed greedily drift
   // late. Two passes keep them on their words: backward, the latest each phrase may appear and still
   // leave every later phrase its reading time; forward, each appears at its ideal frame (lead before its

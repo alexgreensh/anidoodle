@@ -1,0 +1,90 @@
+{
+  "about": "anidoodle's own review record for launchExampleClean, the worked example of the launch template. Written by fresh critics (agents) over two rounds, not a person's review. A film made from the template gets its own record, written for that film (references/workflows/review.md).",
+  "verdict": "ship (builder agent, template r3): no open P0 or P1; every P2 from critics r1 and r2 fixed and the film re-shipped PASS on 16:9 and 9:16",
+  "findings": [
+    {
+      "id": "c1-1",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): the end card no longer holds still. As its last part lands the page settles in 3 % about the dot on an out-cubic, and the install line is fully on for more than 3 s of it.",
+      "by": "fresh critic r1, rechecked by r2 (agents); fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c1-2",
+      "p": "P1",
+      "status": "fixed",
+      "note": "Words sink at frames 910 to 935, and the headline is fully gone before the dot travels and the bloom opens at 960 to 984. Nothing is cut mid-word.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "c1-3",
+      "p": "P1",
+      "status": "fixed",
+      "note": "Copy now reads 'Month end, one click.' (frames 560 to 700), and the cursor click on Close month at 596 agrees with the words.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "c1-4",
+      "p": "P1",
+      "status": "fixed",
+      "note": "The bloom is now the loudest moment: momentary -10.5 LUFS at 16.3 s against a body of about -12.5, true peak -1.4 dBFS. Slim margin; a short dip before the drop would sell it. Measured only: a person must listen.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "c1-5",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): the grid card's footer stamp is set inline, one gap after the text block (endCard stamp: \"inline\"), and a lockup with a descender declares it (descent 0.3), so the line under 'Tally' keeps its air.",
+      "by": "fresh critic r1, rechecked by r2 (agents); fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c1-6",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): on 16:9 the travels alternate, down then up then down; no two in a row arrive from the same side.",
+      "by": "fresh critic r1, rechecked by r2 (agents); fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c1-7",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): on 9:16 the corner mark sits flush with the content's right edge, at the bottom of the safe rectangle (the platforms' bottom 25 % holds no text, so that is the frame's usable corner), clear of the window.",
+      "by": "fresh critic r1, rechecked by r2 (agents); fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c1-8",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): in a tall frame the product's rows are tall touch rows, so the panel fills the safe rectangle above the corner mark. The bottom 25 % stays empty by design: it is the platforms' caption zone.",
+      "by": "fresh critic r1, rechecked by r2 (agents); fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c1-9",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Counter steps 14 to 3 to 0 across frames 110 to 140, and rows flip to 'matched' one by one.",
+      "by": "fresh critic r1, an agent"
+    },
+    {
+      "id": "c2-1",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): the drop swells left of Explain and clear of its word on both shapes (launchGrammar checks it at any push).",
+      "by": "fresh critic r2, an agent; fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c2-2",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): frame 0 shows the prompt typed to a whole word ('match every').",
+      "by": "fresh critic r2, an agent; fixed in template r3, checked by the builder agent"
+    },
+    {
+      "id": "c2-3",
+      "p": "P2",
+      "status": "fixed",
+      "note": "Fixed (template r3): after each click the pointer rests just above the product window, never on a row's figure (on 9:16 it had settled on '$1,208' at frame 935).",
+      "by": "fresh critic r2, an agent; fixed in template r3, checked by the builder agent"
+    }
+  ]
+}

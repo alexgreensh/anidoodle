@@ -34,6 +34,10 @@ export type Film = { meta: {
   captions?: { from: number; to: number; text: string }[];
   // a legible frame for the poster image and the thumbnail (render --poster-frame, launch.mjs ship)
   poster?: number;
+  // what the film tells the ship checks about itself (shipMeta.ts: layout exemptions, length budget, brand fonts)
+  checks?: import("./shipMeta").ShipMeta;
+  // what the film tells the motion scans (motionMeta.ts: brand colours, temperament, approved shots, exceptions)
+  motion?: import("./motionMeta").MotionMeta;
 }; assets: Assets; shots: Shot[]; audio?: FilmAudio;
   // the same film composed for another frame shape (launch template films); hosts/page.ts calls it for <film>-<shape>
   reshape?: (shape: string) => Film };

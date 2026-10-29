@@ -4,6 +4,7 @@
 import { CHAT_GEOM, chatGeom, CHAT } from "../src/canvas-core/launchKit";
 import { launchLayout, SHAPES, MIN_PX, PHONE_SAFE, estWidth, installRows, monoWidth, parseShapes, type Shape } from "../src/canvas-core/launchLayout";
 import { makeLaunchFilm, fitWords } from "../src/canvas-core/launchTemplate";
+import { measure } from "../src/canvas-core/kinetic"; // the drawn corner mark, written on: the wider of the two presets' marks
 import type { Film } from "../src/canvas-core/film";
 
 type R = { x: number; y: number; w: number; h: number };
@@ -26,6 +27,10 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
     ok(L.thread.cardX >= c.CHAT.x && L.thread.cardX + L.thread.card <= c.CHAT.x + c.CHAT.w && L.thread.card > 0, `${shape}: the answer card (${L.thread.card} px) sits inside the thread`);
     ok(L.thread.bubbles.every((ls) => ls.length <= 3), `${shape}: prompts wrap to at most 3 bubble lines (${L.thread.bubbles.map((b) => b.length).join(", ")})`);
     ok(L.bug.y > c.CHAT.y + c.CHAT.h, `${shape}: the corner mark sits below the chat window, never on it`);
+    // and clear of it, not touching its corner (a fresh critic saw them kiss on 16:9 and 9:16, frame 0): beside
+    // the window by 16 px or more, or under it by 24 px plus what the hook's creep about the window's centre adds (2 %, 4 % on 9:16)
+    { const bw = measure("Your Product", L.bug.px), side = L.bug.x - bw - (c.CHAT.x + c.CHAT.w), under = L.bug.y - 0.75 * L.bug.px - (c.CHAT.y + c.CHAT.h);
+      ok(side >= 16 * L.k || under >= 24 * L.k + (L.zones ? 0.04 : 0.02) * c.CHAT.h / 2, `RED ${shape}: the corner mark clears the window (${Math.round(side)} px beside it, ${Math.round(under)} px under it)`); }
     const pw = Math.max(...L.end.rows.map((r) => monoWidth(r.text, L.end.monoPx) + r.indent * L.end.monoPx * 0.61)) + 2 * L.end.padX;
     ok(pw <= L.W, `${shape}: the install panel (${pw.toFixed(0)} px at ${L.end.monoPx.toFixed(1)} px mono) fits the frame's width`);
     ok(L.end.titleY < L.end.taglineY && L.end.taglineY < L.end.panelY && L.end.footerY < L.stage.h, `${shape}: the end card stacks title, line, panel, footer, all in frame`);
@@ -41,6 +46,7 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
     const bugW = estWidth("Your Product", L.bug.px) * 1.2;
     ok(inside({ x: L.bug.x - bugW, y: L.bug.y - L.bug.px, w: bugW, h: L.bug.px * 1.3 }, S), "9x16: the corner mark sits inside the safe rectangle");
     const at = L.type.at!; ok(!!at && inside({ x: at[0] - L.type.maxW / 2, y: at[1] - 10, w: L.type.maxW, h: 20 }, S), "9x16: a word page's lines are centred in the safe rectangle and no wider than it");
+    ok(Math.abs(E.cx - L.W / 2) < 1e-9, `RED 9x16: the end card centres on the frame (x ${E.cx.toFixed(0)}), not on the safe rectangle, which read 60 px left of the middle`);
     const pw0 = pw;
     ok(inside({ x: E.cx - Math.max(E.titleW, pw0) / 2, y: E.titleY - E.titleMax, w: Math.max(E.titleW, pw0), h: E.footerY + E.footerPx - (E.titleY - E.titleMax) }, S), "9x16: the end card (name, line, install panel, footer) sits inside the safe rectangle");
   }
@@ -77,5 +83,13 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   ok((Object.keys(SHAPES) as Shape[]).every((sh) => { const x = f.reshape(sh); return (x.heroPx ?? 0) >= (x.layout.phone ? 64 : 56); }), `the first prompt is the hero: ${(Object.keys(SHAPES) as Shape[]).map((sh) => `${sh} ${f.reshape(sh).heroPx} px`).join(", ")} (>= 64 on a phone frame, 56 on 16x9)`);
   let long = ""; try { makeLaunchFilm({ title: "Tally", shape: "9x16", asks: [{ prompt: "a very long first prompt that goes on and on about everything it could possibly want drawn today", plate, label: "l" }], tagline: "t", install: ["npm i tally"], bpm: 90, score: null }); } catch (e) { long = (e as Error).message; }
   ok(/shorten it/.test(long), "a first prompt too long for a readable hook is an error, never tiny type");
+  // a split beat's words are read too: up for their reading time (readS) before they sink, or the spec is an
+  // error that says how to make room (the clean scaffold's defaults left "Every receipt, matched for you." up 0.45 s)
+  const ui = { title: "T", nav: ["A"], action: "Go", before: { items: [{ id: "a", label: "x", value: 1 }] }, after: { items: [{ id: "a", label: "x", value: 0, done: true }] } };
+  const splitSpec = (claimBar: number) => ({ title: "Tally", preset: "clean" as const, fps: 60 as const, asks: [{ kind: "ui" as const, ui, prompt: "match every receipt" }, { kind: "ui" as const, ui, split: [{ text: "Every receipt,", style: "ink" as const, color: "#111111" }, { text: "matched for you.", style: "ink" as const, color: "#2f54eb" }] }], words: [[{ text: "ASK ONCE.", style: "ink" as const, color: "#111111" }]], tagline: "t", install: ["npm i tally"], bpm: 90, askBeats: 6, typeBeats: 6, endBeats: 8, claimBar, score: null });
+  let short = ""; try { makeLaunchFilm(splitSpec(4)); } catch (e) { short = (e as Error).message; }
+  ok(/split words/.test(short) && /claimBar|askBeats/.test(short), `RED: split words up too short to read are an error that says how to make room ("${short.slice(0, 90)}")`);
+  let roomy = ""; try { makeLaunchFilm(splitSpec(6)); } catch (e) { roomy = (e as Error).message; }
+  ok(roomy === "", `a split beat with room to be read builds (${roomy.slice(0, 80) || "ok"})`);
   ok(wide.length === 1 && tall.length === 2, `a word page re-sets its lines for a narrow frame (16x9: ${wide.length} line, 9x16: ${tall.map((l) => l.text).join(" / ")})`);
 };

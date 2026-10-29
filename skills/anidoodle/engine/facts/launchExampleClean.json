@@ -4,8 +4,8 @@
   "claims": [
     { "claim": "ASK ONCE.", "where": "on-screen", "generated": true, "note": "demo slogan for a made-up product, states no fact" },
     { "claim": "DONE.", "where": "on-screen", "generated": true, "note": "demo slogan for a made-up product, states no fact" },
-    { "claim": "Books close", "where": "on-screen", "generated": true, "note": "describes the mock UI on screen beside it (its rows reaching their after state); the product is made up" },
-    { "claim": "themselves.", "where": "on-screen", "generated": true, "note": "second line of 'Books close themselves.', describes the mock UI beside it; the product is made up" },
+    { "claim": "Month end,", "where": "on-screen", "generated": true, "note": "describes the mock month-close screen beside it; the product is made up" },
+    { "claim": "one click.", "where": "on-screen", "generated": true, "note": "second line of 'Month end, one click.', describes the one press on the mock screen beside it; the product is made up" },
     { "claim": "And it shows", "where": "on-screen", "generated": true, "note": "describes the mock reports screen beside it; the product is made up" },
     { "claim": "you where.", "where": "on-screen", "generated": true, "note": "second line of 'And it shows you where.', describes the mock reports screen beside it; the product is made up" },
     { "claim": "Bookkeeping that does itself", "where": "on-screen", "generated": true, "note": "demo tagline for a made-up product, states no fact" }

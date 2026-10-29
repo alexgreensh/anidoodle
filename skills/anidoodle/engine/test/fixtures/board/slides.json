@@ -1,0 +1,14 @@
+{ "version": 1,
+  "_about": "RED fixture: the first board of a brand launch film, a list of facts that played as a slide deck",
+  "brief": { "story": "An event for marketers.", "promise": { "line": "Multiply your marketing intelligence" }, "kind": "event", "people": { "speakers": ["?", "?"] } },
+  "rows": [
+    { "id": "s1", "seconds": 3, "action": "You talk to AI all day." },
+    { "id": "s2", "seconds": 3, "action": "Keynotes" },
+    { "id": "s3", "seconds": 3, "action": "Topics strip" },
+    { "id": "logo", "seconds": 3, "action": "the logo appears", "brand": true, "counts": [{ "of": "dots", "from": 3, "to": 2 }], "texture": ["Here is a detailed plan for your campaign"] },
+    { "id": "card", "seconds": 4, "kind": "card", "action": "end card", "words": ["400+ marketers"] },
+    { "id": "joke", "seconds": 2, "kind": "stinger", "action": "see you there?", "words": ["400+ marketers"] },
+    { "id": "card2", "seconds": 4, "kind": "card", "action": "end card again" } ],
+  "jokes": [ { "line": "the AI is too dumb to count", "device": "verbal", "butt": "the AI tool" } ],
+  "pitches": [ { "line": "AI loves em-dashes", "device": "verbal" }, { "line": "AI says great question", "device": "verbal" } ],
+  "program": [ { "name": "Mystery speaker", "role": "", "company": "" }, { "name": "Speaker B", "role": "CMO", "company": "B Co", "title": "Inside the playbook of a very long talk title" } ] }

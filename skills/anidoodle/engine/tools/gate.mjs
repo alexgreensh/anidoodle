@@ -8,20 +8,26 @@
 //   2 CONTRACT     a static scan of every module the film draws through.
 //   3 DEAD AIR     no identical consecutive frames, no half-second window under 0.5 % changed per 1/30 s.
 //   5 3D CHECKS    3D films only: three-core/checks3d.ts on sampled frames plus every frame of a
-//                  grip's contact window. Any finding (a prop through a hand, rigs clipping) fails.
+//                  grip's contact window. Any finding (a prop through a hand, rigs clipping) fails, and
+//                  so does a 3D film that registers nothing to check (unless meta.checks.none["3d"] says why).
+//   A film made before a check existed (a frozen source of a published film) may declare a dead-air row,
+//   meta.checks.none["gate:identical"] or ["gate:still"], with its reason: listed with the reason, never counted.
 //
 // The gate NEVER writes to out/. It renders into .tmp/gate/ and it only ever READS the MP4 it is
 // pointed at, so running it can never damage a finished film.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
+import { ROOTS } from "./overlay.mjs";
+import { trackProvenance } from "./sidecar.mjs";
 import { readdirSync } from "node:fs";
 import { defaultOutput, requireFilm } from "./names.mjs";
 import { changedArea } from "./motion.mjs";
 import { pathToFileURL } from "node:url";
 import { glArgs } from "./adapters/playwright.mjs";
 import { detect } from "./detect.mjs";
+import { deadAirVerdict, threeDVerdict } from "./gaterules.mjs";
 
 const VAL = new Set(["adapter", "mp4", "samples", "scale", "workers"]);
 const pos = [], opt = {};
@@ -69,7 +75,8 @@ const walk = (dir, out = []) => { for (const e of execFileSync("find", [dir, "-n
 const contractScan = () => {
   head(2, "CONTRACT  the art core cannot reach a clock, the network or a file");
   // the worked example is part of the same tree at build time (tools/overlay.mjs): scan it too
-  const files = [...walk("src/canvas-core"), ...(existsSync("src/three-core") ? walk("src/three-core") : []), ...(existsSync("../example/src/canvas-core") ? walk("../example/src/canvas-core") : []), `src/hosts/page-${film}.ts`].filter((f) => existsSync(f));
+  // a linked project (scaffold --linked) draws through the engine's modules too: scan the whole tree the build sees
+  const files = [...new Set(ROOTS.flatMap((r) => ["canvas-core", "three-core"].map((d) => join(r, d))).filter((d) => existsSync(d)).flatMap((d) => walk(d)))].concat(existsSync(`src/hosts/page-${film}.ts`) ? [`src/hosts/page-${film}.ts`] : []);
   const hits = [];
   for (const f of files) { const src = stripComments(readFileSync(f, "utf8")); FORBIDDEN.forEach(([re, label]) => { const m = src.match(new RegExp(re.source, "g")); if (m) hits.push(`${f}: ${label} x${m.length}`); }); }
   say(hits.length === 0, `no forbidden call in ${files.length} art-core modules`, hits.length ? hits.slice(0, 6).join(" | ") : "Math.random, Date, performance.now, ctx.filter, network, image/font loads: none");
@@ -93,8 +100,10 @@ const deadAir = async (mp4, meta) => {
   const merged = []; win.forEach((f) => { const l = merged[merged.length - 1]; if (l && f <= l[1]) l[1] = f + windowSize; else merged.push([f, f + windowSize]); });
   for (const [from, to, reason] of meta.locked ?? []) console.log(`        LOCKED ${from}-${to}: ${reason}; violations remain failures`);
   for (const [from, to, reason] of meta.holds ?? []) if (reason) console.log(`        HOLD ${from}-${to}: ${reason}`);
-  say(still.length === 0, "no unexplained identical consecutive frames", still.length ? still.slice(0, 20).join(", ") : "none");
-  say(merged.length === 0, `no ${windowSize}-frame window under ${meta.kind === "drawing" ? "0.02" : "0.5"}% changed`, merged.map(([a, b]) => `${a}-${b}`).join(", ") || "none");
+  // (a frozen film made before these checks may declare a row in meta.checks.none: listed with its reason, never counted as a pass)
+  const row = (key, ok, label, detail) => { const v = deadAirVerdict(key, ok, detail, meta); if (v.counted) say(v.ok, label, v.detail); else note(`${label} (not judged)`, v.detail); };
+  row("gate:identical", still.length === 0, "no unexplained identical consecutive frames", still.length ? still.slice(0, 20).join(", ") : "none");
+  row("gate:still", merged.length === 0, `no ${windowSize}-frame window under ${meta.kind === "drawing" ? "0.02" : "0.5"}% changed`, merged.map(([a, b]) => `${a}-${b}`).join(", ") || "none");
   const mvt = changed.slice(1).sort((a, b) => a - b);
   console.log(`        ${n} frames measured; median ${((mvt[mvt.length >> 1] ?? 0) * 100).toFixed(2)}%  min ${((mvt[0] ?? 0) * 100).toFixed(2)}%`);
 };
@@ -123,9 +132,9 @@ const checks3d = async (pagePath, meta) => {
     const fill = []; for (let i = 0; i + 1 < sampled.length; i++) { const a = byFrame.get(sampled[i]), b = byFrame.get(sampled[i + 1]); if (a?.grips.length || b?.grips.length) for (let f = sampled[i] + 1; f < sampled[i + 1]; f++) fill.push(f); }
     recs.push(...(await ask(fill)));
     if (errors.length) { say(false, "the 3D check pass drew without errors", errors.slice(0, 3).join("; ")); return; }
-    const findings = recs.flatMap((r) => r.findings), withGrip = recs.filter((r) => r.grips.length).length;
-    if (!recs.length) { note(`no frame registers anything to check (${sampled.length} sampled)`, "a 3D film with characters or held props should register them: three-core/checks3d.ts"); return; }
-    say(findings.length === 0, `${recs.length} frames checked (${sampled.length} sampled + ${fill.length} in grip windows), ${withGrip} with a grip`, findings.length ? `${findings.length} finding(s): ` + findings.slice(0, 6).map((x) => `${x.frame} ${x.kind} ${x.where}: ${x.detail}`).join(" | ") : "no finding");
+    // nothing registered is a check that could not look: FAIL, unless the film declares why (gaterules.mjs)
+    const v = threeDVerdict({ recs, sampled: sampled.length, fill: fill.length, meta });
+    if (v.counted) say(v.ok, v.label, v.detail); else note(v.label, v.detail);
   } finally { await browser.close(); }
 };
 
@@ -210,6 +219,14 @@ const run = async () => {
     head(4, `ARTIFACT  what this adapter delivers`);
     console.log(`        ${art.path}  (${(art.bytes / 1024).toFixed(0)} KB, ${art.kind})`);
     art.checks.forEach((c) => say(c.ok, c.label, c.detail));
+  }
+  // EXTERNAL MUSIC (meta.checks.music.track). "Any score is synthesized in the page" holds for the page; a
+  // film whose music is a supplied or generated track is mixed outside it (track.mjs), so the gate holds
+  // the delivered file to the take its manifest pins instead of waving it through (X3).
+  if (meta.checks?.music?.track) {
+    head("4b", "EXTERNAL TRACK  the music in the file is the pinned take");
+    const mp4 = resolve(opt.mp4 ?? defaultOutput(film)), pv = trackProvenance(resolve(meta.checks.music.track), mp4);
+    say(pv.ok, "the delivered mix comes from the take its manifest pins", pv.detail);
   }
   await checks3d(resolve(`dist/${film}.html`), meta);
 

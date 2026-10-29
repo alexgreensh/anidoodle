@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "about": "The ledger of launchClip, anidoodle's own 4 second motion test (the Generate press, the ink drop and the bloom) cut from the launch film. Its prompt is a user's request and the rest of its text is the chat's own interface; the two lines below are the ones that claim something.",
+  "claims": [
+    { "claim": "drawn in code", "where": "on-screen", "source": { "sentence": "Pictures, films and interactive pieces drawn entirely in code, in 2D or in 3D.", "file": "skills/anidoodle/SKILL.md" } },
+    { "claim": "marker comic", "where": "on-screen", "source": { "sentence": "| 2 | Marker comic | `koi.ts` | flat cel fills with a hard shadow edge, one heavy contour that thickens away from the light |", "file": "skills/anidoodle/references/styles.md" } }
+  ]
+}

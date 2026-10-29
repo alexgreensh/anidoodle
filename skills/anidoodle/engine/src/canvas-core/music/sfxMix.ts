@@ -2,7 +2,7 @@
 // ducked under the cues that matter, one final master (a look-ahead true-peak ceiling), and an
 // audibility guarantee: every cue is measured against the ducked score at its own moment and the
 // mix FAILS if a cue sits more than minDb under it (a cue nobody hears is a bug, not a choice).
-import { renderSfx, validateSfx, sfxNeeds, SFX, SFX_KINDS, type SfxKind, type SfxOpts, type SfxSound } from "./sfxKit";
+import { renderSfx, validateSfx, sfxNeeds, sfxDuckDb, SFX, SFX_KINDS, type SfxKind, type SfxOpts, type SfxSound } from "./sfxKit";
 import { kWeight, winLufs, mixSeed, strSeed, secs, type SfxStereo } from "./sfxCore";
 import { Biquad, db } from "./dsp";
 import { MODES } from "./theory";
@@ -137,7 +137,7 @@ export const placeSfx = (plan: SfxPlan, sr: number): PlacedCue[] => {
 export const sfxDuck = (placed: PlacedCue[], n: number, sr: number, o: SfxPlan["duck"] = {}) => {
   const g = new Float32Array(n).fill(1), att = secs(sr, o.attackS ?? 0.04), maxDb = o.maxDb ?? 9;
   for (const pc of placed) {
-    const depth = Math.min(maxDb, pc.cue.duckDb ?? SFX[pc.cue.kind].duckDb); if (depth <= 0) continue;
+    const depth = Math.min(maxDb, pc.cue.duckDb ?? sfxDuckDb(pc.cue.kind, pc.sound.variant)); if (depth <= 0) continue;
     const rel = secs(sr, pc.cue.kind === "impact" ? 1.2 : o.releaseS ?? 0.28), lo = db(-depth), [a, b] = pc.window;
     for (let i = Math.max(0, a - att); i < Math.min(n, b + rel); i++) {
       const s = i < a ? 0.5 - 0.5 * Math.cos((Math.PI * (i - (a - att))) / att) : i < b ? 1 : 0.5 + 0.5 * Math.cos((Math.PI * (i - b)) / rel);

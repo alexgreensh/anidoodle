@@ -50,6 +50,11 @@ speaking window (K-weighted, see below). Duck is how far the score dips under it
 | brick | clack, snap, tumble | toy bricks: tap, press onto studs, drop on a pile | -15 | 1.5 |
 | thread | pull, pierce, stitch | embroidery: thread through cloth (hit = the tug), the needle | -17.5 | 1.5 |
 
+**Under someone else's music, effects are transients, never notes.** Use the unpitched `tap` kind
+(tick, tickHi, tock, thump, impact); tuned kinds are refused unless the cue says why (`pitched`).
+The impact's in-key shimmer applies only to scores the engine composes. The route for a generated or
+supplied track: `generated-tracks.md`.
+
 ## Placing effects in a film
 
 Cues are addressed by **film frame**, a whole number (a fractional frame throws; to land a hit

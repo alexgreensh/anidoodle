@@ -51,8 +51,18 @@ export const ${n} = makeLaunchFilm({
   title: "TODO Product",                         // the exact product name
   subtitle: "TODO the one line it lives by",
   placeholder: "Ask for anything…",
+  // THE LOOK: your product's own, field by field (launch-video-kit.md, Looks). Uncomment what you need;
+  // every field is optional and the base's value stands for the rest. launchExampleBrand.ts is a worked example.
+  // look: {
+  //   base: "drawn",                              // a registered look: "drawn" or "clean" (or one you registerLook)
+  //   from: brandJson,                             // import brandJson from "../../brand/brand.json" (node tools/brand.mjs import): fills palette, logo
+  //   palette: { bg: "#rrggbb", card: "#rrggbb", ink: "#rrggbb", soft: "#rrggbb", mute: "#rrggbb", line: "#rrggbb", chip: "#rrggbb", accent: "#rrggbb", accentDeep: "#rrggbb", paper: "#rrggbb" }, // checked for contrast (WCAG AA)
+  //   fonts: { display: { family: "Your Serif", file: yourSerif }, text: { family: "Your Sans", file: yourSans } }, // import yourSans from "../../assets/fonts/YourSans.ttf" (a local .ttf, no network)
+  //   shape: { radius: 12, bubble: "rounded", composer: "box", button: "pill", buttonLabel: "Send" }, // bubble rounded|square|none, composer box|bar, button pill|square
+  //   chat: { header: true, title: "Product", subtitle: "its line", logo: undefined, bubble: { fill: "#rrggbb", ink: "#rrggbb" }, reply: { fill: "#rrggbb", ink: "#rrggbb" } },
+  // },
   asks: [
-    { prompt: "TODO what a user types, in their words", plate: lighthouseDraw, label: "TODO the card's byline" },
+    { prompt: "TODO what a user types", plate: lighthouseDraw, label: "TODO the card's byline" },
     { prompt: "TODO the follow-up", plate: foxDraw, label: "TODO byline" },
   ],
   words: [[{ text: "TODO CLAIM.", style: "ink", color: C.ink }, { text: "TODO PROOF.", style: "ink", color: C.accent }]],
@@ -60,8 +70,18 @@ export const ${n} = makeLaunchFilm({
   install: ["TODO the exact install line"],       // shown exactly as given, held 3 s or more
   footer: "TODO where it lives",
   bpm: 90,                                         // TODO the tempo of the score composed for this brief
-  askBeats: 6, typeBeats: 4, endBeats: 8, claimBar: 4,
-  score: null,                                     // TODO the score composed for this product (references/music/compose.md)
+  // THE DECLARATIONS ship reads (node tools/ship.mjs): a check with nothing declared cannot look, and
+  // a check that cannot look fails. Fill each from the brief (launchExample.ts is a worked example).
+  motion: {
+    temperament: "calm",                           // TODO how the brand moves: "calm", "lively" or "snappy"
+    brandColors: [C.accent],                // TODO the brand's own colours, #rrggbb (no see-through fills in them; the drawn look's ink is its pen, not a brand colour unless yours is ink)
+  },
+  claims: [],                                     // TODO every claim beyond the words and tagline (a real number on screen), each in facts.json
+  checks: { length: { target: 30, max: 45 } },     // TODO the length budget in seconds: over max fails, over target flags
+  // the review is yours: a fresh critic's findings go in reviews/${n}.json (references/workflows/review.md)
+  askBeats: 6, typeBeats: 6, endBeats: 8, claimBar: 5,
+  score: null,                                     // TODO the score composed for this product (references/music/compose.md; launchExampleScore.ts is a worked example)
+  sfx: false,                                      // TODO true once the score is in: the sound cues ride the score, and alone they are clicks on silence (soundcheck fails their loudness)
 });
 `;
 const CLEAN = (n) => `// ${n}: a UI-first launch film on the template, in the clean preset (a quiet canvas, one accent,
@@ -72,24 +92,54 @@ const CLEAN = (n) => `// ${n}: a UI-first launch film on the template, in the cl
 import { makeLaunchFilm } from "./launchTemplate";
 import type { ProductUI } from "./productUI";
 
+// (the stand-in is three plain rows on purpose, and the split beat shows it without its command bar: it renders
+// and ships as it is. Your real screen will have more on it,
+// its nav, its figures, its tags; a frame of it over 7 text blocks is dense, and framecheck says so: declare
+// those beats in checks.layoutExempt below once you see them)
 const main: ProductUI = {                          // TODO your product's own UI, its before and after
-  title: "TODO", nav: ["TODO", "TODO"], action: "TODO action", command: "TODO Ask…",
-  before: { items: [{ id: "a", label: "TODO item", value: 3, tag: "TODO" }, { id: "b", label: "TODO item", value: 8 }] },
-  after: { items: [{ id: "b", label: "TODO item", value: 0, done: true, accent: true }, { id: "a", label: "TODO item", value: 0, done: true }] },
+  title: "TODO", action: "TODO action",
+  before: { items: [{ id: "a", label: "TODO first item", tag: "TODO" }, { id: "b", label: "TODO second item" }, { id: "c", label: "TODO third item" }] },
+  after: { items: [{ id: "b", label: "TODO second item", done: true, accent: true }, { id: "a", label: "TODO first item", tag: "TODO", done: true }, { id: "c", label: "TODO third item", done: true }] },
 };
 
 export const ${n} = makeLaunchFilm({
   title: "TODO Product", preset: "clean", fps: 60,
+  // THE LOOK: your product's own, field by field (launch-video-kit.md, Looks). Uncomment what you need;
+  // every field is optional and the base's value stands for the rest. launchExampleBrand.ts is a worked example.
+  // look: {
+  //   base: "clean",                              // a registered look (preset: "clean" above is its shorthand; keep one of the two)
+  //   from: brandJson,                             // import brandJson from "../../brand/brand.json" (node tools/brand.mjs import): fills palette, logo
+  //   palette: { bg: "#rrggbb", card: "#rrggbb", ink: "#rrggbb", soft: "#rrggbb", mute: "#rrggbb", line: "#rrggbb", chip: "#rrggbb", accent: "#rrggbb", accentDeep: "#rrggbb", paper: "#rrggbb" }, // checked for contrast (WCAG AA)
+  //   fonts: { display: { family: "Your Serif", file: yourSerif }, text: { family: "Your Sans", file: yourSans } }, // import yourSans from "../../assets/fonts/YourSans.ttf" (a local .ttf, no network)
+  //   shape: { radius: 12, bubble: "rounded", composer: "box", button: "pill", buttonLabel: "Send" }, // bubble rounded|square|none, composer box|bar, button pill|square
+  //   chat: { header: true, title: "Product", subtitle: "its line", logo: undefined, bubble: { fill: "#rrggbb", ink: "#rrggbb" }, reply: { fill: "#rrggbb", ink: "#rrggbb" } },
+  // },
   asks: [
-    { kind: "ui", ui: main, prompt: "TODO what a user asks the product" },
-    { kind: "ui", ui: main, split: [{ text: "TODO the feature,", style: "ink", color: "#15161a" }, { text: "TODO in five words.", style: "ink", color: "#2f54eb" }] },
+    { kind: "ui", ui: { ...main, command: "TODO Ask…" }, prompt: "TODO what a user asks the product" }, // the ask typed into its command bar
+    { kind: "ui", ui: main, split: [{ text: "TODO the feature,", style: "ink", color: "#15161a" }, { text: "in five words.", style: "ink", color: "#2f54eb" }] }, // TODO the feature in about five words
   ],
   words: [[{ text: "TODO CLAIM.", style: "ink", color: "#15161a" }]],
   tagline: "TODO one sentence that says what it is",
   install: ["TODO the exact install line"],
   footer: "TODO where it lives",
-  bpm: 90, askBeats: 6, typeBeats: 4, endBeats: 8, claimBar: 4,
-  score: null,                                     // TODO the score composed for this product
+  // THE DECLARATIONS ship reads (node tools/ship.mjs): a check with nothing declared cannot look, and
+  // a check that cannot look fails. Fill each from the brief (launchExampleClean.ts is a worked example).
+  motion: {
+    temperament: "calm",                           // TODO how the brand moves: "calm", "lively" or "snappy"
+    brandColors: ["#15161a", "#2f54eb"],         // TODO the brand's own colours, #rrggbb (no see-through fills in them)
+  },
+  claims: [],                                     // TODO every claim beyond the words and tagline (a real number on screen), each in facts.json
+  checks: {
+    length: { target: 30, max: 45 },               // TODO the length budget in seconds: over max fails, over target flags
+    // a product screen dense with rows is the point of its beat, not a layout fault: once you see the beats,
+    // declare each as [from, to, "why"] in film frames (ship's frame row names them; launchExampleClean.ts shows how)
+    // layoutExempt: [[0, 330, "TODO the first ask shows the product's whole inbox: dense UI is the subject"]],
+  },
+  // the review is yours: a fresh critic's findings go in reviews/${n}.json (references/workflows/review.md)
+  // (claimBar 6: the split beat's words need their reading time before the end card; the template says so if not)
+  bpm: 90, askBeats: 6, typeBeats: 6, endBeats: 8, claimBar: 6,
+  score: null,                                     // TODO the score composed for this product (launchExampleCleanScore.ts is a worked example)
+  sfx: false,                                      // TODO true once the score is in: the sound cues ride the score, and alone they are clicks on silence (soundcheck fails their loudness)
 });
 `;
 

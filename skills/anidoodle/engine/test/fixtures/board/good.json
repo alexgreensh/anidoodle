@@ -1,0 +1,22 @@
+{ "version": 1,
+  "brief": { "story": "A marketer stuck in a chat window finds the room of people who already figured it out.",
+    "message": "AI is changing marketing. Nobody has a prompt for that.",
+    "premise": { "pain": "marketers who talk to AI all day", "stereotype": "the assistant's em-dash habit and fake enthusiasm" },
+    "promise": { "line": "Half a day with marketers who already figured it out.", "does": "spend half a day with marketers", "leaves": "real systems that get real results" },
+    "actor": "the three typing dots", "kind": "event",
+    "people": { "hosts": ["Host A", "Host B"], "sponsors": ["Sponsor One"], "partners": "excluded: none this year, decided by the organisers", "speakers": ["Speaker A"] },
+    "voices": { "ai": "three dots, then white type in the reply bubble" },
+    "reference": { "film": "a classic keynote title film", "notes": "reference/deconstruction.md" },
+    "length": { "target": 60, "max": 90 } },
+  "rows": [
+    { "id": "hook", "seconds": 3, "action": "the three typing dots bounce in an empty chat, then type a fast reply", "texture": ["blah blah blah"], "lines": [{ "speaker": "ai", "text": "Great question!" }] },
+    { "id": "fall", "seconds": 4, "action": "the dots fall out of the chat and land in a crowd of dots", "carry": "the three dots" },
+    { "id": "crowd", "seconds": 4, "action": "the crowd of dots wires itself into a network and spirals into one dot", "carry": "the crowd of dots", "counts": [{ "of": "dots", "from": 3, "to": 1, "why": "two dots join the network; one hops up and becomes the logo's dot" }] },
+    { "id": "logo", "seconds": 5, "action": "the network thread becomes the mark's neck and the lockup rises", "carry": "the one dot", "brand": true, "bridge": "the people who connected ARE the event", "builtFrom": "the network thread and the one dot" },
+    { "id": "card", "seconds": 4, "kind": "card", "action": "the lockup slides to the corner and the date, venue and call land on the grid", "carry": "the lockup", "words": ["Reserve a spot"] },
+    { "id": "sting", "seconds": 2, "kind": "stinger", "action": "the dots type one last reply under the card", "carry": "the card", "answers": "the call to reserve a spot on the card", "lines": [{ "speaker": "ai", "text": "You're absolutely right." }] } ],
+  "jokes": [
+    { "line": "Great question!", "device": "verbal", "butt": "the habit of empty praise", "who": "anyone who chats with an assistant daily knows the opener", "row": "hook" },
+    { "line": "an 'I'm not a robot' box ticked at '100% in person'", "device": "visual", "butt": "the situation of proving you are human", "who": "everyone has clicked that box", "row": "card" },
+    { "line": "the dots hesitate, then type 'make no mistakes'", "device": "interaction", "butt": "the habit of over-prompting", "who": "prompt writers recognise their own line", "row": "hook" } ],
+  "program": [ { "name": "Speaker A", "role": "Head of Growth", "company": "Example Co", "logo": "logos/example.svg" } ] }

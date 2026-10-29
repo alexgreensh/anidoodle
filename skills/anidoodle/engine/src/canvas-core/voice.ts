@@ -42,14 +42,17 @@ export const resample = (x: Float32Array, from: number, to: number) => {
   return out;
 };
 
-const decoded = new Map<string, Float32Array>(); // per (line, rate): decoding is pure, so caching it changes nothing
+// Decoded takes, keyed on the take's own base64 text and then on (source rate, target rate). Keying on the
+// exact text means two voices that share a line id and a take length can never be served each other's take.
+const decoded = new Map<string, Map<string, Float32Array>>();
 /** Every line's take on one mono track of `frames` film frames, each starting exactly on its start frame. */
 export const voiceTrack = (v: BakedVoice, sr: number, frames = v.timing.totalFrames) => {
   const fps = v.timing.fps, out = new Float32Array(Math.round((frames / fps) * sr));
   for (const ln of v.timing.lines) {
     const b64 = v.pcm[ln.id]; if (!b64) throw new Error(`voice: no take for line '${ln.id}' (re-run narrate.mjs bake)`);
-    const key = `${ln.id}@${sr}@${b64.length}`;
-    let x = decoded.get(key); if (!x) { x = resample(decodePcm16(b64), v.sampleRate, sr); decoded.set(key, x); }
+    let rates = decoded.get(b64); if (!rates) { rates = new Map(); decoded.set(b64, rates); }
+    const key = `${v.sampleRate}>${sr}`;
+    let x = rates.get(key); if (!x) { x = resample(decodePcm16(b64), v.sampleRate, sr); rates.set(key, x); }
     const at = Math.round((ln.start / fps) * sr);
     for (let i = 0; i < x.length && at + i < out.length; i++) out[at + i] += x[i];
   }

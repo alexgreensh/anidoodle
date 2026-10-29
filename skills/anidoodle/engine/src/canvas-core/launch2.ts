@@ -8,10 +8,12 @@
 // styles as a rolling wall the camera punches into; the full website tour; the words drawn in their
 // media; the corner logo throughout; an end card composed for the frame, with both install lines.
 import type { Ctx, Env, P } from "./core";
+import { texture } from "./readable";
 import type { Film } from "./film";
 import {
   C, GEN, HOME, INPUT, MONO, REPLY, SANS, TEXT, blot, camLerp, caretAt, charTimes, clamp, drawChatFrame, expo, inkDrop, inOut, lerp, lerpP,
   out3, pathOf, plateLayer, pointer, press, ramp, rr, selfLayer, softShadow, typedAt, useCam, type Cam,
+  frozenNone,
 } from "./launchKit";
 import { koiDraw } from "./koiDraw";
 import { koi } from "./koi";
@@ -99,9 +101,9 @@ const drawCard = (ctx: Ctx, env: Env, it: Extract<Item, { kind: "card" }>, x: nu
 };
 // the drop in flight from Generate to where the new card will land
 const drawDrop = (ctx: Ctx, f: number, d: { t0: number; land: number }, to: P) => inkDrop(ctx, f, d, to);
-type ChatO = { typed: string; caret: boolean; press: number; hot: number; flip?: number; hideCard?: number };
+type ChatO = { typed: string; caret: boolean; press: number; hot: number; flip?: number; hideCard?: number; composer?: number };
 const drawChat = (ctx: Ctx, env: Env, f: number, o: ChatO) => {
-  drawChatFrame(ctx, { typed: o.typed, caret: o.caret, placeholder: "Describe what you want drawn…", genPress: o.press, genHot: o.hot });
+  drawChatFrame(ctx, { typed: o.typed, caret: o.caret, placeholder: "Describe what you want drawn…", genPress: o.press, genHot: o.hot, composer: o.composer });
   const sc = scrollAt(f);
   ctx.save(); ctx.beginPath(); ctx.rect(300, 158, 1320, VIEW_BOTTOM - 158); ctx.clip();
   LAYOUT.forEach((L, i) => {
@@ -133,16 +135,19 @@ const sceneOpen = (ctx: Ctx, env: Env, f: number) => {
 
 // ---------------------------------------------------------------- 1: the ask
 const askCam = (ctx: Ctx, f: number): Cam => {
-  const typed = typedAt(KOI_PROMPT, f, ASK.times), [cx] = caretAt(ctx, typed), macro: Cam = { c: [Math.max(TEXT.x + 330, cx - 110), 934], z: 2.4 };
+  // the macro follows the caret, but never so far that the start of the line leaves the frame
+  const typed = typedAt(KOI_PROMPT, f, ASK.times), [cx] = caretAt(ctx, typed), z = 2.4, keepStart = TEXT.x + (W / 2 - 60) / z;
+  const macro: Cam = { c: [Math.min(keepStart, Math.max(TEXT.x + 330, cx - 110)), 934], z };
   return f < 136 ? macro : camLerp(macro, HOME, expo(ramp(f, 136, 158)));
 };
 // the code composition: the koi card at left of centre, its code streaming on the right
 const CODE_CAM = (): Cam => { const r = cardRect(1, 230), z = 1.25; return { c: [r.x + r.s / 2 + (W / 2 - 520) / z, r.y + r.s / 2 - (620 - H / 2) / z], z }; }; // the card lands at (520, 620), the words above it, the code at right
 const sceneAsk = (ctx: Ctx, env: Env, f: number) => {
-  const cam = f < T2.ask[1] ? (f < 160 ? askCam(ctx, f) : camLerp(HOME, CODE_CAM(), expo(ramp(f, 186, 226)))) : HOME;
+  const push = f < T2.ask[1] && f >= 160 ? expo(ramp(f, 186, 226)) : 0, cam = f < T2.ask[1] ? (f < 160 ? askCam(ctx, f) : camLerp(HOME, CODE_CAM(), push)) : HOME;
   useCam(ctx, env, cam);
   const typed = typedAt(KOI_PROMPT, f, ASK.times);
-  drawChat(ctx, env, f, { typed: f < ASK.up ? typed : "", caret: f < ASK.up, press: press(f, ASK.down, ASK.up), hot: ramp(f, 150, 158) });
+  // the code composition crops the composer at the frame's edge: it fades out as the camera pushes in (a focus pull)
+  drawChat(ctx, env, f, { typed: f < ASK.up ? typed : "", caret: f < ASK.up, press: press(f, ASK.down, ASK.up), hot: ramp(f, 150, 158), composer: 1 - push });
   if (f >= 136) pointer(ctx, lerpP([1760, 1130], [GEN_C[0] + 18, GEN_C[1] + 6], out3(ramp(f, 138, 158))), press(f, ASK.down, ASK.up) * 0.8);
   bug(ctx, env, f);
 };
@@ -151,20 +156,22 @@ const sceneAsk = (ctx: Ctx, env: Env, f: number) => {
 const sceneCode = (ctx: Ctx, env: Env, f: number) => {
   const back = expo(ramp(f, 328, 359));
   useCam(ctx, env, camLerp(CODE_CAM(), HOME, back));
-  drawChat(ctx, env, f, { typed: "", caret: false, press: 0, hot: 0 });
+  drawChat(ctx, env, f, { typed: "", caret: false, press: 0, hot: 0, composer: back }); // the composer returns with the camera
   // the editor slides in from the right, the lines stream in time with the drawing
   screen(ctx, env);
   const inU = expo(ramp(f, 200, 222)) * (1 - back), ex = lerp(W + 40, 1010, inU), ey = 110, ew = 830, eh = 860;
   if (inU > 0.001) {
     softShadow(ctx, ex, ey, ew, eh, 22, 1.6); ctx.fillStyle = "#1f1c18"; rr(ctx, ex, ey, ew, eh, 22); ctx.fill();
-    ctx.fillStyle = "#8f8676"; ctx.font = MONO(16); ctx.textBaseline = "middle"; ctx.fillText("koi.ts  ·  drawFish()  ·  running", ex + 26, ey + 30);
+    ctx.fillStyle = "#8f8676"; ctx.font = MONO(16); ctx.textBaseline = "middle"; texture(ctx, () => ctx.fillText("koi.ts  ·  drawFish()  ·  running", ex + 26, ey + 30)); // the editor's title bar, part of the code texture
     const prog = clamp((f - DROP0.land) / (KOI_DONE - DROP0.land)), shown = Math.floor(prog * KOI_CODE.length), first = Math.max(0, shown - 24);
     ctx.save(); ctx.beginPath(); ctx.rect(ex, ey + 56, ew, eh - 70); ctx.clip();
-    for (let i = first; i < Math.min(KOI_CODE.length, shown + 1); i++) {
+    // the code streams in time with the drawing: it shows THAT the koi is code, it is not there to be read
+    // line by line, so its lines are texture to the reading-time rule (readable.ts texture())
+    texture(ctx, () => { for (let i = first; i < Math.min(KOI_CODE.length, shown + 1); i++) {
       const y = ey + 80 + (i - first) * 32, ln = KOI_CODE[i], partial = i === shown ? ln.slice(0, Math.floor(((prog * KOI_CODE.length) % 1) * ln.length)) : ln;
       ctx.fillStyle = "#5d564b"; ctx.font = MONO(13); ctx.fillText(String(i + 1).padStart(3, " "), ex + 16, y);
       ctx.font = MONO(15); ctx.fillStyle = partial.trim().startsWith("//") ? "#8faa7c" : "#ece4d6"; ctx.fillText(partial, ex + 56, y);
-    }
+    } });
     ctx.restore();
   }
   // the point, drawn: no image model
@@ -245,7 +252,9 @@ const sceneHand = (ctx: Ctx, env: Env, f: number) => {
 };
 const sceneLoop = (ctx: Ctx, env: Env, f: number) => {
   const flip = Math.cos(Math.PI * inOut(ramp(f, FLIP - 8, FLIP + 8))), r = cardRect(4, f), push = inOut(ramp(f, FLIP + 12, FLIP + 52));
-  useCam(ctx, env, camLerp(HOME, { c: [r.x + r.s / 2, r.y + r.s / 2], z: 1040 / r.s }, push));
+  // the push frames the card and its byline above it, so the byline is never cut by the frame's top edge
+  const top = r.y - 40, z = (H - 60) / (r.y + r.s - top);
+  useCam(ctx, env, camLerp(HOME, { c: [r.x + r.s / 2, (top + r.y + r.s) / 2], z }, push));
   drawChat(ctx, env, f, { typed: "", caret: false, press: 0, hot: 0, flip: Math.abs(flip) < 0.02 ? 0.02 : Math.abs(flip) });
   bug(ctx, env, f);
 };
@@ -318,7 +327,7 @@ const audio2 = (sr: number): [Float32Array, Float32Array] => {
 // ---------------------------------------------------------------- the film
 const shot = (id: keyof typeof T2, draw: (ctx: Ctx, env: Env, f: number) => void) => ({ id, start: T2[id][0], end: T2[id][1], draw: (ctx: Ctx, local: number, env: Env) => draw(ctx, env, T2[id][0] + local) });
 export const launch2: Film = {
-  meta: { title: "anidoodle · launch, cut 2", W, H, fps: FPS, bpm: 90, durationFrames: N, raster: "cpu", kind: "launch" },
+  meta: { title: "anidoodle · launch, cut 2", W, H, fps: FPS, bpm: 90, durationFrames: N, raster: "cpu", kind: "launch", checks: { none: frozenNone(["gate:identical", "gate:still"]) } },
   assets: { images: { almond: "assets/refs/vangogh-almond-blossom.jpg" } }, // public domain; provenance in engine/assets/refs/PROVENANCE.json
   shots: [
     shot("open", sceneOpen), shot("ask", sceneAsk), shot("code", sceneCode), shot("swim", sceneSwim), shot("wall", sceneWall), shot("brick", sceneBrick),

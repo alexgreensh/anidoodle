@@ -45,6 +45,9 @@ export const tween = (f: number, a: number, b: number, e: Ease = ease.inOutCubic
  * after a turn). Closed form, so frame 300 never needs frames 0-299. freq in Hz, damping 0-1.
  */
 export const spring = (f: number, at: number, fps: number, freq = 2.2, damping = 0.28) => {
+  // a 0 fps or a 0 Hz spring has no time to ring in: it would return NaN, and a NaN position draws nothing
+  if (!(fps > 0) || !Number.isFinite(fps)) throw new Error(`spring: fps must be a positive number of frames per second (got ${fps})`);
+  if (!(freq > 0) || !Number.isFinite(freq)) throw new Error(`spring: freq must be a positive number of Hz (got ${freq})`);
   if (f < at) return 0;
   const t = (f - at) / fps, w = 2 * Math.PI * freq, z = Math.min(0.999, Math.max(0, damping)), wd = w * Math.sqrt(1 - z * z);
   return Math.exp(-z * w * t) * (Math.cos(wd * t) + ((z * w) / wd) * Math.sin(wd * t));
@@ -63,6 +66,7 @@ export const beatFrames = (bpm: number, fps: number) => (60 * fps) / bpm;
  * use the real frame directly.
  */
 export const storyClock = (anchors: [story: number, real: number][]) => {
+  if (!anchors.length) throw new Error("storyClock: give at least one [storyFrame, realFrame] anchor");
   const a = [...anchors].sort((x, y) => x[0] - y[0]);
   for (let i = 1; i < a.length; i++) if (!(a[i][0] > a[i - 1][0] && a[i][1] > a[i - 1][1])) throw new Error(`storyClock: anchors must increase in both columns (at ${a[i - 1]} -> ${a[i]})`);
   const map = (x: number, from: 0 | 1, to: 0 | 1) => {

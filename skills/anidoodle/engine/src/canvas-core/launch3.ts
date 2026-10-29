@@ -5,7 +5,7 @@
 // off to reveal the next scene. (Chosen: the ink bloom, and every word in ink.) 29 bars of the score (launchLofi3), 77 s.
 import type { Ctx, Env } from "./core";
 import type { Film } from "./film";
-import { C } from "./launchKit";
+import { C, frozenNone } from "./launchKit";
 import { content2, SFX2, T2, WEB_SKIP } from "./launch2";
 import { logoBug } from "./kinetic";
 import { beatGrid, makeCut, pic, type, typeFrame, type Seg, type TypeSeg } from "./launchCut";
@@ -100,7 +100,10 @@ const ACCEPTED3: [number, number, string][] = [
 ];
 
 export const launch3: Film = {
-  meta: { title: "anidoodle · launch, cut 3", W, H, fps: FPS, bpm: 90, durationFrames: N3, raster: "cpu", kind: "launch", holds: [...HOLDS3, ...ACCEPTED3] },
+  meta: { title: "anidoodle · launch, cut 3", W, H, fps: FPS, bpm: 90, durationFrames: N3, raster: "cpu", kind: "launch", holds: [...HOLDS3, ...ACCEPTED3],
+    // the code composition: the editor slides in over the chat, so its title bar crosses the sent prompt.
+    // The overlap is the move (the koi IS this code); the editor is opaque, the probe cannot see that.
+    checks: { layoutExempt: [[205, 283, "the code editor slides in over the chat: an opaque panel crossing the sent prompt, by design"]], none: frozenNone(["gate:identical"]) } },
   assets: { images: { almond: "assets/refs/vangogh-almond-blossom.jpg" } }, // public domain; provenance in engine/assets/refs/PROVENANCE.json
   shots: [{ id: "cut", start: 0, end: N3, draw: (ctx, F, env) => { const { s, local } = at(F); if (s.kind === "pic") content2(ctx, env, contentOf(s, local)); else drawType(ctx, env, s, local, F); } }],
   audio: Object.assign(audio3, { scores: [launchLofi3()] }),

@@ -12,6 +12,7 @@ import type { Ctx, Env } from "./core";
 import type { Film } from "./film";
 import * as THREE from "three";
 import { draw3d, memo } from "../three-core/stage";
+import { checking, registerPath, registerSize, runChecks } from "../three-core/checks3d";
 import { ease, seg, tween } from "../three-core/time";
 import { crane, dolly, dutch, handheld, hash01, look, orbit, path, place, pushIn, then, whipPan, withMods, type CamState, type Move, type V3 } from "../three-core/camera";
 import { assemble, dropIn, explode, grid, indicate, lagged, morph, moveAlongPath, popIn, riseFromFloor, wave, writeOn, writeTube } from "../three-core/mograph";
@@ -138,6 +139,17 @@ const draw = (ctx: Ctx, f: number, env: Env) => {
   s.rim.position.set(at[0] - 4, 5, at[2] - 8); s.rim.target.position.set(at[0], 1, at[2]);
   place(s.cam, c, env);
   draw3d(ctx, env, s.scene, s.cam, { clear: BG, shadows: true });
+  // what each station must keep true (checks3d, gate check 5): its subject big enough to read, and the bead
+  // riding the ribbon never passes through a pillar (an upright cylinder the bead's size around its centre)
+  if (checking()) {
+    if (f < CUT.write) registerSize(s.tiles, 40);
+    else if (f < CUT.morph) {
+      registerSize(s.pillars, 40);
+      if (f >= w0) registerPath({ at: (ff) => s.swoop.getPointAt(ease.inOutSine(seg(ff, w0, w1))).clone().setY(s.swoop.getPointAt(ease.inOutSine(seg(ff, w0, w1))).y - 0.24), from: f, to: f, radius: 0.24, height: 0.48, name: "bead" }, s.pillars.children.map((c, i) => ({ name: `pillar ${i + 1}`, box: c })));
+    } else if (f < WHIP) registerSize(s.ringTube, 40);
+    else if (f >= CUT.explode) registerSize(s.blockWrap, 40);
+    runChecks(f, s.cam, env);
+  }
 };
 
 const shot = (id: string, start: number, end: number) => ({ id, start, end, draw: (ctx: Ctx, local: number, env: Env) => draw(ctx, start + local, env) });

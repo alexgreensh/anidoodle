@@ -5,7 +5,9 @@
 // colour to assert, and a one-shot film has no seam to hide.
 //
 //   node tools/verify-export.mjs <film> [--file out/x.mp4] [--adapter html-player]
-//   node tools/verify-export.mjs out/<film>.mp4 [...]   the file itself: the film is its name (out/<film>[.<from>-<to>].<ext>)
+//   node tools/verify-export.mjs out/<file>.mp4 [...]   the file itself: the film is its sidecar's (<file>.film.json,
+//                             written by render), else its name (out/<film>[.<from>-<to>].<ext>); a renamed file
+//                             with neither gets the --file form to run instead
 //     [--width W]               expected pixel width of a .gif/.webm/.apng made with render --width
 //                               (default: the film's own; height follows the aspect). Not for .mp4:
 //                               render always writes the MP4 at the film's size (x --scale), so
@@ -33,7 +35,8 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { defaultOutput, requireFilm } from "./names.mjs";
+import { defaultOutput, knownFilms, requireFilm } from "./names.mjs";
+import { filmOfFile, readSidecar, trackProvenance } from "./sidecar.mjs";
 import { firstFrameBlank } from "./thumb.mjs";
 import { mono, onsetNear, xcorrOffset } from "./avsync.mjs";
 import { filmShape } from "./filmshape.mjs";
@@ -46,7 +49,9 @@ const USAGE = "node tools/verify-export.mjs <film> [--file out/<film>.mp4] [--fi
 if (pos[0] && /\.(mp4|gif|webm|apng|png)$/i.test(pos[0])) {
   if (opt.file) { console.error(`verify-export: give the file once: '${pos[0]}' or --file ${opt.file}`); process.exit(2); }
   if (!existsSync(pos[0])) { console.error(`verify-export: no file '${pos[0]}'`); process.exit(2); }
-  opt.file = pos[0]; pos[0] = basename(pos[0]).split(".")[0];
+  opt.file = pos[0]; const who = filmOfFile(pos[0], knownFilms());
+  if (!who.film) { console.error(`verify-export: ${who.why}`); process.exit(2); }
+  pos[0] = who.film; console.log(`film "${who.film}" from the ${who.how}`);
 }
 const film = requireFilm(pos[0], "verify-export", USAGE);
 const adapterName = opt.adapter ?? "html-player";
@@ -80,6 +85,13 @@ const file = resolve(opt.file ?? defaultOutput(film));
 console.log(`VERIFY-EXPORT   film "${meta.title}"   file ${file}`);
 if (!existsSync(file)) die(`${file} not found`);
 const isMp4 = /\.(mp4|m4v|mov)$/i.test(file);
+// the sidecar render wrote beside the file: it must name THIS film, and a placeholder render never ships
+{ const sc = readSidecar(file);
+  if (sc?.error) die(sc.error);
+  if (sc?.film && sc.film !== film) die(`${basename(file)} was rendered from film '${sc.film}' (its sidecar), not '${film}'`);
+  if (sc?.stale) note("the sidecar's hash does not match the file", "the file changed after render wrote it: re-render, or check what touched it");
+  const ph = [...new Set([...(sc?.placeholders ?? []), ...(meta.placeholders ?? [])])];
+  if (ph.length) (opt.delivery ? (l, d) => say(false, l, d) : note)(`rendered with ${ph.length} placeholder asset(s): ${ph.join(", ")}`, "a labelled grey box stands in for each; --delivery refuses it"); }
 if (opt.width && isMp4) die(`--width does not apply to an MP4: render writes it at the film's own size (x --scale); use --scale to check a scaled render`);
 const FRAME = opt.frame === undefined ? 0 : Number(opt.frame);
 if (!Number.isInteger(FRAME) || FRAME < 0 || FRAME >= N) die(`--frame wants a frame number in [0, ${N - 1}], got '${opt.frame}'`);
@@ -100,7 +112,9 @@ say(Math.abs(dur - wantDur) <= slack, `duration ${dur.toFixed(3)} s`, `expected 
 if (isMp4) {
   head("1b", "SOUND  the score is in the file, as long as the picture, and audible");
   const a = ffprobe(["-select_streams", "a", "-show_entries", "stream=codec_name,duration,sample_rate,channels", "-of", "csv=p=0", file]).split("\n").filter(Boolean);
-  const hasAudio = meta.hasAudio ?? Boolean(await s.audio?.(48000)); // older pages / other adapters: ask the score itself
+  // a supplied or generated track (meta.checks.music.track) is mixed outside the page: the file must carry it
+  const ext = meta.checks?.music?.track ? resolve(meta.checks.music.track) : null;
+  const hasAudio = ext ? true : meta.hasAudio ?? Boolean(await s.audio?.(48000)); // older pages / other adapters: ask the score itself
   if (!hasAudio) say(a.length === 0, "no audio stream (the film has no score)", a.length ? `found ${a.length}: ${a.join(" | ")}` : "");
   else if (!a.length) say(false, "an audio stream (the film has a score)", "none found: was it a range render?");
   else {
@@ -111,6 +125,11 @@ if (isMp4) {
     const mx = Number(((vd.stdout + vd.stderr).match(/max_volume:\s*(-?[0-9.]+|-inf) dB/) ?? [])[1]);
     say(Number.isFinite(mx) && mx > -40 && mx <= 0, `audio peak ${Number.isFinite(mx) ? mx.toFixed(1) : "-inf"} dBFS`, "audible (> -40 dBFS) and not clipped past 0");
 
+    if (ext) {
+      head("1c", "TRACK  the music is the pinned take (an external track, mixed by track.mjs)");
+      const pv = trackProvenance(ext, file); say(pv.ok, "the delivered mix comes from the take its manifest pins", pv.detail);
+      note("shape, holes and the ending of an external track", "track.mjs check measures them on this file against the track's declared stops (ship runs it)");
+    } else {
     head("1c", "SYNC  the delivered sound sits on the picture's frames");
     const SR = 48000, dec = spawnSync("ffmpeg", ["-v", "error", "-i", file, "-map", "0:a:0", "-f", "f32le", "-ac", "2", "-ar", String(SR), "-"], { maxBuffer: 1 << 30 });
     if (dec.status !== 0) die(`ffmpeg could not decode the audio: ${dec.stderr.toString().trim()}`);
@@ -136,6 +155,8 @@ if (isMp4) {
         if (Number.isFinite(on) && Number.isFinite(want)) say(Math.abs(on - want) * 1000 <= 5, `frame ${mk.frame} ${mk.label}: the attack starts ${((on - t) * 1000).toFixed(1)} ms from its frame`, `the master's attack is at ${((want - t) * 1000).toFixed(1)} ms (the sound's own lead); delivered within 5 ms of it (AAC pre-echo can pull a sharp attack a few ms early)`);
         else note(`frame ${mk.frame} ${mk.label}: no attack found within 80 ms`, "a soft attack; the cross-correlation above is the sync measurement");
       }
+    }
+
     }
 
     head("1d", "PEAK  the true peak of the file as delivered (after the encode)");

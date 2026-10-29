@@ -1,0 +1,5 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- GREEN fixture: two dots and an S-curve neck, the same after a half turn -->
+  <circle cx="50" cy="50" r="40" fill="#FFD900"/><circle cx="150" cy="150" r="40" fill="#FFD900"/>
+  <path d="M60 70 C100 70 100 110 140 110 L140 130 C100 130 100 90 60 90 Z" fill="#FFD900"/>
+</svg>

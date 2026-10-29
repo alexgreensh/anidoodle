@@ -36,16 +36,17 @@ or in 3D (one medium per film), what **shape** (1x1, 9x16, 16x9, 4x5 or any W x 
 | A story film, any length | Film workflow below, `references/workflows/long-film.md` |
 | A 3D film or 3D motion graphics: extruded type, objects, puppets, a camera through space | `references/workflows/three-d.md` |
 | An explainer or infographic; a machine that comes apart to explain an idea, in any style | `references/workflows/explainer.md`, `references/workflows/machines.md` |
-| A launch or product video (their screenshots welcome) | `references/workflows/launch-video.md`; build it on `references/workflows/launch-video-kit.md`; its claims: `references/workflows/facts.md` |
+| A launch or product video, or 2D motion graphics (their screenshots welcome) | `references/workflows/launch-video.md`; one world, one camera: `references/workflows/motion-film.md`; the kit: `references/workflows/launch-video-kit.md`; claims: `references/workflows/facts.md` |
+| A film in someone else's brand: their exact elements, logos, fonts, sponsors, an event program | `references/workflows/brand-film.md` (imported and signed off before the first board) |
 | Art for a site (hero by a headline, tiles, spots, share card) on its page colour and brand; or a web animation that reacts to the UI | `references/workflows/site-art.md`; `references/workflows/interactive.md` |
 | A drawing lesson, or "how do I draw this?" | `references/workflows/teach-drawing.md` |
 | A character kept identical in any style (woodcut to toy brick) | `references/workflows/character-consistency.md`, `references/anatomy.md` |
 | A style matched from their image | `references/workflows/adapt-a-style.md` |
-| A score or soundtrack | `references/music/README.md` |
+| A score or soundtrack; or a generated or licensed track cut to the film | `references/music/README.md`; `references/music/generated-tracks.md` |
 | Narration, a voice-over, word timing or subtitles | `references/workflows/narration.md` |
 
 - Music: pick a style vocabulary (`references/music/styles/vocabularies.md`; deep dives `references/music/styles/music-box.md`, `references/music/styles/lofi-electronic.md`) and mood, sketch the tension arc and motif, compose your own harmony, motif and form (references/music/compose.md, craft in references/music/theory/), revise until node tools/music.mjs craft shows only findings you chose, then check must PASS before a human listens. Styles give sound, never notes.
-- Sound effects: references/music/sound-design.md. 14 layered, seeded effects cued by film frame (filmSfx); the score ducks, and every cue must be within 6 dB of it. Effects only on real direction changes, one riser + one impact per film.
+- Sound effects: references/music/sound-design.md. 14 layered, seeded effects cued by film frame (filmSfx); the score ducks, and every cue must be within 6 dB of it. Effects only on real direction changes, one riser + one impact per film. Under someone else's music, unpitched `tap` effects only.
 - Launch films: `launchTemplate.ts` renders a product's launch from data (prompts, plates or its own UI, a score composed for it, words, install lines) in every shape from one timeline; `launch.mjs new|ship`. Habits that save tokens: `references/working-method.md`.
 
 ## The seven laws
@@ -80,11 +81,11 @@ size and shape asked for from the same source, and say `reproducible` was printe
 something moves every second. Check the seam (last frame against frame 0). ✋ **One approval, on the moving file.**
 
 **Film.** (1) **The story in three sentences** (setup, transformation, payoff) and the token; for
-longer films, a spine plus one line per chapter. If you cannot write it, stop. (2) **The grid**:
+longer films, a spine plus one line per chapter; a launch or brand film adds a `board.json` that `board.mjs` passes. If you cannot write it, stop. (2) **The grid**:
 a beat is 60 x fps / bpm frames, the bpm from the brief's score; one cue table holds every frame number and a checker
 runs at load. (3) **Real reference** for anything that exists. (4) **ONE look still**, the hardest
 frame, critiqued in writing. ✋ **Approval.** (5) **ONE 8-second music sample.** ✋ **Approval.**
-(6) **Build the whole film**; mechanical checks run continuously. (7) **A fresh critic reviews, never you**
+(6) **Build the whole film**; mechanical checks run continuously, and `ship.mjs` passes on the exact file before anyone sees a version. (7) **A fresh critic reviews, never you**
 (`references/workflows/review.md`): after the storyboard, each scene and the full render, a new subagent that saw none of the building returns ranked, timestamped problems and a verdict. Fix the biggest, a NEW critic rechecks; 3 rounds at most, logged in `ledger.md`.
 (8) ✋ **Final approval.** Say what you verified and what you cannot. Three approval gates at most. Approval is a budget; spend it where being wrong is expensive.
 
@@ -101,7 +102,7 @@ draws itself declares `kind: "drawing"` and is judged on a finer floor; a freeze
 ## The engine
 
 `engine/` is the portable art core plus the tooling. `engine/src/canvas-core` knows nothing
-about the DOM or any backend. `W`, `H`, `fps` and `durationFrames` come from the film's `meta`.
+about the DOM or any backend. `W`, `H`, `fps` and `durationFrames` come from the film's `meta`. Four backends, one art core → `references/backends-and-adapters.md`.
 3D: `engine/src/three-core` renders three.js onto the same frame, so every tool below works on 3D films (vendored and hash-pinned, `engine/vendor/three/PROVENANCE.md`; type face `engine/assets/fonts/PROVENANCE.md`).
 Camera moves (pans, dollies, lens and dolly zooms, parallax, shake) and slow motion or freeze frames: `engine/src/canvas-core/camera.ts`, `engine/src/canvas-core/timeRemap.ts`, `references/camera.md`.
 Seams between scenes: `references/motion-grammar.md` (cuts that carry motion: `seams.ts`; `tools/deck.mjs deal` deals each film different moves; `deck.mjs find "<name>"` turns a move's everyday name into its card). `render.mjs --blur auto` renders with motion blur (subframes per frame
@@ -123,24 +124,21 @@ node <skill>/engine/tools/soundfetch.mjs get piano rooms  # on their yes (piano 
 | `scaffold.mjs` | a project with a still and/or film; `--duration`, `--format` or `--size`, `--fps`, `--bpm` |
 | `still.mjs` / `render.mjs` | frames drawn twice with hashes (`--frames a,b,c --sheet <file>` in one browser) / the piece in any format (`--from/--to`, `--poster-frame`, `--hashes`) |
 | `gate.mjs` | determinism, contract, dead air, artifact, 3D checks; `--self-test` proves it can fail |
-| `registry.mjs` / `gallery.mjs` | the style list from the plates themselves / the gallery sheet |
-| `docs-check.mjs` | fails when any doc's style count, length or path disagrees with the code |
+| `registry.mjs` / `gallery.mjs` / `docs-check.mjs` | the style list from the plates / the gallery sheet / fails when a doc's style count, length or path disagrees with the code |
 | `verify-export.mjs` | QA on the rendered file: frames, duration, score, A/V sync, true peak after the encode; opt-in first frame, loop seam, `--delivery` |
-| `launch.mjs` | a launch film: `new <name>` scaffolds the spec; `ship <name> --shapes 16x9,9x16` renders, posters, captions, verifies and framechecks each (`framecheck.mjs`: text whole, up long enough to read, clear of the 9:16 phone zones) and checks `facts.json` (`facts.mjs`) |
+| `launch.mjs` | a launch film: `new <name>` scaffolds the spec (its `look` wears the product's own fonts, palette, shapes and logo: launch-video-kit.md, Looks); `ship <name> --shapes 16x9,9x16` renders, posters, captions, verifies and framechecks each (`framecheck.mjs`: text whole, up long enough to read, clear of the 9:16 phone zones) and checks `facts.json` (`facts.mjs`) |
 | `test.mjs` (`npm test`) | unit suites in `engine/test/`, no browser |
 | `music.mjs` | `vocab` prints a style's vocabulary; `check` gates your composed score (key, master, guards, stems, novelty, which parts played recordings) and prints its shape (ARC); `render`, `meter` |
 | `narrate.mjs` | narration: `say` (takes, cached), `time`, `check` (hears every word back; exit 1 on a dropped word), `bake`, `all`, `providers` |
-| `soundfetch.mjs` | the sound pack: `list`, `get <id...\|all>`, `where`, `verify`, `remove <id>` |
-| `sfx.mjs` | the sound-effects kit: `list`, `one`, `kit <dir>`, `test` |
-
-Four backends, one art core: `playwright`, `html-player`, `remotion`, `hyperframes` → `references/backends-and-adapters.md`.
+| `soundfetch.mjs` / `sfx.mjs` | the sound pack: `list`, `get <id...\|all>`, `where`, `verify`, `remove <id>` / the effects kit: `list`, `one`, `kit <dir>`, `test` |
+| `ship.mjs` | every check on the exact delivered file (framecheck on all drawn text, verify-export, gate, motion and layer scans, locks, sound, cues, facts, review ledger, length), one table and a critic sheet; a check that cannot look FAILS |
+| `board.mjs` / `brand.mjs` | the brief and storyboard checked before drawing / a brand imported exactly: `import --sheet`, `inventory`, `find`, `check`, `logos`, `logo` |
+| `motionscan.mjs` / `layerscan.mjs` / `lock.mjs` / `worldfilm.mjs` | slide cuts, carousels, dissolves, temperament on the MP4 / text residue, fast type, shapes over faces, translucent brand colour / approved shots frozen / a film started as one world |
+| `track.mjs` / `cues.mjs` | an outside track: `analyze`, `cut` by bars, `mix`, `master`, `check`, `listen`, `prompt` (never sent) / the film's own event times for sound and sync |
 
 ## Worked examples
 
-- **The style plates** in `engine/src/canvas-core/`: every hand has a still and a film of it being
-  drawn, with the recipe in the header and `references/styles/<id>.md`.
-- **MECHANICAL LEPIDOPTERA** in `example/`: a 47 s scored film. `scaffold.mjs ~/study --example`.
-**Study them. Do not copy them.** The craft bar is not satisfied by inheritance.
+The style plates in `engine/src/canvas-core/` (a still and a film of each being drawn, recipe in the header and `references/styles/<id>.md`) and **MECHANICAL LEPIDOPTERA** in `example/`, a 47 s scored film (`scaffold.mjs ~/study --example`). **Study them. Do not copy them.** The craft bar is not satisfied by inheritance.
 
 ## Honest limits
 

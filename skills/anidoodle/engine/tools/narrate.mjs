@@ -25,6 +25,7 @@
 // the environment and never printed. say (macOS), kokoro (local) and files (your own recordings) stay
 // on this machine.
 import { spawnSync } from "node:child_process";
+import { enginePath } from "./overlay.mjs";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -38,6 +39,7 @@ import * as openai from "./narrate/providers/openai.mjs";
 import * as elevenlabs from "./narrate/providers/elevenlabs.mjs";
 import * as kokoro from "./narrate/providers/kokoro.mjs";
 import * as files from "./narrate/providers/files.mjs";
+import { which } from "./narrate/providers/util.mjs";
 
 export const PROVIDERS = { say, gemini, openai, elevenlabs, kokoro, files };
 const SR = 24000, CACHE = resolve(".cache/voice"), POST = "trim45-pad40-80-lufs20-pk3-v1"; // POST names the take processing: change it and every take is made again
@@ -117,7 +119,7 @@ export const findModel = (flag) => {
   if (!pick) die(`no whisper.cpp model in ${dir}. Get one (MIT, about 148 MB):\n  mkdir -p ~/.cache/whisper && curl -L -o ~/.cache/whisper/ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin\n(ggml-small.en.bin, about 488 MB, hears better)`);
   return join(dir, pick);
 };
-const whisperBin = () => { for (const c of ["whisper-cli", "whisper-cpp"]) { const r = spawnSync("/usr/bin/env", ["which", c], { encoding: "utf8" }); if (r.status === 0) return r.stdout.trim(); } die("whisper.cpp is not installed (brew install whisper-cpp gives whisper-cli)"); };
+const whisperBin = () => { for (const c of ["whisper-cli", "whisper-cpp"]) { const f = which(c); if (f) return f; } die("whisper.cpp is not installed (brew install whisper-cpp gives whisper-cli)"); };
 /** Transcribe a take with NO prompt (the check must hear what was said, not what was meant). Cached by take + model. */
 export const transcribe = (file, model, lang = "en") => {
   const key = sha(readFileSync(file).toString("base64") + "\0" + basename(model) + "\0" + lang + "\0ml1-sow"), dir = join(CACHE, "asr"), hit = join(dir, `${key}.json`);
@@ -153,7 +155,7 @@ export const timeScript = async (s, o = {}) => {
 // ---------------------------------------------------------------- check
 // the phrase subtitles, built by the film's own module, so the check and the film can never disagree
 const loadSubtitles = async () => {
-  const js = (await build({ entryPoints: [resolve("src/canvas-core/subtitles.ts")], bundle: true, format: "esm", write: false, platform: "neutral", logLevel: "error" })).outputFiles[0].text;
+  const js = (await build({ entryPoints: [enginePath("src/canvas-core/subtitles.ts")], bundle: true, format: "esm", write: false, platform: "neutral", logLevel: "error" })).outputFiles[0].text;
   return import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
 };
 const show = (p) => { const r = relative(process.cwd(), p); return r.startsWith("..") ? p : r; };
@@ -187,13 +189,22 @@ export const checkScript = async (s, o = {}) => {
   // the film plays the BAKED takes: a module baked from other takes (or another timing) is a stale film
   const mod = resolve(o.module ?? `src/canvas-core/${s.name}Voice.ts`); let stale = false;
   if (existsSync(mod)) {
-    const src = readFileSync(mod, "utf8"), hashes = [...src.matchAll(/"hash":"([0-9a-f]{64})"/g)].map((m) => m[1]), frames = Number((src.match(/"totalFrames":(\d+)/) ?? [])[1]);
-    stale = !o.ignoreStale && hashes.join() !== timing.lines.map((l) => l.hash).join() || frames !== timing.totalFrames;
+    stale = bakedStale(readFileSync(mod, "utf8"), timing, !!o.ignoreStale);
     console.log(`  BAKED  ${show(mod)}: ${stale ? "FAIL   baked from other takes or timing: run narrate.mjs bake" : "matches these takes and this timing"}`);
   } else console.log(`  BAKED  ${show(mod)}: not baked yet (narrate.mjs bake writes it)`);
   const bad = rows.filter((r) => r.problems.length).length + (plan.problems.length ? 1 : 0) + (mixBad ? 1 : 0) + (stale ? 1 : 0);
   console.log(bad ? `NARRATE CHECK: FAIL   ${rows.filter((r) => r.problems.length).length} line(s) failed${plan.problems.length ? `, ${plan.problems.length} subtitle problem(s)` : ""}${mixBad ? ", the mix lost words" : ""}${stale ? ", the baked module is stale" : ""}` : `NARRATE CHECK: PASS   ${rows.length}/${rows.length} lines heard word for word, timed and clean`);
   return { ok: !bad, rows, timing, plan };
+};
+
+/**
+ * Is a baked module out of date for these takes and this timing? It is when its take hashes or its
+ * length differ. `all` passes ignoreStale, because re-baking a stale module is the job it exists to do:
+ * the parentheses make that cover a changed length too, not only changed takes.
+ */
+export const bakedStale = (src, timing, ignoreStale = false) => {
+  const hashes = [...src.matchAll(/"hash":"([0-9a-f]{64})"/g)].map((m) => m[1]), frames = Number((src.match(/"totalFrames":(\d+)/) ?? [])[1]);
+  return !ignoreStale && (hashes.join() !== timing.lines.map((l) => l.hash).join() || frames !== timing.totalFrames);
 };
 
 // ---------------------------------------------------------------- bake

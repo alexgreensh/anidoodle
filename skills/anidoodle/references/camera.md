@@ -95,6 +95,10 @@ name(g, f);                 // the writing, on the film's own frame
 cues.push({ frame: t.filmFrameOf(LANDING), kind: "paper" }); // a sound on a remapped event
 ```
 
+- **Every key names its unit**: `f` (a film frame), `film` (seconds of film time) or `scene` (seconds of
+  scene time, resolved through the keys before it), exactly one. A bare number throws, because a
+  speed key set in scene seconds when film seconds were meant once put a logo's speed-up in the wrong
+  place.
 - **A ramp eases the speed**, on a smoothstep (or `curve: "linear"`), so it starts and ends with
   no kick. `ramp` defaults to 0, a deliberate hard change of speed; give it frames to glide. A slowed scene is asked for frames between its frames, so it must
   draw at fractional time (motion is a function of time, never of a frame counter).

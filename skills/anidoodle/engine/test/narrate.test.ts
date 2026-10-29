@@ -95,6 +95,13 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   const baked: BakedVoice = { sampleRate: 1000, pcm: { a: b64(Array.from({ length: 200 }, (_, i) => (i % 2 ? 0x40 : 0x00))) }, timing: { version: 1, fps: 10, totalFrames: 20, lines: [{ id: "a", text: "x", start: 5, end: 7, words: [] }] } };
   const vt = voiceTrack(baked, 1000);
   ok(vt.length === 2000 && vt[499] === 0 && vt[500] === 0.5 && vt[599] === 0.5 && vt[600] === 0, "a take lands on its start frame to the sample (frame 5 at 10 fps = sample 500)");
+  // L8: two baked voices with the same line id and the same take length must each play their own take
+  const twinA: BakedVoice = { ...baked, pcm: { a: b64(Array.from({ length: 200 }, (_, i) => (i % 2 ? 0x20 : 0x00))) } };
+  const twinB: BakedVoice = { ...baked, pcm: { a: b64(Array.from({ length: 200 }, (_, i) => (i % 2 ? 0x10 : 0x00))) } };
+  const ta = voiceTrack(twinA, 1000), tb = voiceTrack(twinB, 1000);
+  ok(ta[500] === 0.25 && tb[500] === 0.125, `RED (L8): same line id and length, different takes, each plays its own (${ta[500]}, ${tb[500]})`);
+  const slow: BakedVoice = { ...twinB, sampleRate: 500 };
+  ok(voiceTrack(slow, 1000).length === 2000 && voiceTrack(slow, 1000).filter((x) => x !== 0).length > 150, "RED (L8): the same take at another sample rate is resampled again, not served from the cache");
 
   // the duck: silence 1 s, voice 1 s, silence 2 s
   const S = 8000, v = new Float32Array(4 * S); for (let i = S; i < 2 * S; i++) v[i] = 0.3 * Math.sin(i * 0.2);

@@ -1,8 +1,22 @@
 // Shared bits for the providers: PATH lookup, a key read from the environment (never printed), and a
 // POST that returns bytes and reports a failure WITHOUT echoing headers (the key lives there).
-import { spawnSync } from "node:child_process";
+import { accessSync, constants, statSync } from "node:fs";
+import { delimiter, join } from "node:path";
 
-export const which = (cmd) => { const r = spawnSync("/usr/bin/env", ["which", cmd], { encoding: "utf8" }); return r.status === 0 ? r.stdout.trim() : null; };
+/**
+ * A program's full path from the PATH, or null. Read in node rather than by running `which`, which
+ * Windows does not have: there every PATHEXT ending (.EXE, .CMD, ...) is tried, and a folder with a space
+ * is just a folder. `o` overrides the PATH, PATHEXT and platform (the tests use it).
+ */
+export const which = (cmd, o = {}) => {
+  const win = o.win ?? process.platform === "win32", path = o.path ?? process.env.PATH ?? process.env.Path ?? "";
+  const exts = win ? [...String(o.pathext ?? process.env.PATHEXT ?? ".EXE;.CMD;.BAT;.COM").split(";").filter(Boolean)] : [""];
+  for (const dir of path.split(delimiter).filter(Boolean)) for (const e of exts) {
+    const f = join(dir.replace(/^"(.*)"$/, "$1"), cmd + e);
+    try { if (!statSync(f).isFile()) continue; if (!win) accessSync(f, constants.X_OK); return f; } catch { /* not here */ }
+  }
+  return null;
+};
 export const envKey = (...names) => { for (const n of names) if (process.env[n]?.trim()) return { name: n, value: process.env[n].trim() }; return null; };
 export const post = async (url, headers, body, what) => {
   const r = await fetch(url, { method: "POST", headers, body: typeof body === "string" ? body : JSON.stringify(body) });

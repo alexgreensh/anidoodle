@@ -3,6 +3,8 @@
 // both shapes to equal counts by arc length.
 //   node tools/test.mjs threeMograph
 import * as THREE from "three";
+import type { Env } from "../src/canvas-core/core";
+import { defaultFont, text3d } from "../src/three-core/type3d";
 import { assemble, dropIn, explode, extrudeIn, fadeIn, fadeOut, grid, growFrom, indicate, kinetic, lagged, morph, moveAlongPath, popIn, popOut, resample, riseFromFloor, wave, wiggle, writeOn, writePoints, writeTube } from "../src/three-core/mograph";
 
 export const name = "threeMograph";
@@ -70,6 +72,32 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   kinetic(word, 0, 2, 3); const k0 = word.children.map((c) => c.visible);
   kinetic(word, 50, 2, 3); ok(k0.every((v) => !v) && word.children.map(pose).every((p, i) => p === wr[i]), "kinetic: letters hidden before, all at rest after");
   kinetic(word, 9, 2, 3); ok(word.children.map((c) => c.visible).join() === "true,true,true,false", "and each letter enters 3 frames after the one before");
+  // M1: text3d letters share one material, so "rise" set every letter's opacity to the last letter's.
+  // The old test looked at .visible only; this one reads the opacity each letter is drawn with.
+  {
+    const env = { W: 1920, H: 1080, scale: 1, cache: new Map(), canvas: () => { throw new Error("no canvas in node"); } } as unknown as Env;
+    const own = new THREE.MeshStandardMaterial({ color: "#336699" });
+    for (const [label, abcd] of [["default material", text3d(env, defaultFont(), "ABCD")], ["one material passed in", text3d(env, defaultFont(), "ABCD", { material: own })]] as const) {
+      const L = abcd.userData.letters, op = () => L.map((l) => (l.material as THREE.Material).opacity);
+      kinetic(abcd, 9, 2, 3); const mid = op();
+      ok(mid[0] > 0.5 && mid[1] > 0.2 && mid[2] > 0 && mid[3] === 0 && mid[0] > mid[1] && mid[1] > mid[2], `M1 kinetic rise on text3d (${label}): each letter fades in on its own (${mid.map((x) => x.toFixed(2)).join(", ")})`);
+      kinetic(abcd, 0, 2, 3); kinetic(abcd, 50, 2, 3);
+      ok(op().every((x) => x === 1) && L.every((l) => !(l.material as THREE.Material).transparent && l.visible), `M1 and after the last letter lands every letter is fully opaque again, drawn opaque (${label})`);
+      kinetic(abcd, 9, 2, 3); ok(op().join() === mid.join(), `M1 the same frame drawn again gives the same opacities (${label})`);
+    }
+    ok(own.opacity === 1 && !own.transparent, "M1 the material passed in is left as it was (each letter fades its own copy)");
+  }
+  // L14: a one-point shape (a dot morphing into a line) threw a TypeError in resample
+  {
+    let err = ""; let r1: number[][] = [];
+    try { r1 = resample([[1, 2, 3]], 4); } catch (e) { err = String(e); }
+    ok(!err && r1.length === 4 && r1.every((p) => p.join() === "1,2,3"), `L14 resample of a one-point shape gives that point n times (${err || r1.length})`);
+    let m: number[][] = []; err = "";
+    try { m = morph([[0, 0, 0]], [[0, 0, 0], [2, 0, 0]], 0.5); } catch (e) { err = String(e); }
+    ok(!err && m.length === 2 && m[1][0] === 1, `L14 a dot morphs into a line (${err || JSON.stringify(m)})`);
+    let threw = ""; try { resample([], 3); } catch (e) { threw = String(e); }
+    ok(threw.includes("resample"), `L14 an empty shape is refused with a clear error (${threw})`);
+  }
 
   // 4. paths: writeOn draws whole tube segments, moveAlongPath runs at constant speed
   const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 2, 0), new THREE.Vector3(1.2, 2.1, 0), new THREE.Vector3(5, 0, 1)]);

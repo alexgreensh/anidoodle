@@ -18,6 +18,7 @@
 // test/threeTransitions.test.ts.
 import type { Ctx, Env, Layer } from "../canvas-core/core";
 import { fractal } from "../canvas-core/core";
+import * as THREE from "three";
 import { ease, type Ease } from "./time";
 
 export type DrawInto = (ctx: Ctx, env: Env) => void;
@@ -38,8 +39,11 @@ export const wipe = (dir: Dir = "right", o: Base & { feather?: number } = {}): T
 /** an iris opening from (x, y), given as 0-1 of the frame; feather in frame pixels */
 export const radialWipe = (o: Base & { x?: number; y?: number; feather?: number } = {}): TransitionKind => ({ kind: "radial", x: o.x ?? 0.5, y: o.y ?? 0.5, feather: o.feather ?? 80, ease: o.ease });
 /** an ink-blot dissolve from seeded noise; scale = blot size in frame pixels; ink = rim colour (null for none) */
-export const noiseWipe = (seed = 1, o: Base & { scale?: number; soft?: number; ink?: string | null; inkWidth?: number } = {}): TransitionKind =>
-  ({ kind: "noise", seed, scale: o.scale ?? 360, soft: o.soft ?? 0.02, ink: o.ink === undefined ? "#1b1622" : o.ink, inkWidth: o.inkWidth ?? 0.014, ease: o.ease ?? ease.inOutSine });
+export const noiseWipe = (seed = 1, o: Base & { scale?: number; soft?: number; ink?: string | null; inkWidth?: number } = {}): TransitionKind => {
+  const ink = o.ink === undefined ? "#1b1622" : o.ink;
+  if (ink) inkRGB(ink); // a bad colour fails here, where the wipe is written, not mid-render
+  return { kind: "noise", seed, scale: o.scale ?? 360, soft: o.soft ?? 0.02, ink, inkWidth: o.inkWidth ?? 0.014, ease: o.ease ?? ease.inOutSine };
+};
 /** B pushes A out: both move in `dir` */
 export const slide = (dir: Dir = "left", o: Base = {}): TransitionKind => ({ kind: "slide", dir, ease: o.ease });
 /** fly through A onto B; amount = how far A grows (4 = to four times its size); A is gone by 52 % so the middle never reads as a double exposure */
@@ -116,7 +120,21 @@ const putMask = (env: Env, slot: string, w: number, h: number, a: Uint8ClampedAr
   for (let p = 0; p < a.length; p++) { const q = p * 4; img.data[q] = rgb[0]; img.data[q + 1] = rgb[1]; img.data[q + 2] = rgb[2]; img.data[q + 3] = a[p]; }
   l.ctx.putImageData(img, 0, 0); return l;
 };
-const hex = (s: string): [number, number, number] => { const m = s.replace("#", ""); const v = m.length === 3 ? m.split("").map((c) => c + c).join("") : m; return [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16)) as [number, number, number]; };
+/**
+ * The rim colour as 0-255 sRGB. Hex is read exactly; any other CSS colour (a name, rgb(), hsl()) goes
+ * through three's own CSS parser. Anything else throws: a hex-only parser read "red" as a dark teal
+ * and drew it without a word.
+ */
+export const inkRGB = (s: string): [number, number, number] => {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s.trim());
+  if (m) { const v = m[1].length === 3 ? m[1].split("").map((c) => c + c).join("") : m[1]; return [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16)) as [number, number, number]; }
+  const c = new THREE.Color(); c.r = -1; // three leaves an unknown colour untouched, so -1 marks "not parsed"
+  const t = typeof s === "string" ? s.trim() : "";
+  // only a CSS name, rgb() or hsl() reaches three's parser (so it never prints its own warning)
+  if (/^(rgb|hsl)a?\(/i.test(t) || Object.hasOwn(THREE.Color.NAMES, t.toLowerCase())) c.setStyle(t);
+  if (c.r === -1) throw new Error(`noiseWipe: ink "${s}" is not a colour (use hex like "#1b1622", a CSS name, rgb() or hsl())`);
+  const h = c.getHex(); return [(h >> 16) & 255, (h >> 8) & 255, h & 255];
+};
 
 /**
  * Draw the frame of a transition at progress t (0-1) from what drawA and drawB paint. Each draw
@@ -154,7 +172,7 @@ export const transition = (ctx: Ctx, env: Env, t: number, kind: TransitionKind, 
         const M = putMask(env, "m", mw, mh, m.alpha);
         B.ctx.save(); B.ctx.globalCompositeOperation = "destination-in"; B.ctx.imageSmoothingEnabled = true; B.ctx.imageSmoothingQuality = "high"; B.ctx.drawImage(src(M), 0, 0, mw * cell, mh * cell); B.ctx.restore();
         ctx.drawImage(src(A), 0, 0); ctx.drawImage(src(B), 0, 0);
-        if (m.ink && kind.ink) { const I = putMask(env, "i", mw, mh, m.ink, hex(kind.ink)); ctx.drawImage(src(I), 0, 0, mw * cell, mh * cell); }
+        if (m.ink && kind.ink) { const I = putMask(env, "i", mw, mh, m.ink, inkRGB(kind.ink)); ctx.drawImage(src(I), 0, 0, mw * cell, mh * cell); }
         break;
       }
     }

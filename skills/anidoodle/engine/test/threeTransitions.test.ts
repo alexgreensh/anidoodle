@@ -49,6 +49,25 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   let grows = true; for (let e = 0; e < 1; e += 0.1) { const a = noiseMask(5, e, mw, mh).alpha, b = noiseMask(5, e + 0.1, mw, mh).alpha; if (b.some((v, i) => v < a[i])) grows = false; }
   ok(grows, "the blots only grow");
   ok(noiseMask(5, 0.5, mw, mh, { ink: false }).ink === null, "ink: false draws no rim");
+  // L15: the rim colour went through a hex-only parser, so ink: "red" drew a BLACK rim, silently.
+  // Run the real transition on recording layers and read the colour the rim was painted with.
+  {
+    const rimRGB = (ink: string) => {
+      const puts: Uint8ClampedArray[] = [];
+      const fake = (): Ctx => new Proxy({}, { get: (_t, k) => k === "createImageData" ? (w: number, h: number) => ({ data: new Uint8ClampedArray(w * h * 4), width: w, height: h }) : k === "putImageData" ? (img: { data: Uint8ClampedArray }) => puts.push(img.data) : k === "createLinearGradient" || k === "createRadialGradient" ? () => ({ addColorStop() {} }) : () => {}, set: () => true }) as unknown as Ctx;
+      const env = { W: 64, H: 36, scale: 1, cache: new Map(), canvas: () => ({ canvas: {}, ctx: fake() }) } as unknown as Env;
+      transition(fake(), env, 0.5, noiseWipe(5, { ink, inkWidth: 0.2 }), () => {}, () => {});
+      const rim = puts[1]; if (!rim) return "no rim drawn";
+      for (let q = 0; q < rim.length; q += 4) if (rim[q + 3] > 0) return [rim[q], rim[q + 1], rim[q + 2]].join(",");
+      return "rim empty";
+    };
+    ok(rimRGB("#14112a") === "20,17,42", `GREEN a hex ink paints the rim that colour (${rimRGB("#14112a")})`);
+    ok(rimRGB("red") === "255,0,0", `L15 a CSS colour name paints the rim that colour, not black (${rimRGB("red")})`);
+    ok(rimRGB("rgb(10, 200, 30)") === "10,200,30", `L15 rgb() works too (${rimRGB("rgb(10, 200, 30)")})`);
+    ok(rimRGB("#abc") === "170,187,204", `GREEN short hex (${rimRGB("#abc")})`);
+    let e = ""; try { noiseWipe(5, { ink: "not-a-colour" }); } catch (x) { e = String(x); }
+    ok(e.includes("noiseWipe"), `L15 an ink that is not a colour is refused when the wipe is made (${e || "no error"})`);
+  }
 
   // 5. slide: A leaves as B arrives, B lands exactly home
   for (const dir of ["left", "right", "up", "down"] as Dir[]) {

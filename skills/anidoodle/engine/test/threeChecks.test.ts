@@ -4,7 +4,7 @@
 //   node tools/test.mjs threeChecks
 import * as THREE from "three";
 import { grip, gripFrame, handle, limb, makeRig, part, pose, type Rig } from "../src/three-core/rig";
-import { checkGrip, checking, collectChecks, labelVisible, pathClear, placeLabel, faceCamera, proximity, registerGrip, registerRig, runChecks, screenSizeOk, selfClear, type Finding } from "../src/three-core/checks3d";
+import { checkGrip, checking, collectChecks, labelVisible, pathClear, placeLabel, faceCamera, proximity, registerGrip, registerRig, runChecks, screenSizeOk, selfClear, surfacePoints, type Finding } from "../src/three-core/checks3d";
 import { rigDemoFrame } from "../src/canvas-core/threeRigDemo";
 
 const v3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -118,6 +118,39 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
     pose(h, { arms: { right: { target: v3(0.05, 1.35, 0) } } });
     const r = selfClear(h, { frame: 3 });
     ok(!r.ok && r.findings[0].kind === "self" && r.findings[0].where.includes("arms.right"), `RED a hand driven into its own torso: ${r.findings[0]?.where}`);
+  }
+  // ---- L12: a rig built in centimetres (a 60 x 80 x 40 torso). The sampler kept 6 passes of 1.6x and
+  // then gave up, so one 20-unit box at the self-check spacing came back with 307,800 points (cap 6000).
+  {
+    const big = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), mat);
+    const t0 = Date.now(), n = surfacePoints(big, 0.012).length, ms = Date.now() - t0;
+    ok(n <= 6000, `L12 a 20-unit box sampled at 0.012 stays under the 6000-point cap (${n} points, ${ms} ms)`);
+    const cm = makeRig("cm", { hipHeight: 100 });
+    part(cm, cm.body, "torso", new THREE.Mesh(new THREE.BoxGeometry(60, 80, 40), mat)).position.y = 40;
+    for (const [side, s] of [["left", 1], ["right", -1]] as const) limb(cm, `arms.${side}`, { at: [36 * s, 75, 0], lengths: [35, 35], radius: 5, rest: [5 * s, -65, 5], pole: [20 * s, 0, -100], material: mat,
+      end: () => new THREE.Mesh(new THREE.SphereGeometry(6, 12, 8), mat) });
+    pose(cm, {}); scene(cm.root);
+    const c0 = Date.now(), green = selfClear(cm), cms = Date.now() - c0;
+    ok(green.ok && cms < 1500, `L12 GREEN a centimetre rig at rest is clean, and checked in ${cms} ms`);
+    pose(cm, { arms: { right: { target: v3(5, 135, 0) } } });
+    const red = selfClear(cm, { frame: 3 });
+    ok(!red.ok && red.findings[0].where.includes("arms.right"), `L12 RED the same rig with a hand in its torso is still caught: ${red.findings[0]?.where}`);
+  }
+  // ---- H7: a held prop before its popIn starts (scale 2.2e-16, hidden). The sampler asked for
+  // unbounded points at the handle's tiny radius: frame 0 stalled, then threw RangeError.
+  {
+    const h = holder(), p = lantern(); scene(h.root, p); holding(h, p, v3(-0.3, 1.2, 0.3));
+    p.scale.setScalar(2.2e-16); p.visible = false; p.updateMatrixWorld(true);
+    let res: ReturnType<typeof checkGrip> | null = null, err = ""; const t0 = Date.now();
+    try { res = checkGrip(h, h.limbs["arms.right"], p, 0); } catch (e) { err = String(e); }
+    ok(!!res && res.ok && Date.now() - t0 < 500, `H7 a hidden, popping-in prop is skipped, fast and without a crash (${err || `${Date.now() - t0} ms`})`);
+    p.visible = true; p.scale.setScalar(1e-5); p.updateMatrixWorld(true);
+    res = null; err = ""; const t1 = Date.now();
+    try { res = checkGrip(h, h.limbs["arms.right"], p, 0); } catch (e) { err = String(e); }
+    ok(!!res && res.ok && Date.now() - t1 < 500, `H7 a visible prop at a thousandth of its size is too small to judge: skipped (${err || `${Date.now() - t1} ms`})`);
+    const box = new THREE.Group(); box.add(p); scene(h.root, box); box.visible = false; p.scale.setScalar(1);
+    res = checkGrip(h, h.limbs["arms.right"], p, 0);
+    ok(res.ok, "H7 a prop inside a hidden group never counts");
   }
 
   // ---- pathClear (walking through a closed prop, lesson 22)

@@ -82,5 +82,13 @@ None of that was drawing. These habits cut it by an order of magnitude:
   prints it and keeps failing, so the decision stays visible. If the owner accepts it as shipped,
   it becomes a hold with that reason as its third field (`[from, to, "approved as shipped: ..."]`),
   which the gate prints and passes (`launch3.ts`).
+- **Dense strips around a seam** come from `still.mjs --frames 840-880:2 --sheet out/seam.jpg`, never a
+  hand-written ffmpeg tiling script.
+- **A film beside its own files.** `scaffold.mjs <dir> --linked --film promo [--world]` makes a project
+  that USES the installed engine (its film, host page, brand files and photos live in the project), so
+  no film needs a copy of the engine, and every tool (`music.mjs check`, `ship.mjs`) finds it.
+- **A photo that has not arrived yet.** `ANIDOODLE_PLACEHOLDERS=1` draws a labelled grey box for a
+  missing image asset and lists it in `meta.placeholders`; `verify-export --delivery` and `ship` refuse
+  a file that still has one. Never drop a stand-in photo in under the real name.
 - **`npm test`** (in `engine/`) runs the unit suites in `engine/test/*.test.ts` without a
   browser (camera moves today). Run it with the gate after any engine change.

@@ -30,7 +30,9 @@ const turn = (ctx: Ctx, f: number, env: Env) => {
   draw3d(ctx, env, scene, cam, { clear: "#0f0d1a" });
 };
 export const threeHello: Film = {
-  meta: { title: "three hello", W, H, fps: FPS, bpm: 120, durationFrames: N, kind: "loop" },
+  meta: { title: "three hello", W, H, fps: FPS, bpm: 120, durationFrames: N, kind: "loop",
+    // gate check 5 FAILS a 3D film that registers nothing; this one has nothing physical to go wrong
+    checks: { none: { "3d": "one star turning alone in the middle of the frame: no character, nothing held, nothing for it to pass through" } } },
   assets: { images: {} },
   shots: [{ id: "turn", start: 0, end: N, draw: turn }],
 };
