@@ -51,6 +51,16 @@ while IFS= read -r f; do
   mkdir -p "${STAGE}/$(dirname "$f")"; cp -p "$f" "${STAGE}/$f"; count=$((count + 1))
 done < <(git ls-files skills/ | grep -v -E "${EXCLUDE}")
 
+# a host page that is exactly the standard one (import the film, mountFilm) is left out: the tools build that
+# page in memory when a film has none (engine/tools/names.mjs standardHost), pixel-identical. Custom pages stay.
+dropped=0
+for h in "${STAGE}"/skills/anidoodle/engine/src/hosts/page-*.ts; do
+  n="$(basename "$h" .ts)"; n="${n#page-}"
+  want="$(printf 'import { %s } from "../canvas-core/%s";\nimport { mountFilm } from "./page";\n\nmountFilm(%s);' "$n" "$n" "$n")"
+  if [ "$(cat "$h")" = "${want}" ] && [ -f "${STAGE}/skills/anidoodle/engine/src/canvas-core/${n}.ts" ]; then rm "$h"; dropped=$((dropped + 1)); fi
+done
+echo "left out ${dropped} standard host pages (built in memory)"
+
 # a showcase or launch film in the installed plugin is a leak of the repository's own promotion: refuse to publish one
 leaked="$(cd "${STAGE}" && find . -type f \( -iname 'cheetah*' -o -iname 'page-cheetah*' -o -name 'launch[0-9]*.ts' -o -name 'launchClip.ts' \) | head -5)"
 [ -z "${leaked}" ] || { echo "ERROR: repository-only films reached the plugin folder:" >&2; echo "${leaked}" >&2; exit 5; }

@@ -3,9 +3,9 @@
 import { build } from "esbuild";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { extname, join, relative, resolve } from "node:path";
+import { dirname, extname, join, relative, resolve } from "node:path";
 import { enginePath, overlay, resolveOverlay } from "./overlay.mjs";
-import { requireFilm, splitShape } from "./names.mjs";
+import { filmModule, requireFilm, splitShape, standardHost } from "./names.mjs";
 import { loadFilmModule, prepareFilmSounds, filmFloat32 } from './audio.mjs';
 import { isMain } from "./is-main.mjs";
 
@@ -49,8 +49,11 @@ export const buildPage = async ({ entry, out, title, plugins: extra = [] }) => {
   const { base, shape } = splitShape(title);
   if (shape) { entry = entry.replace(`page-${title}.ts`, `page-${base}.ts`); title = base; }
   if (!existsSync(entry)) entry = resolveOverlay("./" + entry, process.cwd()) ?? entry; // e.g. the example's own host page
-  if (!existsSync(entry) && title) requireFilm(title, "build", "a film name: src/hosts/page-<film>.ts"); // a clear exit with the known films, not an esbuild trace
-  const main = await build({ absWorkingDir: process.cwd(), entryPoints: [resolve(entry)], bundle: true, format: "iife", target: "es2020", minify: true, write: false, legalComments: "none", metafile: true, plugins: [...plugins, tagFilms] });
+  // no host page of its own: the standard one (names.mjs standardHost), built in memory next to the film's module
+  const mod = !existsSync(entry) && title ? filmModule(title) : null;
+  if (!existsSync(entry) && !mod && title) requireFilm(title, "build", "a film name: src/hosts/page-<film>.ts"); // a clear exit with the known films, not an esbuild trace
+  const from = mod ? { stdin: { contents: standardHost(title), resolveDir: join(dirname(dirname(mod)), "hosts"), sourcefile: `page-${title}.ts`, loader: "ts" }, tsconfig: enginePath("tsconfig.json") } : { entryPoints: [resolve(entry)] };
+  const main = await build({ absWorkingDir: process.cwd(), ...from, bundle: true, format: "iife", target: "es2020", minify: true, write: false, legalComments: "none", metafile: true, plugins: [...plugins, tagFilms] });
   const js = main.outputFiles[0].text;
   // read the manifest out of the film module itself, so the page and the film can never disagree
   const { film, music } = await loadFilmModule(shape ? `${title}-${shape}` : title, plugins);
