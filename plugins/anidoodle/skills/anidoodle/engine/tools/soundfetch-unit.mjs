@@ -249,7 +249,8 @@ ok("tampered index refused before any download");
 ok("no env override: the compiled-in pin is what refuses");
 
 // Positive leg, when the real release dist is on this machine: fetch through the actual pin.
-const REAL_DIST = "/Users/alexgreenshpun/CascadeProjects/Prompts/Claude-Skills/anidoodle-research/sound-pack/dist-v1";
+// the maintainer's built pack, when ANIDOODLE_SOUNDPACK_DIR points at the sound-pack work folder (skipped otherwise)
+const REAL_DIST = join(process.env.ANIDOODLE_SOUNDPACK_DIR ?? "/nonexistent", "dist-v1");
 if (existsSync(join(REAL_DIST, INDEX))) {
   const installReal = join(root, "install-real");
   let e = null;

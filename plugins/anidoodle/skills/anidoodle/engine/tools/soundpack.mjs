@@ -22,7 +22,9 @@ import { isMain } from "./is-main.mjs";
 const SR = 48000;
 const VCSL_RAW = "https://raw.githubusercontent.com/sgossner/VCSL/master/";
 // The whole-repo file index (size TAB path), kept with the research notes this tool was built from.
-const VCSL_TREE = "/Users/alexgreenshpun/CascadeProjects/Prompts/Claude-Skills/anidoodle-research/sound-pack/vcsl-tree.tsv";
+// the sound-pack work folder (sources, room recordings, the built pack) lives outside the repository
+const PACK_DIR = process.env.ANIDOODLE_SOUNDPACK_DIR ?? "";
+const VCSL_TREE = join(PACK_DIR, "vcsl-tree.tsv");
 
 // ---------------------------------------------------------------- note names
 const SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -153,7 +155,7 @@ const TIMPANI_DRUMS = ["7G", "7D", "2A", "7B", "3A", "6G", "3B", "6E", "3C", "6D
 // 4.0): B-format W X Y Z decoded to stereo as L = W + Y, R = W - Y, direct sound at frame 0,
 // unit energy, tail cut by the same rule as zones. manifest.rooms maps room id -> metadata;
 // directFrames is the length of the direct sound, for the engine to skip.
-const ROOMS_SRC = "/Users/alexgreenshpun/CascadeProjects/Prompts/Claude-Skills/anidoodle-research/sound-pack/rooms-src";
+const ROOMS_SRC = join(PACK_DIR, "rooms-src");
 const ROOMS = [
   { id: "small-room", title: "Arthur Sykes Rymer Auditorium, University of York",
     wav: "arthur-sykes-rymer-auditorium-university-york/arthur-sykes-rymer-auditorium-university-york/b-format/s1r7.wav",
@@ -173,6 +175,7 @@ const DIRECT_FRAMES = Math.round(0.0025 * SR); // ~2.5 ms of direct sound, for t
 // ---------------------------------------------------------------- the VCSL index
 const tree = () => {
   const map = new Map(); // path -> size
+  if (!PACK_DIR) throw new Error("soundpack: set ANIDOODLE_SOUNDPACK_DIR to the sound-pack work folder (it holds vcsl-tree.tsv and rooms-src)");
   for (const line of readFileSync(VCSL_TREE, "utf8").split("\n")) {
     const [size, path] = line.split("\t");
     if (path) map.set(path, Number(size));
