@@ -138,7 +138,7 @@ The film at the top of this page was made with anidoodle, and the kit it was mad
 - **Sound from the picture:** every key, press and landing gets its own effect, placed where it happens on screen, over a score composed for the film.
 - **Ready to post:** `launch.mjs ship <name>` renders every shape with its poster frame and captions (.srt and .vtt), checks audio-to-video sync and peak level on the file you deliver, and fails any frame whose edge cuts off text.
 
-Two looks (drawn ink, or clean for a UI-first product), at 30 or 60 fps, with motion blur matched to each frame's speed.
+It wears your product's look: your fonts, your colours, your chat window's shape, or a brand file imported straight from Figma. Start from drawn ink or a clean UI-first canvas, at 30 or 60 fps, with motion blur matched to each frame's speed. One `ship` command checks the finished film the way a picky editor would: text held long enough to read, no slide-deck cuts, no blurred exits, sound mastered for the feed, and every claim on screen sourced.
 
 The rules come from four cuts of our own launch and from the craft of the best ones out there: say what it is within five seconds, never put words over the art, cut on the downbeat, make the first frame the thumbnail. → [`launch-video.md`](skills/anidoodle/references/workflows/launch-video.md) · [the kit](skills/anidoodle/references/workflows/launch-video-kit.md)
 
@@ -173,6 +173,8 @@ Ask how to draw something, or bring a drawing, and anidoodle rebuilds it as a le
 | **Learning** | Drawing lessons: step sheets and timelapses that teach how a picture is built, with what to look for and the common mistakes. |
 | **Characters** | One character, built once and kept identical across shots, poses and styles. |
 | **Your launch** | A launch film for your product from a template: your prompts, your pictures, your words and your install lines, cut to a score. |
+| **3D and motion graphics** | 3D scenes, extruded type and title sequences rendered with three.js, on the same frame-exact timeline as everything else. |
+| **Narration** | A voice-over timed to the picture, with subtitles that follow each word, so the film reads with the sound off. |
 
 Ask in plain words, *"a risograph lighthouse for our careers page, 1600×900"* or *"a chalkboard explainer of how our pricing tiers stack up"*, and anidoodle routes it to the right workflow and style recipe, asking only for what the request leaves open.
 
