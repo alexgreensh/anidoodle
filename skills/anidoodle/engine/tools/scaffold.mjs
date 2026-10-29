@@ -99,7 +99,7 @@ export const ${film}: Film = {
 `);
   writeFileSync(host, `import { ${film} } from "../canvas-core/${film}";\nimport { mountFilm } from "./page";\nmountFilm(${film});\n`);
   const eng = rel(ENGINE);
-  if (!existsSync(join(target, "tsconfig.json"))) writeFileSync(join(target, "tsconfig.json"), JSON.stringify({ compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, noEmit: true, skipLibCheck: true, lib: ["DOM", "ES2022"], rootDirs: ["src", `${eng}/src`], paths: { three: [`${eng}/vendor/three/types/Three.d.ts`] } }, include: ["src"] }, null, 2) + "\n");
+  if (!existsSync(join(target, "tsconfig.json"))) writeFileSync(join(target, "tsconfig.json"), JSON.stringify({ compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, noEmit: true, skipLibCheck: true, lib: ["DOM", "ES2022"], rootDirs: ["src", `${eng}/src`], paths: { three: [`${eng}/vendor/three/types/Three.d.ts`, `${eng}/vendor/three/three-untyped.d.ts`] } }, include: ["src"] }, null, 2) + "\n");
   // npm runs a script through a shell (sh, or cmd.exe on Windows): the tool path is quoted so a folder
   // with a space stays one word. Single quotes on sh (nothing inside expands), double quotes on cmd.exe.
   const quote = (p) => (process.platform === "win32" ? `"${p}"` : `'${p.replace(/'/g, `'\\''`)}'`);

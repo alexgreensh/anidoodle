@@ -43,7 +43,9 @@ cd "${REPO_ROOT}"
 # The engine's unit tests and the worked example film stay in the repository too: Anthropic's directory
 # holds any plugin over 512 files for a manual review, so every release waited days. The tools that
 # use them (npm test, gate --self-test, scaffold --example) say where to get them when they are absent.
-EXCLUDE='^skills/anidoodle/engine/test/|^skills/anidoodle/example/|/canvas-core/(launch|launch2|launch3|launchClip|launchCode|typeOptions|typeStyles)\.ts$|/hosts/page-(launch|launch2|launch3|launchClip|typeOptions|typeStyles)\.ts$|/engine/assets/refs/|/engine/tools/gallery\.mjs$|^skills/anidoodle/assets/styles\.jpg$|/engine/package-lock\.json$|/music/blind/|/canvas-core/cheetah[A-Za-z]*\.ts$|/music/pieces/cheetah[A-Za-z]*\.ts$|/hosts/page-cheetah[A-Za-z]*\.ts$|/test/cheetahRig\.test\.ts$|/test/craft\.test\.ts$'
+# three.js (1.3 MB, over the directory's 256 KiB file hold) and its 500 type files are left out too: the
+# plugin gets the same pinned release from npm install, checked against the same sha256 (tools/overlay.mjs).
+EXCLUDE='^skills/anidoodle/engine/test/|^skills/anidoodle/example/|/canvas-core/(launch|launch2|launch3|launchClip|launchCode|typeOptions|typeStyles)\.ts$|/hosts/page-(launch|launch2|launch3|launchClip|typeOptions|typeStyles)\.ts$|/engine/assets/refs/|/engine/tools/gallery\.mjs$|^skills/anidoodle/assets/styles\.jpg$|/engine/package-lock\.json$|/music/blind/|/canvas-core/cheetah[A-Za-z]*\.ts$|/music/pieces/cheetah[A-Za-z]*\.ts$|/hosts/page-cheetah[A-Za-z]*\.ts$|/test/cheetahRig\.test\.ts$|/test/craft\.test\.ts$|/engine/vendor/three/three\.module\.js$|/engine/vendor/three/types/'
 count=0
 while IFS= read -r f; do
   mkdir -p "${STAGE}/$(dirname "$f")"; cp -p "$f" "${STAGE}/$f"; count=$((count + 1))

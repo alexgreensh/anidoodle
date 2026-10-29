@@ -12,7 +12,8 @@
     "test": "node tools/test.mjs"
   },
   "dependencies": {
-    "esbuild": "0.25.12"
+    "esbuild": "0.25.12",
+    "three": "0.170.0"
   },
   "devDependencies": {
     "playwright-core": "1.63.0",

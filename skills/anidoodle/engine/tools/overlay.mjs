@@ -4,6 +4,7 @@
 // example keeps importing "../core"; a launch film can import "./mechanicalLepidoptera" and get
 // the committed example. Order matters: engine/src first, so the engine always wins a name clash.
 // tsconfig.json says the same thing to tsc with "rootDirs", so the checker and the bundler agree.
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,13 +36,27 @@ export const resolveOverlay = (spec, dir) => {
   return null;
 };
 
-// THREE. A film imports "three" by its bare name and gets the vendored, hash-pinned build
-// (vendor/three/PROVENANCE.md): no npm package, no network, the same bytes on every machine.
-export const THREE_MODULE = join(ENGINE, "vendor/three/three.module.js");
+// THREE. A film imports "three" by its bare name and gets three.js 0.170.0, hash-pinned
+// (vendor/three/PROVENANCE.md): the same bytes on every machine. The repository vendors the file; the
+// installed plugin leaves it out (plugin directories refuse a file this size) and gets the same npm
+// release from `npm install` (package.json pins three 0.170.0). Either way the hash must match.
+export const THREE_SHA256 = "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb";
+export const threeCandidates = (engine = ENGINE) => [join(engine, "vendor/three/three.module.js"), join(engine, "node_modules/three/build/three.module.js")];
+export const resolveThree = (engine = ENGINE, read = (f) => (existsSync(f) ? readFileSync(f) : null)) => {
+  for (const f of threeCandidates(engine)) {
+    const bytes = read(f); if (!bytes) continue;
+    const got = createHash("sha256").update(bytes).digest("hex");
+    if (got !== THREE_SHA256) throw new Error(`three.js at ${f} is not the pinned 0.170.0 build (sha256 ${got.slice(0, 12)}...): run npm install in the engine folder so package.json's exact version is used`);
+    return f;
+  }
+  throw new Error(`three.js is not installed: run npm install in the engine folder (${engine}); it pins three 0.170.0`);
+};
+let threeModule = null;
+export const THREE_MODULE_PATH = () => (threeModule ??= resolveThree());
 export const overlay = {
   name: "anidoodle-overlay",
   setup(b) {
-    b.onResolve({ filter: /^three$/ }, () => ({ path: THREE_MODULE }));
+    b.onResolve({ filter: /^three$/ }, () => { try { return { path: THREE_MODULE_PATH() }; } catch (e) { return { errors: [{ text: e.message }] }; } });
     // FONT FILES. A launch look imports its typefaces by path (import serif from "../../assets/fonts/X.ttf"):
     // the bytes are inlined as { path, format, data } so the film carries them and nothing is fetched. A path
     // that is not there is a build error that says where to put the file.
