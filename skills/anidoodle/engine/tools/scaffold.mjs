@@ -107,7 +107,7 @@ export const ${film}: Film = {
   // the marker that makes this folder a linked project: overlay.mjs puts its src/ in front of the engine's
   // only when this file is here, so another repo that happens to have a src/ never replaces engine files
   if (!existsSync(join(target, PROJECT_MARKER))) writeFileSync(join(target, PROJECT_MARKER), JSON.stringify({ linked: true, film, engine: ENGINE }, null, 2) + "\n");
-  if (!existsSync(join(target, "package.json"))) writeFileSync(join(target, "package.json"), JSON.stringify({ name: film.toLowerCase(), private: true, type: "module", scripts: { still: `${tool("still.mjs")} ${film}`, render: `${tool("render.mjs")} ${film}`, framecheck: `${tool("framecheck.mjs")} ${film}`, ship: `${tool("ship.mjs")} ${film}` } }, null, 2) + "\n");
+  if (!existsSync(join(target, "package.json"))) writeFileSync(join(target, "package.json"), JSON.stringify({ name: film.toLowerCase(), private: true, type: "module", dependencies: { three: "0.170.0" }, scripts: { still: `${tool("still.mjs")} ${film}`, render: `${tool("render.mjs")} ${film}`, framecheck: `${tool("framecheck.mjs")} ${film}`, ship: `${tool("ship.mjs")} ${film}` } }, null, 2) + "\n");
   console.log(`linked project ${target}\n  src/canvas-core/${film}.ts, src/hosts/page-${film}.ts, tsconfig.json, package.json, ${PROJECT_MARKER}\n  engine: ${ENGINE}\nnext (from ${target}):\n  ${tool("still.mjs")} ${film} --out out/look.png\n  ${tool("render.mjs")} ${film}\n  ${tool("ship.mjs")} ${film}`);
   process.exit(0);
 }
@@ -117,7 +117,8 @@ mkdirSync(target, { recursive: true });
 cpSync(join(ENGINE, "src"), join(target, "src"), { recursive: true, filter: (f) => !skip.has(f) });
 cpSync(join(ENGINE, "tools"), join(target, "tools"), { recursive: true });
 for (const f of ["package.json", "package-lock.json", "tsconfig.json"]) if (existsSync(join(ENGINE, f))) cpSync(join(ENGINE, f), join(target, f));
-// three.js for 3D shots: the vendored, hash-pinned build and its types (vendor/three/PROVENANCE.md)
+// three.js for 3D shots: the vendored, hash-pinned build and its types where the install has them; the
+// plugin install has neither, and npm install brings the same pinned release (package.json, overlay.mjs)
 if (existsSync(join(ENGINE, "vendor"))) cpSync(join(ENGINE, "vendor"), join(target, "vendor"), { recursive: true });
 
 if (opt.example) {

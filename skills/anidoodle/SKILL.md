@@ -103,7 +103,7 @@ draws itself declares `kind: "drawing"` and is judged on a finer floor; a freeze
 
 `engine/` is the portable art core plus the tooling. `engine/src/canvas-core` knows nothing
 about the DOM or any backend. `W`, `H`, `fps` and `durationFrames` come from the film's `meta`. Four backends, one art core → `references/backends-and-adapters.md`.
-3D: `engine/src/three-core` renders three.js onto the same frame, so every tool below works on 3D films (vendored and hash-pinned, `engine/vendor/three/PROVENANCE.md`; type face `engine/assets/fonts/PROVENANCE.md`).
+3D: `engine/src/three-core` renders three.js onto the same frame, so every tool below works on 3D films (three.js 0.170.0, hash-pinned, `engine/vendor/three/PROVENANCE.md`; type face `engine/assets/fonts/PROVENANCE.md`).
 Camera moves (pans, dollies, lens and dolly zooms, parallax, shake) and slow motion or freeze frames: `engine/src/canvas-core/camera.ts`, `engine/src/canvas-core/timeRemap.ts`, `references/camera.md`.
 Seams between scenes: `references/motion-grammar.md` (cuts that carry motion: `seams.ts`; `tools/deck.mjs deal` deals each film different moves; `deck.mjs find "<name>"` turns a move's everyday name into its card). `render.mjs --blur auto` renders with motion blur (subframes per frame
 from its measured on-screen speed, averaged in linear light, `--shutter 180`); the default path is untouched.

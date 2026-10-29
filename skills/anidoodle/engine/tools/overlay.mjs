@@ -41,9 +41,9 @@ export const resolveOverlay = (spec, dir) => {
 // installed plugin leaves it out (plugin directories refuse a file this size) and gets the same npm
 // release from `npm install` (package.json pins three 0.170.0). Either way the hash must match.
 export const THREE_SHA256 = "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb";
-export const threeCandidates = (engine = ENGINE) => [join(engine, "vendor/three/three.module.js"), join(engine, "node_modules/three/build/three.module.js")];
+export const threeCandidates = (engine = ENGINE, cwd = process.cwd()) => [...new Set([join(engine, "vendor/three/three.module.js"), join(engine, "node_modules/three/build/three.module.js"), join(cwd, "node_modules/three/build/three.module.js")])];
 export const resolveThree = (engine = ENGINE, read = (f) => (existsSync(f) ? readFileSync(f) : null)) => {
-  for (const f of threeCandidates(engine)) {
+  for (const f of threeCandidates(engine, engine === ENGINE ? process.cwd() : engine)) {
     const bytes = read(f); if (!bytes) continue;
     const got = createHash("sha256").update(bytes).digest("hex");
     if (got !== THREE_SHA256) throw new Error(`three.js at ${f} is not the pinned 0.170.0 build (sha256 ${got.slice(0, 12)}...): run npm install in the engine folder so package.json's exact version is used`);
