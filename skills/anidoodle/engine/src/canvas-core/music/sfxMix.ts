@@ -26,6 +26,10 @@ export type SfxCue = SfxOpts & {
 };
 export type SfxPlan = {
   fps: number; frames: number; cues: SfxCue[];
+  /** Keep archived plans on the original effect models. */
+  legacy?: boolean;
+  /** Set on newly authored plans to select version 2 effects. */
+  sfxVersion?: 2;
   /** seeds every cue that has no seed of its own; per-cue seeds depend on (kind, frame), not on list order. */
   seed?: number;
   /** tempo grid: bpm, the time of beat 1 in seconds (beatZeroS), beats per bar. */
@@ -85,6 +89,8 @@ export const validateSfxPlan = (plan: SfxPlan) => {
   const p = resolveSfxPlan(plan);
   if (!Number.isSafeInteger(p.fps) || p.fps <= 0) throw new Error(`sfx plan: fps must be a positive integer, got ${String(p.fps)}`);
   if (!Number.isSafeInteger(p.frames) || p.frames <= 0) throw new Error(`sfx plan: frames must be a positive integer, got ${String(p.frames)}`);
+  if (p.legacy !== undefined && typeof p.legacy !== "boolean") throw new Error("sfx plan: legacy must be boolean");
+  if (p.sfxVersion !== undefined && p.sfxVersion !== 2) throw new Error("sfx plan: sfxVersion must be 2");
   if (p.seed !== undefined && (!Number.isSafeInteger(p.seed) || p.seed < 0 || p.seed > 0xffffffff)) throw new Error(`sfx plan: seed must be an integer 0..4294967295, got ${String(p.seed)}`);
   if (p.bpm !== undefined && (!Number.isFinite(p.bpm) || p.bpm < 20 || p.bpm > 300)) throw new Error(`sfx plan: bpm must be 20..300, got ${String(p.bpm)}`);
   if (p.minDb !== undefined && !Number.isFinite(p.minDb)) throw new Error("sfx plan: minDb must be a finite number");
@@ -106,7 +112,7 @@ export const validateSfxPlan = (plan: SfxPlan) => {
     if (need.bpm && o.bpm === undefined) throw new Error(`sfx plan: ${name(c, i)} is tempo-synced: set plan.bpm, cue.bpm, or plan.score (the film's piece); there is no default tempo`);
   });
 };
-const optsOf = (p: SfxPlan, c: SfxCue, seed: number): SfxOpts => ({ seed: c.seed ?? seed, variant: c.variant, pitch: c.pitch, lengthS: c.lengthS, beats: c.beats, bpm: c.bpm ?? p.bpm, key: c.key ?? p.key, dir: c.dir, gainDb: c.gainDb });
+const optsOf = (p: SfxPlan, c: SfxCue, seed: number): SfxOpts => ({ seed: c.seed ?? seed, legacy: c.legacy ?? p.legacy, sfxVersion: c.sfxVersion ?? p.sfxVersion, variant: c.variant, pitch: c.pitch, lengthS: c.lengthS, beats: c.beats, bpm: c.bpm ?? p.bpm, key: c.key ?? p.key, dir: c.dir, gainDb: c.gainDb });
 
 /** Render and place every cue. Throws if a cue's pre-roll (whoosh approach, riser build) would start before 0. */
 export const placeSfx = (plan: SfxPlan, sr: number): PlacedCue[] => {

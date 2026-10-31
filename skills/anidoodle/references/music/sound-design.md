@@ -55,6 +55,12 @@ speaking window (K-weighted, see below). Duck is how far the score dips under it
 The impact's in-key shimmer applies only to scores the engine composes. The route for a generated or
 supplied track: `generated-tracks.md`.
 
+### Versioned effects
+
+Set `sfxVersion: 2` on a new `SfxPlan` or `renderSfx` call. Unversioned plans retain the original renderer for original kinds; cues can override their plan. Version 2 defaults to `notification:drop` and `typing:real`. The `bar` and `glass` notification variants and `mech`, `laptop`, and `soft` typing variants remain available. `typing:old` selects the legacy key tick.
+
+Additional kinds are `click`, `pop-in`, `whoosh-short`, `whoosh-long`, `dark-riser`, `cut-hit`, `sub-drop`, `typing`, `notification`, `toggle-on`, and `toggle-off`. Use `old` or `new` to select the original or physical model where supported. For kinds absent from the original kit, the old reference uses the nearest original sound. `legacy: true` selects that reference and `legacy: false` selects physical models where available. See `engine/SFX_VERSIONING.md` for details.
+
 ## Placing effects in a film
 
 Cues are addressed by **film frame**, a whole number (a fractional frame throws; to land a hit
@@ -68,6 +74,7 @@ import { filmSfx, filmAudio, composePiece, type SfxPlan } from "./music";
 import { myScore } from "./myScore";                  // the Material YOU composed for this film (compose.md)
 const score = composePiece(myScore);
 const plan: SfxPlan = {
+  sfxVersion: 2,
   fps: 30, frames: 450, score: { piece: score }, beatZeroS: 0, seed: 7,  // key, bpm, bar from the score
   cues: [
     { frame: 12, kind: "tick" },                                          // ...one per typed character

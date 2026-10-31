@@ -3,3 +3,5 @@
 export { SFX, SFX_KINDS, sfxVariants, sfxInfo, sfxDuckDb, renderSfx, validateSfx, sfxNeeds, parseKey, type SfxKind, type SfxOpts, type SfxSound } from "./sfxKit";
 export { placeSfx, sfxDuck, sfxAudibility, sfxHarshness, SFX_HARSH_CAPS, mixSfx, assertSfxAudible, filmSfx, validateSfxPlan, resolveSfxPlan, type SfxCue, type SfxPlan, type SfxSnap, type PlacedCue, type SfxAudibility, type SfxHarshOptions, type SfxHarshness, type SfxMix } from "./sfxMix";
 export { type SfxStereo } from "./sfxCore";
+export { auditSfx, hasRisingGlide, type SfxAudit } from "./sfxAudit";
+export { kWeight, winLufs } from "./sfxCore";

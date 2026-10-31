@@ -1,0 +1,24 @@
+import { strict as assert } from "node:assert";
+import { build } from "esbuild";
+const { outputFiles } = await build({ entryPoints: ["src/canvas-core/music/sfxAudit.ts"], bundle: true, write: false, format: "esm", platform: "neutral" });
+const { auditSfx, hasRisingGlide, rerollTake } = await import("data:text/javascript;base64," + Buffer.from(outputFiles[0].text).toString("base64"));
+const sr = 48000, n = sr / 2;
+const clean = Float32Array.from({ length: n }, (_, i) => Math.sin(2 * Math.PI * 400 * i / sr) * Math.sin(Math.PI * i / n) ** 2);
+const check = a => auditSfx([a, a], sr);
+assert.deepEqual(check(clean).failures, []);
+assert(check(new Float32Array(n)).failures.includes("silence"));
+const edge = clean.slice(); edge[0] = 0.1; assert(check(edge).failures.includes("edge"));
+const dc = clean.map(x => x + 0.02); assert(check(dc).failures.includes("dc"));
+const cut = clean.slice(); cut[n - 100] = 0.3; assert(check(cut).failures.includes("truncated tail"));
+const gap = clean.slice(); gap.fill(0, 5000, 5100); assert(check(gap).failures.includes("digital silence gap"));
+const click = clean.slice(); click[8000] += 1; assert(check(click).failures.includes("second-difference click"));
+assert.throws(() => auditSfx([clean, clean.slice(1)], sr), /equal/);
+const glide = new Float32Array(sr / 5); let phase = 0;
+for (let i = 0; i < glide.length; i++) { phase += 2 * Math.PI * (500 + 1000 * i / glide.length) / sr; glide[i] = Math.sin(phase); }
+assert(hasRisingGlide(glide, sr));
+assert(!hasRisingGlide(clean, sr));
+assert.equal(hasRisingGlide(new Float32Array(4), 1), false);
+const attempts=[]; const result=rerollTake(9, seed => { attempts.push(seed); return seed; }, seed => ({ok:seed===2009,failures:['test'],peak:1}));
+assert.equal(result,2009); assert.deepEqual(attempts,[9,1009,2009]);
+assert.throws(() => rerollTake(0, seed=>seed, () => ({ok:false,failures:['test'],peak:0})), /after 4 takes/);
+console.log("sfx audit unit: 13 checks passed");
