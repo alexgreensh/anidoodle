@@ -1,6 +1,6 @@
 {
   "name": "anidoodle-engine",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "type": "module",
   "description": "Portable art core + backend adapters for illustrations, animations and films drawn entirely in code.",
@@ -9,7 +9,7 @@
     "gate": "node tools/gate.mjs",
     "emit": "node tools/emit.mjs",
     "render": "node tools/render.mjs",
-    "test": "node tools/test.mjs"
+    "test": "node tools/test.mjs && node tools/sfx-audit-unit.mjs && node tools/sfx-physics-unit.mjs && node tools/sfx-models-unit.mjs && node tools/sfx-typing-real-unit.mjs && node tools/sfx-legacy-unit.mjs"
   },
   "dependencies": {
     "esbuild": "0.25.12",

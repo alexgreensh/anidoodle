@@ -221,7 +221,7 @@ const test = async () => {
 
 const [cmd, ...args] = process.argv.slice(2);
 if (cmd === "list") { const M = await load(); for (const k of M.SFX_KINDS) { const i = M.sfxInfo(k); console.log(`${k.padEnd(8)} [${i.variants.join(", ")}]  level ${i.levelLufs} LUFS(win), duck ${i.duckDb} dB\n         ${i.use}`); } }
-else if (cmd === "one") { const M = await load(), out = args.pop(), [kind, variant, seed] = args; const s = M.renderSfx(kind, { variant, seed: seed ? Number(seed) : undefined, key: process.env.KEY, bpm: process.env.BPM ? Number(process.env.BPM) : undefined }, SR); writeAudio(out, s.L, s.R); console.log(`${kind}:${s.variant} seed ${s.seed}: ${(s.L.length / SR).toFixed(2)} s, hit @ ${(s.hit / SR).toFixed(3)} s, ${s.lufs.toFixed(1)} LUFS(win)`); }
+else if (cmd === "one") { const M = await load(), out = args.pop(), [kind, variant, seed] = args; const s = M.renderSfx(kind, { variant, seed: seed ? Number(seed) : undefined, legacy: process.env.SFX_LEGACY === "1", key: process.env.KEY, bpm: process.env.BPM ? Number(process.env.BPM) : undefined }, SR); writeAudio(out, s.L, s.R); console.log(`${kind}:${s.variant} seed ${s.seed}: ${(s.L.length / SR).toFixed(2)} s, hit @ ${(s.hit / SR).toFixed(3)} s, ${s.lufs.toFixed(1)} LUFS(win)`); }
 else if (cmd === "kit" && args[0]) await kit(args[0]);
 else if (cmd === "test") await test();
 else { console.log("usage: node tools/sfx.mjs list | one <kind> [variant] [seed] <out> | kit <outdir> | test"); process.exit(cmd ? 1 : 0); }
