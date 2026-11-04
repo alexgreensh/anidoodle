@@ -31,13 +31,18 @@ const headlessShellOf = (chrome) => {
 // Prefer the browser playwright expects; otherwise the newest cached headless shell or chromium.
 export const findBrowser = (lib) => {
   try { const p = lib.chromium.executablePath(); if (p && existsSync(p)) { const shell = headlessShellOf(p); return { ok: true, executablePath: undefined, launches: shell ?? p, why: shell ? `playwright default, headless: ${shell}` : `playwright default: ${p}` }; } } catch { /* fall through */ }
-  const cache = process.env.PLAYWRIGHT_BROWSERS_PATH || join(homedir(), process.platform === "darwin" ? "Library/Caches/ms-playwright" : ".cache/ms-playwright");
+  // Playwright's default cache is %LOCALAPPDATA%\ms-playwright on Windows,
+  // ~/Library/Caches/ms-playwright on macOS and ~/.cache/ms-playwright elsewhere. Scanning the
+  // Linux path on Windows missed browsers another tool already installed. PLAYWRIGHT_BROWSERS_PATH
+  // overrides the cache ROOT (a folder of builds), never a single binary.
+  const defaultCache = process.platform === "win32" ? join(process.env.LOCALAPPDATA || join(homedir(), "AppData", "Local"), "ms-playwright") : join(homedir(), process.platform === "darwin" ? "Library/Caches/ms-playwright" : ".cache/ms-playwright");
+  const cache = process.env.PLAYWRIGHT_BROWSERS_PATH || defaultCache;
   if (!existsSync(cache)) {
     const local = remotionShell();
     return local ? { ok: true, executablePath: local, why: `remotion's own chrome-headless-shell in node_modules (no playwright cache at ${cache})` } : { ok: false, why: `no browser cache at ${cache}, and none in node_modules/.remotion` };
   }
   const dirs = readdirSync(cache).filter((d) => /^chromium(_headless_shell)?-\d+$/.test(d)).sort((a, b) => Number(b.split("-")[1]) - Number(a.split("-")[1]) || (a.includes("headless") ? -1 : 1));
-  for (const d of dirs) { const stack = [join(cache, d)]; while (stack.length) { const dir = stack.pop(); for (const e of readdirSync(dir, { withFileTypes: true })) { const f = join(dir, e.name); if (e.isDirectory() && !e.name.endsWith(".app") ? true : false) stack.push(f); else if (e.isDirectory()) stack.push(f); else if (/^(chrome-headless-shell|chrome|Chromium)$/.test(e.name)) return { ok: true, executablePath: f, why: `cached ${d} (playwright's own revision is not installed)` }; } } }
+  for (const d of dirs) { const stack = [join(cache, d)]; while (stack.length) { const dir = stack.pop(); for (const e of readdirSync(dir, { withFileTypes: true })) { const f = join(dir, e.name); if (e.isDirectory() && !e.name.endsWith(".app") ? true : false) stack.push(f); else if (e.isDirectory()) stack.push(f); else if (/^(chrome-headless-shell|chrome|Chromium)(\.exe)?$/.test(e.name)) return { ok: true, executablePath: f, why: `cached ${d} (playwright's own revision is not installed)` }; } } }
   const local = remotionShell();
   if (local) return { ok: true, executablePath: local, why: `remotion's own chrome-headless-shell in node_modules (no playwright cache at ${cache})` };
   return { ok: false, why: `no chromium build in ${cache}, and none in node_modules/.remotion` };
