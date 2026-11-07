@@ -182,14 +182,29 @@ export const importSvg = (text) => {
   const index = (n) => { if (n.attrs.id) byId.set(n.attrs.id, n); n.kids.forEach(index); }; index(svg);
   const vb = nums(svg.attrs.viewBox ?? svg.attrs.viewbox ?? ""), w = n0(svg.attrs.width, vb[2] ?? 0), h = n0(svg.attrs.height, vb[3] ?? 0);
   let root = I; if (vb.length === 4 && vb[2] && vb[3]) { const s = Math.min(w / vb[2], h / vb[3]); root = [s, 0, 0, s, -vb[0] * s + (w - vb[2] * s) / 2, -vb[1] * s + (h - vb[3] * s) / 2]; }
+  // stop-color, stop-opacity and color all inherit; a stop's colour context is where it sits in
+  // the document, not the element it paints. `color: currentColor` means the inherited colour, so
+  // it is skipped on the climb (CSS Color 3 §4.4) — it never resolves to a literal.
+  const inheritedProp = (node, key) => {
+    for (let n = node; n && n.tag !== "#root"; n = n.parent) {
+      const v = styleOf(n, classes)[key];
+      if (v == null || (key === "color" && String(v).trim().toLowerCase() === "currentcolor")) continue;
+      return v;
+    }
+    return null;
+  };
   const stopsOf = (g, seen = new Set()) => {
-    const own = g.kids.filter((k) => k.tag === "stop"); if (own.length || seen.has(g)) return own.map((s) => { const st = styleOf(s, classes); return [pct(s.attrs.offset, 0), normColor(st["stop-color"] ?? "#000"), pct(st["stop-opacity"], 1)]; });
+    const own = g.kids.filter((k) => k.tag === "stop"); if (own.length || seen.has(g)) return own.map((s) => {
+      const raw = inheritedProp(s, "stop-color") ?? "#000";
+      const c = String(raw).trim().toLowerCase() === "currentcolor" ? inheritedProp(s, "color") ?? "#000" : raw;
+      return [pct(s.attrs.offset, 0), normColor(c), pct(inheritedProp(s, "stop-opacity"), 1)];
+    });
     seen.add(g); const ref = byId.get(String(g.attrs["xlink:href"] ?? g.attrs.href ?? "").replace(/^#/, "")); return ref ? stopsOf(ref, seen) : [];
   };
-  const paint = (v, bbLocal) => {
+  const paint = (v, bbLocal, cur = "#000") => {
     if (v == null || v === "none") return null;
     const id = urlRef(v);
-    if (!id) { const c = normColor(v === "currentColor" ? "#000" : v); return c === "none" ? null : { type: "solid", c }; }
+    if (!id) { const c = normColor(String(v).trim().toLowerCase() === "currentcolor" ? cur : v); return c == null || c === "none" ? null : { type: "solid", c }; }
     const g = byId.get(id); if (!g) { warnings.add(`a fill points at #${id}, which the file does not define; drawn black`); return { type: "solid", c: "#000000" }; }
     if (g.tag === "pattern") { warnings.add(`#${id} is a pattern fill (often an embedded image); not imported, check the contact sheet`); return null; }
     const stops = stopsOf(g), obb = (g.attrs.gradientUnits ?? "objectBoundingBox") === "objectBoundingBox";
@@ -205,7 +220,12 @@ export const importSvg = (text) => {
   const visit = (node, m, inh, op, clipOuter) => {
     const t = node.tag; if (["defs", "symbol", "clipPath", "mask", "linearGradient", "radialGradient", "pattern", "style", "title", "desc", "metadata", "filter", "marker"].includes(t)) return;
     const own = styleOf(node, classes); if (own.display === "none" || own.visibility === "hidden") return;
-    const st = { ...inh }; for (const k of INHERIT) if (own[k] != null) st[k] = own[k];
+    const st = { ...inh };
+    for (const k of INHERIT) {
+      const v = own[k]; if (v == null) continue;
+      if (k === "color" && String(v).trim().toLowerCase() === "currentcolor") continue; // means the inherited colour: a no-op
+      st[k] = v;
+    }
     let mm = node.attrs.transform ? mul(m, parseTransform(node.attrs.transform)) : m, o = op * pct(own.opacity, 1);
     let clipFromMask = null;
     if (own.mask) {
@@ -231,7 +251,8 @@ export const importSvg = (text) => {
     const d = shapeToD(node); if (!d) return;
     let local; try { local = bboxOf(flatten(d)); } catch (e) { warnings.add(`skipped a ${t} with unreadable path data (${e.message})`); return; }
     const isLine = t === "line" || t === "polyline";
-    const fill = isLine ? null : paint(st.fill ?? "#000", local), stroke = paint(st.stroke, local);
+    const cur = st.color != null ? normColor(st.color) ?? "#000" : "#000";
+    const fill = isLine ? null : paint(st.fill ?? "#000", local, cur), stroke = paint(st.stroke, local, cur);
     if (!fill && !stroke) return;
     const subs = flatten(d, mm), bb = bboxOf(subs), sw = n0(st["stroke-width"], 1) * Math.sqrt(Math.abs(mm[0] * mm[3] - mm[1] * mm[2]));
     const part = { d, fill: fill ?? { type: "none" }, rule: st["fill-rule"] === "evenodd" ? "evenodd" : "nonzero", op: round(o * pct(st["fill-opacity"], 1)), bb: (stroke ? [bb[0] - sw / 2, bb[1] - sw / 2, bb[2] + sw, bb[3] + sw] : bb).map(round) };
@@ -240,7 +261,11 @@ export const importSvg = (text) => {
     if (clip) part.clip = clip;
     parts.push(part);
   };
-  svg.kids.forEach((k) => visit(k, root, {}, 1, null));
+  // the root <svg> is an element too: its fill, colour, opacity, clip and display reach its children.
+  // Its own transform sits OUTSIDE the viewBox fold (it moves the rendered element, not the content),
+  // so it is composed into the matrix handed in and stripped from the node the walk sees.
+  const rootM = svg.attrs.transform ? mul(parseTransform(svg.attrs.transform), root) : root;
+  visit(svg.attrs.transform ? { ...svg, attrs: { ...svg.attrs, transform: undefined } } : svg, rootM, {}, 1, null);
   return { w, h, parts, fonts: [...fonts], warnings: [...warnings] };
 };
 const round6 = (v) => Math.round(v * 1e6) / 1e6;

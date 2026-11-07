@@ -48,6 +48,32 @@ export const run = (ok: (cond: boolean, label: string) => void) => {
   let notSvg = ""; try { importSvg("<html></html>"); } catch (e) { notSvg = String(e); }
   ok(/no <svg>/.test(notSvg), "NEGATIVE: a file with no <svg> is refused");
 
+  // ---- the root <svg> is an element too: its fill, colour, opacity and display reach its children (issue #16)
+  const rootFill = importSvg(`<svg width="100" height="40" fill="#635bff"><path d="M0 0h50v40H0z"/><path d="M60 0h40v40H60z" fill="#0a2540"/></svg>`);
+  ok(rootFill.parts[0].fill.c === "#635bff" && rootFill.parts[1].fill.c === "#0a2540", "a fill on the root <svg> passes down to a child with no fill of its own, and the child's own fill still wins");
+  const linear = importSvg(`<svg width="13" height="13" viewBox="0 0 100 100" fill="#E2E4E6" color="#E2E4E6"><path d="M12.9 16.4a1.5 1.5 0 0 0 .1 2l20 20H50V10z"/></svg>`);
+  ok(linear.parts[0].fill.c === "#e2e4e6", "a brand mark whose colour lives only on the root (Linear's logomark is exported this way) keeps it");
+  const cc = importSvg(`<svg width="24" height="24" color="#1DBF73"><path d="M2 2h20v20H2z" fill="currentColor"/><g color="#ff385c"><path d="M4 4h4v4H4z" fill="currentColor"/></g></svg>`);
+  ok(cc.parts[0].fill.c === "#1dbf73" && cc.parts[1].fill.c === "#ff385c", "currentColor resolves to the nearest inherited colour, not black");
+  const ccNone = importSvg(`<svg width="24" height="24"><path d="M2 2h20v20H2z" fill="currentColor"/></svg>`);
+  ok(ccNone.parts[0].fill.c === "#000000", "currentColor with no colour anywhere is the initial value, as a browser draws the standalone file");
+  const ccCirc = importSvg(`<svg width="24" height="24" color="currentColor"><path d="M2 2h20v20H2z" fill="currentColor"/></svg>`);
+  ok(ccCirc.parts[0].fill.c === "#000000", "RED: color=currentColor is a no-op (it means the inherited colour), never a literal that bends the fill");
+  const ccStroke = importSvg(`<svg width="24" height="24" color="#123abc"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>`);
+  ok(ccStroke.parts[0].stroke.paint.c === "#123abc", "currentColor resolves in strokes too");
+  const ccCase = importSvg(`<svg width="24" height="24" color="#ABCDEF"><path d="M0 0h4v4H0z" fill="CURRENTCOLOR"/></svg>`);
+  ok(ccCase.parts[0].fill.c === "#abcdef", "currentColor is case-insensitive, as every CSS keyword is");
+  const ccUse = importSvg(`<svg width="24" height="24"><defs><path id="p" d="M0 0h10v10H0z" fill="currentColor"/></defs><use href="#p" color="#f0a"/></svg>`);
+  ok(ccUse.parts[0].fill.c === "#ff00aa", "a <use> shadow tree takes its currentColor from the <use>, as the cascade says");
+  const ccStop = importSvg(`<svg width="10" height="10" color="#00c853"><defs><linearGradient id="g"><stop offset="0" stop-color="currentColor"/><stop offset="1" stop-color="#000"/></linearGradient></defs><rect width="10" height="10" fill="url(#g)"/></svg>`);
+  ok(ccStop.parts[0].fill.stops[0][1] === "#00c853", "currentColor in a gradient stop resolves against the stop's own tree, never the string 'currentcolor' in the palette");
+  const stopInherit = importSvg(`<svg width="10" height="10"><defs><linearGradient id="g" stop-color="#123456" stop-opacity=".5"><stop offset="0"/><stop offset="1" stop-color="#000"/></linearGradient></defs><rect width="10" height="10" fill="url(#g)"/></svg>`);
+  ok(stopInherit.parts[0].fill.stops[0][1] === "#123456" && stopInherit.parts[0].fill.stops[0][2] === 0.5, "stop-color and stop-opacity themselves inherit (a bare stop takes the gradient's)");
+  const rootHidden = importSvg(`<svg width="10" height="10" display="none"><rect width="10" height="10" fill="#f00"/></svg>`);
+  ok(rootHidden.parts.length === 0, "display:none on the root imports nothing, as the file renders nothing");
+  const rootFaded = importSvg(`<svg width="10" height="10" opacity="0.5"><rect width="10" height="10" fill="#f00"/></svg>`);
+  ok(rootFaded.parts[0].op === 0.5, "opacity on the root multiplies every part, as the group opacity does");
+
   // ---- what the marks can do in motion
   const hg = importSvg(HOURGLASS), ell = importSvg(ELL);
   ok(symmetry(hg).rotational === 2, `the hourglass is the same after a half turn, so it can land from a spin without a jump (${JSON.stringify(symmetry(hg))})`);
