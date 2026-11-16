@@ -2,11 +2,12 @@
 // which has no copy of the engine's src/. Every engine file a tool reads must come through enginePath,
 // or the tool looks in the project folder and fails. render.mjs once built the loudness meter from
 // resolve("src/canvas-core/music/meter.ts") and could not find it in a linked project.
-const fsModule = "node:fs", cpModule = "node:child_process", osModule = "node:os", pathModule = "node:path";
+const fsModule = "node:fs", cpModule = "node:child_process", osModule = "node:os", pathModule = "node:path", urlModule = "node:url";
 const { readFileSync, mkdtempSync, rmSync, existsSync } = await import(fsModule);
 const { spawnSync } = await import(cpModule);
 const { tmpdir } = await import(osModule);
 const { join, resolve } = await import(pathModule);
+const { pathToFileURL } = await import(urlModule);
 
 export const name = "linked projects find the engine's files (enginePath)";
 export function run(ok: (cond: boolean, label: string) => void) {
@@ -18,7 +19,7 @@ export function run(ok: (cond: boolean, label: string) => void) {
   // 2. run from an empty project folder, enginePath still lands on the engine's meter
   const engine = resolve("."), project = mkdtempSync(join(tmpdir(), "anidoodle-linked-"));
   try {
-    const script = `import(${JSON.stringify(join(engine, "tools/overlay.mjs"))}).then((m) => console.log(m.enginePath("src/canvas-core/music/meter.ts")))`;
+    const script = `import(${JSON.stringify(pathToFileURL(join(engine, "tools/overlay.mjs")).href)}).then((m) => console.log(m.enginePath("src/canvas-core/music/meter.ts")))`;
     const r = spawnSync(process.execPath, ["--input-type=module", "-e", script], { cwd: project, encoding: "utf8" });
     const got = String(r.stdout).trim();
     ok(r.status === 0, `enginePath runs from a project folder (exit ${r.status}${r.stderr ? `: ${String(r.stderr).trim().split("\n")[0]}` : ""})`);
